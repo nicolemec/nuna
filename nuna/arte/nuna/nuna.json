@@ -1,0 +1,27 @@
+{ "frames": [
+   {
+	"filename": "nuna-Sheet.aseprite",
+	"frame": { "x": 0, "y": 0, "w": 552, "h": 24 },
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": { "x": 0, "y": 0, "w": 552, "h": 24 },
+	"sourceSize": { "w": 552, "h": 24 },
+	"duration": 100
+   }
+ ],
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.7-x64",
+  "image": "nuna.png",
+  "format": "RGBA8888",
+  "size": { "w": 552, "h": 24 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

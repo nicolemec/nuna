@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://def3g2tiffqfp"]
+
+[ext_resource type="Script" uid="uid://d3kqul5vpyft7" path="res://escenas/personajes/nuna.gd" id="1_5eje1"]
+
+[node name="Nuna" type="Node2D" unique_id=1240942188]
+script = ExtResource("1_5eje1")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="." unique_id=161474508]
+position = Vector2(0, -12)

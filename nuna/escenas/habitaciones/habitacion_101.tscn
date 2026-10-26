@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://c2dpfcsa8weeo"]
+
+[ext_resource type="Script" uid="uid://fbnq8uueh7xp" path="res://escenas/habitaciones/habitacion_101.gd" id="1_caf1n"]
+[ext_resource type="PackedScene" uid="uid://def3g2tiffqfp" path="res://escenas/personajes/nuna.tscn" id="2_caf1n"]
+[ext_resource type="Script" uid="uid://dex3oo8cibgpy" path="res://escenas/habitaciones/ui.gd" id="3_orpp7"]
+
+[node name="Habitacion101" type="Node2D" unique_id=1662661855]
+script = ExtResource("1_caf1n")
+
+[node name="Pared" type="ColorRect" parent="." unique_id=296929482]
+offset_right = 320.0
+offset_bottom = 118.0
+mouse_filter = 2
+color = Color(0.5354209, 0.5354209, 0.5354209, 1)
+
+[node name="Piso" type="ColorRect" parent="." unique_id=785037153]
+offset_top = 118.0
+offset_right = 320.0
+offset_bottom = 152.0
+mouse_filter = 2
+color = Color(0.30544624, 0.3054462, 0.3054462, 1)
+
+[node name="FranjaUI" type="ColorRect" parent="." unique_id=403885027]
+offset_top = 152.0
+offset_right = 320.0
+offset_bottom = 180.0
+mouse_filter = 2
+color = Color(0.10524041, 0.10524041, 0.1052404, 1)
+
+[node name="Marcador" type="ColorRect" parent="." unique_id=680735719]
+offset_right = 3.0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(0.97529536, 0.97529536, 0.97529536, 1)
+
+[node name="Nuna" parent="." unique_id=1240942188 instance=ExtResource("2_caf1n")]
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=912331280]
+script = ExtResource("3_orpp7")
