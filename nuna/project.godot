@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="nuna"
-run/main_scene="uid://c2dpfcsa8weeo"
+run/main_scene="uid://dhxqbevp83mq6"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="uid://d3gij45olflq7"
 
