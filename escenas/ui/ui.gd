@@ -21,6 +21,8 @@ const ACCIONES: Array[StringName] = [&"mirar", &"agarrar", &"perturbar"]
 var _linea: Label
 var _letra_chica: Label
 var _texto_base: String = ""
+## Texto de la consola cuando no hay nada seleccionado; la habitación lo va cambiando según el progreso.
+var _texto_guia: String = TEXTO_EXPLORACION
 var _texto_hover: String = ""
 var _botones: Dictionary = {}
 var _prefijos_opciones: Dictionary = {}
@@ -73,7 +75,7 @@ func mostrar_accion(texto: String) -> void:
 func mostrar_exploracion() -> void:
 	_hay_objeto_seleccionado = false
 	_acciones_disponibles.clear()
-	_texto_base = TEXTO_EXPLORACION
+	_texto_base = _texto_guia
 	_texto_hover = ""
 	_linea.visible = true
 	_letra_chica.visible = false
@@ -81,6 +83,14 @@ func mostrar_exploracion() -> void:
 	_actualizar_layout_consola()
 	_refrescar_linea()
 	_actualizar_opciones()
+
+
+## Cambia la pista de la consola (lo que se ve cuando no hay objeto seleccionado).
+func establecer_guia(texto: String) -> void:
+	_texto_guia = texto
+	if not _hay_objeto_seleccionado and not _certificacion_activa and not _dialogo_activo:
+		_texto_base = _texto_guia
+		_refrescar_linea()
 
 
 func mostrar_objeto(
@@ -159,7 +169,7 @@ func mostrar_certificacion(
 		_refrescar_linea()
 	else:
 		_verbos.visible = false
-		_texto_base = TEXTO_EXPLORACION
+		_texto_base = _texto_guia
 		_refrescar_linea()
 	_actualizar_layout_consola()
 	_actualizar_opciones()
@@ -172,7 +182,7 @@ func _finalizar_dialogo_diferido(id: int) -> void:
 	_id_dialogo_actual = -1
 	_letra_chica.visible = false
 	if not _hay_objeto_seleccionado:
-		_texto_base = TEXTO_EXPLORACION
+		_texto_base = _texto_guia
 	_refrescar_linea()
 	_actualizar_layout_consola()
 	_actualizar_opciones()
