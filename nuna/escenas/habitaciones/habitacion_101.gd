@@ -5,27 +5,74 @@ extends Node2D
 @onready var nuna: Nuna = $Nuna
 @onready var marcador: ColorRect = $Marcador
 @onready var ui: InterfazUI = $UI
+@onready var huesped: Huesped101 = get_node_or_null("Cama") as Huesped101
 
 var objeto_pendiente: ObjetoInteractivo = null  # el objeto hacia el que va Nuna
 var verbo_pendiente: StringName = &""
+var ocupado: bool = false
+var cortina_bailando: bool = false
+var sombra_gigante_activada: bool = false
+var _entrada_en_progreso: bool = false
 
 
 func _ready() -> void:
 	marcador.visible = false
+	if huesped == null:
+		push_warning("El nodo 'Cama' no tiene asignado el script Huesped101; las reacciones visuales no se conectarán.")
 	nuna.llego.connect(_on_nuna_llego)
+	nuna.dialogo_solicitado.connect(ui.mostrar_dialogo)
+	nuna.dialogo_finalizado.connect(ui.finalizar_dialogo)
+	for nodo in get_tree().get_nodes_in_group("interactivos"):
+		var obj := nodo as ObjetoInteractivo
+		if obj != null:
+			obj.mirado.connect(_on_objeto_mirado)
+			obj.perturbado.connect(_on_objeto_perturbado)
+			obj.agarrado.connect(_on_objeto_agarrado)
+			if obj is Lumi:
+				var lumi := obj as Lumi
+				lumi.combo_sombra_activado.connect(_on_combo_sombra_activado)
+				if huesped != null:
+					lumi.susto_chico.connect(huesped.temblar)
+					lumi.fogonazo_realizado.connect(huesped.asustarse)
+			elif obj is Ramon and huesped != null:
+				var ramon := obj as Ramon
+				# Reacción temporal para probar el feedback visual antes de tener el dial.
+				ramon.comenzo_a_sonar.connect(huesped.temblar)
+	ocupado = true
+	GameState.pausado = true
+	_entrada_en_progreso = true
+	call_deferred("_reproducir_entrada")
 
 
 func _process(_delta: float) -> void:
-	# Línea de acción: "Mirar lámpara", "Perturbar Lumi"...
-	var texto: String = GameState.NOMBRES_VERBOS[GameState.verbo_actual]
-	var obj: ObjetoInteractivo = _objeto_en(get_global_mouse_position())
-	if obj != null:
-		texto += " " + obj.nombre_visible()
+	var punto: Vector2 = get_global_mouse_position()
+	var texto := ""
+	if punto.y < Ajustes.UI_Y:
+		var obj: ObjetoInteractivo = _objeto_en(punto)
+		if obj != null:
+			texto = GameState.NOMBRES_VERBOS[GameState.verbo_actual] + " " + obj.nombre_visible()
 	ui.mostrar_accion(texto)
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if ocupado:
+		return
+	# --- Teclas de prueba (se borran más adelante) ---
+	var tecla := event as InputEventKey
+	if tecla != null and tecla.pressed and not tecla.echo:
+		if tecla.keycode == KEY_1:
+			GameState.sumar_sello()
+		elif tecla.keycode == KEY_2:
+			GameState.cambiar_bruma(-10.0)
+		elif tecla.keycode == KEY_3:
+			GameState.cambiar_bruma(10.0)
+		return
+
 	var boton := event as InputEventMouseButton
+	# Clic derecho: muestra la coordenada en Salida (para medir el fondo)
+	if boton != null and boton.pressed and boton.button_index == MOUSE_BUTTON_RIGHT:
+		print("Coordenada: ", get_global_mouse_position().round())
+		return
 	if boton == null or not boton.pressed or boton.button_index != MOUSE_BUTTON_LEFT:
 		return
 
@@ -35,12 +82,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	var obj: ObjetoInteractivo = _objeto_en(clic)
 	if obj != null:
-		# Clic en un objeto: Nuna va hasta él y, al llegar, usa el verbo
+		ocupado = true
 		objeto_pendiente = obj
 		verbo_pendiente = GameState.verbo_actual
 		_mover_nuna(obj.punto_de_uso())
 	else:
-		# Clic en el piso o la pared: solo moverse
 		objeto_pendiente = null
 		var destino := Vector2(
 			clampf(clic.x, Ajustes.LIMITE_X_MIN, Ajustes.LIMITE_X_MAX),
@@ -56,22 +102,105 @@ func _mover_nuna(destino: Vector2) -> void:
 
 
 func _on_nuna_llego() -> void:
+	if _entrada_en_progreso:
+		return
 	marcador.visible = false
 	if objeto_pendiente == null:
 		return
 	var obj: ObjetoInteractivo = objeto_pendiente
 	objeto_pendiente = null
-	nuna.mirar_a(obj.global_position.x)
-	nuna.interactuar()
-	var frase: String = obj.ejecutar(verbo_pendiente)
-	nuna.decir(frase)
+	nuna.mirar_a(obj.global_position)
+	await nuna.interactuar()
+	if obj is Lumi:
+		var lumi := obj as Lumi
+		var frases: Array[String] = lumi.resolver_accion(verbo_pendiente, cortina_bailando)
+		for i in range(frases.size()):
+			await nuna.decir(frases[i])
+			if lumi.mostrar_etiqueta_despues_de_frase(i):
+				ui.mostrar_etiqueta_lumi()
+		if lumi.cerrar_etiqueta():
+			ui.ocultar_etiqueta_lumi()
+		lumi.completar_dialogo()
+		await lumi.esperar_bloqueo()
+	else:
+		var frase: String = obj.ejecutar(verbo_pendiente)
+		await nuna.decir(frase)
+	ocupado = false
+
+
+func _reproducir_entrada() -> void:
+	objeto_pendiente = null
+	verbo_pendiente = &""
+	marcador.visible = false
+
+	var marcador_entrada := get_node_or_null("EntradaNuna") as Marker2D
+	var marcador_inicio := get_node_or_null("InicioNuna") as Marker2D
+	var posicion_entrada: Vector2 = nuna.global_position
+	if marcador_entrada != null:
+		posicion_entrada = marcador_entrada.global_position
+	else:
+		push_warning("Falta el Marker2D 'EntradaNuna'; se usará la posición actual de Nuna.")
+
+	var posicion_inicio: Vector2 = posicion_entrada + Vector2(35.0, 0.0)
+	if marcador_inicio != null:
+		posicion_inicio = marcador_inicio.global_position
+	else:
+		push_warning("Falta el Marker2D 'InicioNuna'; se usará EntradaNuna + Vector2(35, 0).")
+
+	var puerta := get_node_or_null("Puerta") as PuertaAnimada
+	nuna.visible = false
+	if puerta != null:
+		puerta.mostrar_cerrada()
+		await puerta.abrir()
+	else:
+		push_warning("El nodo 'Puerta' no tiene asignado el script PuertaAnimada.")
+
+	nuna.global_position = posicion_entrada
+	nuna.visible = true
+	nuna.ir_a(posicion_inicio)
+	await nuna.llego
+	nuna.volver_a_reposo_frontal()
+
+	if puerta != null:
+		await puerta.cerrar()
+	await nuna.decir("Los profesionales entran por la puerta, ¿no?")
+	_finalizar_entrada()
+
+
+func _finalizar_entrada() -> void:
+	_entrada_en_progreso = false
+	ocupado = false
+	GameState.pausado = false
+	nuna.visible = true
+
+
+func _on_objeto_agarrado(obj: ObjetoInteractivo) -> void:
+	GameState.agregar_objeto(obj.id, obj.nombre)
+
+
+func _on_objeto_mirado(_obj: ObjetoInteractivo) -> void:
+	pass
+
+
+func _on_objeto_perturbado(_obj: ObjetoInteractivo) -> void:
+	pass
+
+
+func _on_combo_sombra_activado() -> void:
+	sombra_gigante_activada = true
+	GameState.llenar_vela(Ajustes.LUMI_HABITACION_ID)
 
 
 ## Devuelve el objeto que está bajo el punto, o null si no hay ninguno.
 func _objeto_en(punto: Vector2) -> ObjetoInteractivo:
 	var lista: Array[Node] = get_tree().get_nodes_in_group("interactivos")
-	for i in range(lista.size() - 1, -1, -1):  # de atrás hacia adelante: gana el de arriba
+	var objeto_mas_chico: ObjetoInteractivo = null
+	var area_menor: float = INF
+	for i in range(lista.size() - 1, -1, -1):
 		var o := lista[i] as ObjetoInteractivo
 		if o != null and o.contiene(punto):
-			return o
-	return null
+			var area: float = o.tamano.x * o.tamano.y
+			if area < area_menor:
+				area_menor = area
+				objeto_mas_chico = o
+	return objeto_mas_chico
