@@ -5,33 +5,52 @@ class_name Ajustes
 # --- Nuna: movimiento ---
 const NUNA_VELOCIDAD: float = 70.0        # píxeles por segundo
 const NUNA_DISTANCIA_LLEGADA: float = 1.0 # a menos de esto, consideramos que llegó
-const NUNA_FLOTE_ALTURA: float = 1.0      # cuántos píxeles sube y baja al flotar
+const NUNA_FLOTE_ALTURA: float = 1.5      # cuántos píxeles sube y baja al flotar
 const NUNA_FLOTE_VELOCIDAD: float = 3.0   # qué tan rápido sube y baja
+const NUNA_UMBRAL_ORIENTACION: float = 0.5
+const NUNA_DORMIR_SEGUNDOS: float = 2.0
 
 # ¿Hacia dónde mira Nuna en el dibujo de Lorena? true = derecha
 const NUNA_SPRITE_MIRA_A_LA_DERECHA: bool = true
 
 # --- Nuna: animaciones ---
-# Son los nombres EXACTOS de las etiquetas de Aseprite.
-# Si una etiqueta cambia de nombre, solo se cambia aquí.
-const ANIM_QUIETO: StringName = &"cuerpo"
-const ANIM_MOVIENDO: StringName = &"cuerpo"         # probar con &"mini salto"
-const ANIM_INTERACTUAR: StringName = &"interacciones"
-const ANIM_DORMIR: StringName = &"dormiditu"
-# Animaciones que se reproducen una vez y se detienen (no se repiten).
-const ANIMS_SIN_LOOP: Array = ["mini salto", "interacciones", "dormiditu"]
+const ANIM_FLOTA_FRENTE: StringName = &"flota_frente"
+const ANIM_FLOTA_DERECHA: StringName = &"flota_derecha"
+const ANIM_FLOTA_ESPALDA: StringName = &"flota_espalda"
+const ANIM_MINI_SALTO: StringName = &"mini_salto_frente"
+const ANIM_INTERACTUA_FRENTE: StringName = &"interactua_frente"
+const ANIM_INTERACTUA_LATERAL: StringName = &"interactua_lateral"
+# Estas animaciones se reproducen una vez.
+const ANIMS_SIN_LOOP: Array = [
+	"mini_salto_frente",
+	"interactua_frente",
+	"interactua_lateral",
+]
 
 # --- Nuna: cómo cortar la tira nuna.png ---
 const NUNA_FRAME_ANCHO: int = 24
 const NUNA_FRAME_ALTO: int = 24
-const NUNA_FPS: float = 10.0   # 100 ms por frame
+const NUNA_FPS: float = 10.0
 
-# Etiquetas: "nombre": [primer frame, último frame]. El primer frame es el 0.
 const NUNA_ETIQUETAS: Dictionary = {
-	"cuerpo": [0, 7],
-	"mini salto": [8, 13],
-	"interacciones": [14, 21],
-	"dormiditu": [22, 22],
+	"flota_frente": [0, 1],
+	"flota_derecha": [2, 4],
+	"flota_espalda": [5, 6],
+	"mini_salto_frente": [7, 10],
+	"interactua_frente": [11, 13],
+	"interactua_lateral": [14, 16],
+	"flota_rapido": [17, 19],
+}
+
+# Duración exportada por cuadro, en milisegundos.
+const NUNA_DURACIONES_MS: Dictionary = {
+	"flota_frente": [250, 250],
+	"flota_derecha": [180, 180, 180],
+	"flota_espalda": [250, 250],
+	"mini_salto_frente": [120, 120, 200, 200],
+	"interactua_frente": [120, 120, 200],
+	"interactua_lateral": [120, 100, 120],
+	"flota_rapido": [150, 100, 150],
 }
 
 # --- Habitación: zona donde Nuna puede flotar ---
@@ -40,6 +59,48 @@ const PISO_Y_MAX: float = 148.0   # lo más "adelante" que puede ir
 const LIMITE_X_MIN: float = 12.0
 const LIMITE_X_MAX: float = 308.0
 const UI_Y: float = 152.0         # desde aquí hacia abajo está la interfaz
+const UI_LINEA_Y: float = UI_Y
+const UI_LINEA_ALTO: float = 12.0
+const UI_CONTROLES_Y: float = UI_LINEA_Y + UI_LINEA_ALTO
+const UI_CONTROLES_ALTO: float = 16.0
+
+# --- Lumi: prueba de certificación ---
+const LUMI_COSTO_PERTURBAR_BRUMA: float = 5.0
+const LUMI_RECOMPENSA_BRUMA_NIVEL: float = 10.0
+const LUMI_RECOMPENSA_VELA_NIVEL: float = 10.0
+const LUMI_RECOMPENSA_VELA_FOGONAZO: float = 25.0
+const LUMI_COSTO_BRUMA_FOGONAZO: float = 10.0
+const LUMI_BLOQUEO_CLICS_SEGUNDOS: float = 1.5
+const LUMI_DURACION_QUEMADA_SEGUNDOS: float = 20.0
+const LUMI_HABITACION_ID: StringName = &"habitacion_101"
+const VELA_MAXIMA: float = 100.0
+const BRUMA_RECOMPENSA_SELLO: float = 10.0
+const BRUMA_GOTEO_INTERVALO_SEGUNDOS: float = 5.0
+const BRUMA_GOTEO_CANTIDAD: float = 1.0
+const LUMI_RUTA_TIRA: String = "res://arte/objetos/lampara_base.png"
+const LUMI_FRAME_ANCHO: int = 25
+const LUMI_FRAME_ALTO: int = 30
+const LUMI_FPS_BASE: float = 10.0
+const LUMI_FPS_SUBE: float = 8.33
+const LUMI_FPS_NIVEL_3: float = 2.86
+const LUMI_FPS_FOGONAZO: float = 10.0
+const LUMI_FPS_QUEMADA: float = 6.67
+const LUMI_SPRITE_OFFSET: Vector2 = Vector2(0.5, -6.0)
+const LUMI_ETIQUETAS: Dictionary = {
+	"apagada": [0, 0],
+	"sube": [1, 4],
+	"nivel_1": [5, 5],
+	"nivel_2": [6, 6],
+	"nivel_3": [7, 8],
+	"cuidada": [9, 9],
+	"fogonazo": [10, 14],
+	"quemada": [15, 17],
+}
+const LUMI_ANIMACIONES_SIN_LOOP: Array = ["sube", "fogonazo", "quemada"]
+const LUMI_ETIQUETA_POSICION: Vector2 = Vector2(64.0, 55.0)
+const LUMI_ETIQUETA_TAMANO: Vector2 = Vector2(192.0, 38.0)
+const LUMI_ETIQUETA_TAMANO_TEXTO: int = 8
+const LUMI_ETIQUETA_TAMANO_LETRA_CHICA: int = 6
 
 ## Corta una tira horizontal (PNG) en frames iguales y arma las animaciones
 ## a partir de un diccionario: {"nombre": [desde, hasta]}. No necesita JSON.
