@@ -22,6 +22,13 @@ var _interaccion_lateral: bool = false
 
 var _id_dialogo: int = 0
 var _aviso_dialogo_sin_ui: bool = false
+var _dialogo_en_curso: bool = false
+var _saltar_dialogo: bool = false
+
+## Tiempo de lectura: base + por letra, para que las frases largas se alcancen a leer.
+const DIALOGO_SEGUNDOS_MIN: float = 2.0
+const DIALOGO_SEGUNDOS_POR_LETRA: float = 0.055
+const DIALOGO_SEGUNDOS_ANTES_DE_SALTAR: float = 0.4
 
 
 func _ready() -> void:
@@ -114,8 +121,9 @@ func dormir() -> void:
 	_volver_a_reposo_frontal()
 
 
-## Solicita un diálogo a la UI y espera su duración habitual.
-func decir(texto: String, segundos: float = 2.5) -> void:
+## Solicita un diálogo a la UI y espera a que se lea.
+## Dura según el largo del texto; con clic, Enter o Espacio se pasa a la siguiente.
+func decir(texto: String, segundos: float = -1.0) -> void:
 	if texto == "":
 		return
 	_id_dialogo += 1
@@ -130,11 +138,33 @@ func decir(texto: String, segundos: float = 2.5) -> void:
 	else:
 		dialogo_solicitado.emit(texto, mi_id)
 
-	await get_tree().create_timer(segundos).timeout
+	if segundos < 0.0:
+		segundos = maxf(DIALOGO_SEGUNDOS_MIN, texto.length() * DIALOGO_SEGUNDOS_POR_LETRA)
+	_dialogo_en_curso = true
+	_saltar_dialogo = false
+	var transcurrido: float = 0.0
+	while transcurrido < segundos:
+		await get_tree().process_frame
+		transcurrido += get_process_delta_time()
+		if _saltar_dialogo and transcurrido >= DIALOGO_SEGUNDOS_ANTES_DE_SALTAR:
+			break
+		_saltar_dialogo = false
+	if mi_id == _id_dialogo:
+		_dialogo_en_curso = false
 	dialogo_finalizado.emit(mi_id)
 
 	if mi_id == _id_dialogo:
 		GameState.pausado = pausa_previa
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not _dialogo_en_curso:
+		return
+	var boton := event as InputEventMouseButton
+	var es_clic: bool = boton != null and boton.pressed and boton.button_index == MOUSE_BUTTON_LEFT
+	if es_clic or event.is_action_pressed(&"ui_accept"):
+		_saltar_dialogo = true
+		get_viewport().set_input_as_handled()
 
 
 func _process(delta: float) -> void:

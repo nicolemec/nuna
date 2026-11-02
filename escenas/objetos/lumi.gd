@@ -85,7 +85,7 @@ func obtener_frases_mirar() -> Array[String]:
 			if not mirada_inicial:
 				mirada_inicial = true
 				_certificacion_pendiente = true
-				return ["¡Hola, Lumi!"]
+				return ["¡Hola, lámpara! Te llamaré Lumi.", "¿Nunca se apagan? ¡Hay que encenderla!"]
 			return ["Lumi está apagadita."]
 		Estado.NIVEL_1:
 			return ["Tiene algo grabado… no llego a leerlo."]
@@ -132,7 +132,7 @@ func obtener_frases_perturbar(cortina_bailando: bool) -> Array[String]:
 			_aplicar_recompensa_nivel(Estado.NIVEL_2)
 			_bloquear_clics()
 			_reproducir_animacion(&"sube")
-			return ["¡Más brillo!"]
+			return ["¡Más brillo! ¡Más rendimiento!"]
 		Estado.NIVEL_2:
 			estado = Estado.NIVEL_3
 			susto_chico.emit()

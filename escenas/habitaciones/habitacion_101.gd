@@ -14,6 +14,26 @@ var ocupado: bool = false
 var cortina_bailando: bool = false
 var sombra_gigante_activada: bool = false
 var _entrada_en_progreso: bool = false
+var _intentos_ramon: int = 0
+var _saltos_ventana: int = 0
+
+const PREFIJO_DIN: String = "DIN: "
+const ORDEN_TRABAJO: String = "Orden de trabajo: asusta a la huésped y gana 3 sellos."
+const ORDEN_LETRA_CHICA: String = "(Horas extra no remuneradas.)"
+const VELA_RAMON: float = 20.0
+const VELA_CORTINA: float = 15.0
+## Primera mirada: Nuna bautiza al objeto antes de su frase de siempre.
+const BAUTISMOS: Dictionary = {
+	&"radio": "¡Hola, radio! Te llamaré Ramón.",
+	&"ventana": "¡Hola, cortina! Te llamaré Doña Cortina.",
+	&"ovillo": "¡Hola, ovillo! Te llamaré Ovi.",
+}
+const FRASES_PROGRESO: Array[String] = [
+	"",
+	"¡Sello uno! Faltan dos.",
+	"¡Dos de tres! ¡Ya casi!",
+	"¡Tres sellos! ¡Ya soy casi profesional!",
+]
 
 
 func _ready() -> void:
@@ -42,6 +62,7 @@ func _ready() -> void:
 				var ramon := obj as Ramon
 				# Reacción temporal para probar el feedback visual antes de tener el dial.
 				ramon.comenzo_a_sonar.connect(huesped.temblar)
+	_crear_lista_tareas()
 	ocupado = true
 	GameState.pausado = true
 	_entrada_en_progreso = true
@@ -128,9 +149,14 @@ func _on_nuna_llego() -> void:
 		_cancelar_seleccion()
 		return
 	objeto_pendiente = null
+	var sellos_antes: int = GameState.sellos
 	nuna.mirar_a(obj.global_position)
 	await nuna.interactuar()
-	if obj is Lumi:
+	if obj is Ramon and verbo_pendiente == GameState.PERTURBAR and obj.nombrado:
+		await _perturbar_ramon(obj as Ramon)
+	elif obj is VentanaAnimada and obj.nombrado and (verbo_pendiente == GameState.PERTURBAR or GameState.tiene(&"ovillo")):
+		await _perturbar_ventana(obj as VentanaAnimada)
+	elif obj is Lumi:
 		var lumi := obj as Lumi
 		var frases: Array[String] = lumi.resolver_accion(verbo_pendiente, cortina_bailando)
 		for i in range(frases.size()):
@@ -143,9 +169,19 @@ func _on_nuna_llego() -> void:
 		lumi.completar_dialogo()
 		await lumi.esperar_bloqueo()
 	else:
+		if verbo_pendiente == GameState.MIRAR and not obj.nombrado and BAUTISMOS.has(obj.id):
+			await nuna.decir(BAUTISMOS[obj.id])
 		var frase: String = obj.ejecutar(verbo_pendiente)
 		await nuna.decir(frase)
+		if obj.id == &"ovillo" and GameState.tiene(&"ovillo"):
+			await nuna.decir("¡Contigo llego a la ventana, Ovi!")
+			_brillar(get_node_or_null("Ventana"))
+	if GameState.sellos > sellos_antes and GameState.sellos < FRASES_PROGRESO.size():
+		await nuna.decir(FRASES_PROGRESO[GameState.sellos])
+		if GameState.sellos >= GameState.SELLOS_TOTALES:
+			await _mision_cumplida()
 	ocupado = false
+	_actualizar_guia()
 	if _seleccion_es_valida():
 		_mostrar_contexto_seleccionado()
 	else:
@@ -190,6 +226,10 @@ func _reproducir_entrada() -> void:
 	if puerta != null:
 		await puerta.cerrar()
 	await nuna.decir("Los profesionales entran por la puerta, ¿no?")
+	# La orden de trabajo usa el mismo panel que las etiquetas: promesa arriba, letra chica abajo.
+	await ui.mostrar_certificacion(ORDEN_TRABAJO, ORDEN_LETRA_CHICA)
+	await _decir_din("¡A asustar, equipo! ♥")
+	await nuna.decir("¡Tres sellos y soy profesional!")
 	_finalizar_entrada()
 
 
@@ -199,6 +239,7 @@ func _finalizar_entrada() -> void:
 	GameState.pausado = false
 	nuna.visible = true
 	ui.establecer_acciones_habilitadas(true)
+	_actualizar_guia()
 
 
 func _mostrar_contexto_seleccionado() -> void:
@@ -257,6 +298,122 @@ func _on_objeto_perturbado(_obj: ObjetoInteractivo) -> void:
 func _on_combo_sombra_activado() -> void:
 	sombra_gigante_activada = true
 	GameState.llenar_vela(Ajustes.LUMI_HABITACION_ID)
+
+
+## Prueba 2 (versión prototipo): Ramón arranca al segundo intento.
+func _perturbar_ramon(ramon: Ramon) -> void:
+	if GameState.sellos_obtenidos.has(&"ramon"):
+		await nuna.decir("Ramón ya cantó su parte.")
+		return
+	GameState.iniciar_goteo()
+	_intentos_ramon += 1
+	if _intentos_ramon == 1:
+		ramon._sacudir()
+		await nuna.decir("¡Otra vez, Ramón! ¡No se descansa!")
+		return
+	ramon.sintonizar()  # al sonar, la señora tiembla
+	await nuna.decir("¡Ramón canta! ¡Qué miedo!")
+	GameState.aumentar_vela(Ajustes.LUMI_HABITACION_ID, VELA_RAMON)
+	GameState.otorgar_sello(&"ramon")
+
+
+## Prueba 3 (versión prototipo): sin Ovi no llega; con Ovi en el inventario, abre.
+func _perturbar_ventana(ventana: VentanaAnimada) -> void:
+	if cortina_bailando:
+		await nuna.decir("Ya está bailando. Falta luz.")
+		return
+	GameState.iniciar_goteo()
+	if GameState.tiene(&"ovillo"):
+		await nuna.decir("Ovi, ¿me das una mano?")
+		GameState.quitar_objeto(&"ovillo")
+		ventana.bailar()
+		cortina_bailando = true
+		if huesped != null:
+			huesped.temblar()
+		await nuna.decir("¡Doña Cortina baila sola!")
+		GameState.aumentar_vela(Ajustes.LUMI_HABITACION_ID, VELA_CORTINA)
+		GameState.otorgar_sello(&"ventana")
+		return
+	_saltos_ventana += 1
+	GameState.cambiar_bruma(-2.0)
+	await nuna.mini_salto()
+	match _saltos_ventana:
+		1:
+			await nuna.decir("¡Hop! …¡Hop! Uf… los profesionales flotan más alto, ¿no?")
+		2:
+			await nuna.decir("Todavía soy un fantasma bebé…")
+		_:
+			var ovi := get_node_or_null("Ovillo") as Node2D
+			if ovi != null and ovi.visible:
+				nuna.mirar_a(ovi.global_position)
+				_brillar(ovi)
+			await nuna.decir("Si tuviera un escaloncito…")
+
+
+## La consola de abajo dice cuál es el próximo paso, según cómo va la partida.
+func _actualizar_guia() -> void:
+	ui.establecer_guia(_texto_guia())
+
+
+func _texto_guia() -> String:
+	var sellos: int = GameState.sellos
+	if sellos >= GameState.SELLOS_TOTALES:
+		return "¡3 de 3 sellos! Turno cumplido."
+	if GameState.tiene(&"ovillo"):
+		return "Llevá a Ovi a la ventana."
+	var lumi := get_node_or_null("Lampara") as Lumi
+	if lumi != null and lumi.estado == Lumi.Estado.NIVEL_3:
+		return "Lumi brilla fuerte. Mirala de nuevo."
+	if _intentos_ramon == 1 and not GameState.sellos_obtenidos.has(&"ramon"):
+		return "Ramón no arrancó. Perturbalo otra vez."
+	if _saltos_ventana > 0 and not GameState.sellos_obtenidos.has(&"ventana"):
+		return "La ventana está alta. Buscá algo para subirte."
+	var alguno_mirado := false
+	for nombre in ["Lampara", "Radio", "Ventana"]:
+		var obj := get_node_or_null(nombre) as ObjetoInteractivo
+		if obj != null and obj.nombrado:
+			alguno_mirado = true
+	if not alguno_mirado:
+		return "Hacé clic en un objeto y miralo para conocerlo."
+	if sellos == 0:
+		return "Perturbá lo que conociste para asustar a la huésped."
+	return "%d de 3 sellos. ¡Seguí asustando!" % sellos
+
+
+## Lista de tareas debajo del HUD: una por prueba.
+func _crear_lista_tareas() -> void:
+	var lista := ListaTareas.new()
+	add_child(lista)
+	for datos in [["Lampara", &"lumi", "Lámpara"], ["Radio", &"ramon", "Radio"], ["Ventana", &"ventana", "Cortina"]]:
+		var obj := get_node_or_null(datos[0]) as ObjetoInteractivo
+		if obj != null:
+			lista.agregar(obj, datos[1], datos[2])
+
+
+## Con los tres sellos vuelve la orden de trabajo, sellada.
+func _mision_cumplida() -> void:
+	var orden := OrdenTrabajo.new()
+	orden.cumplida = true
+	add_child(orden)
+	await orden.aceptado
+	await _decir_din("¡Bien, equipo! ¡Una más! ♥")
+	await nuna.decir("¿Una más?…")
+	await nuna.decir("Los profesionales siempre se ponen la 10, ¿no?")
+
+
+## Hace parpadear un objeto para señalarlo.
+func _brillar(nodo: CanvasItem) -> void:
+	if nodo == null:
+		return
+	var tw := create_tween()
+	for i in 4:
+		tw.tween_property(nodo, "modulate", Color(1.8, 1.8, 1.8), 0.15)
+		tw.tween_property(nodo, "modulate", Color.WHITE, 0.15)
+
+
+## Din habla desde ninguna parte, en la misma caja de diálogo.
+func _decir_din(texto: String) -> void:
+	await nuna.decir(PREFIJO_DIN + texto)
 
 
 ## Devuelve el objeto que está bajo el punto, o null si no hay ninguno.
