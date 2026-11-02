@@ -62,7 +62,6 @@ func _ready() -> void:
 				var ramon := obj as Ramon
 				# Reacción temporal para probar el feedback visual antes de tener el dial.
 				ramon.comenzo_a_sonar.connect(huesped.temblar)
-	_crear_lista_tareas()
 	ocupado = true
 	GameState.pausado = true
 	_entrada_en_progreso = true
@@ -378,16 +377,6 @@ func _texto_guia() -> String:
 	if sellos == 0:
 		return "Perturbá lo que conociste para asustar a la huésped."
 	return "%d de 3 sellos. ¡Seguí asustando!" % sellos
-
-
-## Lista de tareas debajo del HUD: una por prueba.
-func _crear_lista_tareas() -> void:
-	var lista := ListaTareas.new()
-	add_child(lista)
-	for datos in [["Lampara", &"lumi", "Lámpara"], ["Radio", &"ramon", "Radio"], ["Ventana", &"ventana", "Cortina"]]:
-		var obj := get_node_or_null(datos[0]) as ObjetoInteractivo
-		if obj != null:
-			lista.agregar(obj, datos[1], datos[2])
 
 
 ## Con los tres sellos vuelve la orden de trabajo, sellada.
