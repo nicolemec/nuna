@@ -14,12 +14,15 @@ var ocupado: bool = false
 var cortina_bailando: bool = false
 var sombra_gigante_activada: bool = false
 var _entrada_en_progreso: bool = false
-var _intentos_ramon: int = 0
+var _estaciones_probadas: Array[int] = []
+var _dial_abierto: bool = false
 var _saltos_ventana: int = 0
 
 const PREFIJO_DIN: String = "DIN: "
 const ORDEN_TRABAJO: String = "Orden de trabajo: asusta a la huésped y gana 3 sellos."
 const ORDEN_LETRA_CHICA: String = "(Horas extra no remuneradas.)"
+const ETIQUETA_RAMON: String = "Prueba de certificación: ¡Sintoniza FXDWUR y llegarás!"
+const LETRA_CHICA_RAMON: String = "(Instrucciones tres pasos atrás.)"
 const VELA_RAMON: float = 20.0
 const VELA_CORTINA: float = 15.0
 ## Primera mirada: Nuna bautiza al objeto antes de su frase de siempre.
@@ -62,7 +65,6 @@ func _ready() -> void:
 				var ramon := obj as Ramon
 				# Reacción temporal para probar el feedback visual antes de tener el dial.
 				ramon.comenzo_a_sonar.connect(huesped.temblar)
-	_crear_lista_tareas()
 	ocupado = true
 	GameState.pausado = true
 	_entrada_en_progreso = true
@@ -169,10 +171,15 @@ func _on_nuna_llego() -> void:
 		lumi.completar_dialogo()
 		await lumi.esperar_bloqueo()
 	else:
-		if verbo_pendiente == GameState.MIRAR and not obj.nombrado and BAUTISMOS.has(obj.id):
+		var primera_mirada: bool = verbo_pendiente == GameState.MIRAR and not obj.nombrado
+		if primera_mirada and BAUTISMOS.has(obj.id):
 			await nuna.decir(BAUTISMOS[obj.id])
 		var frase: String = obj.ejecutar(verbo_pendiente)
 		await nuna.decir(frase)
+		if primera_mirada and obj.id == &"radio":
+			# La etiqueta de Ramón trae la pista del dial en la letra chica.
+			await ui.mostrar_certificacion(ETIQUETA_RAMON, LETRA_CHICA_RAMON)
+			await nuna.decir("¿FXDWUR? ¡Qué estación más rara!")
 		if obj.id == &"ovillo" and GameState.tiene(&"ovillo"):
 			await nuna.decir("¡Contigo llego a la ventana, Ovi!")
 			_brillar(get_node_or_null("Ventana"))
@@ -300,21 +307,77 @@ func _on_combo_sombra_activado() -> void:
 	GameState.llenar_vela(Ajustes.LUMI_HABITACION_ID)
 
 
-## Prueba 2 (versión prototipo): Ramón arranca al segundo intento.
+## Prueba 2: el dial de Ramón. El código FXDWUR, leído tres letras atrás, dice CUATRO.
 func _perturbar_ramon(ramon: Ramon) -> void:
 	if GameState.sellos_obtenidos.has(&"ramon"):
 		await nuna.decir("Ramón ya cantó su parte.")
 		return
 	GameState.iniciar_goteo()
-	_intentos_ramon += 1
-	if _intentos_ramon == 1:
-		ramon._sacudir()
-		await nuna.decir("¡Otra vez, Ramón! ¡No se descansa!")
-		return
-	ramon.sintonizar()  # al sonar, la señora tiembla
-	await nuna.decir("¡Ramón canta! ¡Qué miedo!")
-	GameState.aumentar_vela(Ajustes.LUMI_HABITACION_ID, VELA_RAMON)
-	GameState.otorgar_sello(&"ramon")
+	var pausa_previa: bool = GameState.pausado
+	GameState.pausado = true  # la Bruma no gotea con el panel abierto
+	_dial_abierto = true
+	_actualizar_guia()
+	var dial := DialRadio.new()
+	add_child(dial)
+	for n in _estaciones_probadas:
+		dial.marcar_probada(n)
+	while true:
+		var numero: int = await dial.elegido
+		if numero == 0:
+			break  # se cerró con un clic afuera
+		dial.bloquear(true)
+		var resuelto: bool = await _sintonizar_estacion(ramon, numero)
+		if resuelto:
+			dial.cerrar()
+			break
+		if not _estaciones_probadas.has(numero):
+			_estaciones_probadas.append(numero)
+		dial.marcar_probada(numero)
+		dial.bloquear(false)
+	_dial_abierto = false
+	GameState.pausado = pausa_previa
+
+
+## Qué pasa con cada estación. Devuelve true si es la correcta.
+func _sintonizar_estacion(ramon: Ramon, numero: int) -> bool:
+	match numero:
+		1:  # Radio Mérito
+			ramon._sacudir()
+			await nuna.decir("RAMÓN: ¡Si cumples, llegas! ¡Si cumples, llegas!")
+			if huesped != null:
+				huesped.roncar(2.0)
+			await nuna.decir("Zzz… La señora ronca. Así no se asusta.")
+			GameState.cambiar_bruma(-5.0)
+		2:  # Radio Ocupada
+			ramon._sacudir()
+			await nuna.decir("RAMÓN: Su llamada es importante para nosotros…")
+			await nuna.decir("La señora se da vuelta. Ni se enteró.")
+			GameState.cambiar_bruma(-5.0)
+		3:  # Radio Feriado: no cuesta nada, pero tampoco rinde
+			await nuna.decir("…")
+			await nuna.decir("¿Feriado? ¿Y eso qué es?")
+			nuna.dormir()
+			await get_tree().create_timer(2.0).timeout
+		4:  # Radio Revés: la correcta
+			ramon.sintonizar()  # al sonar, la señora tiembla
+			await nuna.decir("RAMÓN: ♪ oñin etemréud, oñin etemréud ♪")
+			if huesped != null:
+				huesped.temblar()
+			var a_la_primera: bool = _estaciones_probadas.is_empty()
+			if a_la_primera:
+				await nuna.decir("¡A la primera!")
+				GameState.cambiar_bruma(5.0)
+			await nuna.decir("¡Una canción de cuna al revés! ¡Qué miedo!")
+			GameState.cambiar_bruma(10.0)
+			GameState.aumentar_vela(Ajustes.LUMI_HABITACION_ID, VELA_RAMON)
+			GameState.otorgar_sello(&"ramon")
+			return true
+		5:  # Radio Hora Extra
+			ramon._sacudir()
+			await nuna.decir("RAMÓN: ¡Un ratito más! ¡Un ratito más!")
+			await nuna.decir("SEÑORA: Cinco minutitos más…")
+			GameState.cambiar_bruma(-5.0)
+	return false
 
 
 ## Prueba 3 (versión prototipo): sin Ovi no llega; con Ovi en el inventario, abre.
@@ -364,8 +427,10 @@ func _texto_guia() -> String:
 	var lumi := get_node_or_null("Lampara") as Lumi
 	if lumi != null and lumi.estado == Lumi.Estado.NIVEL_3:
 		return "Lumi brilla fuerte. Mirala de nuevo."
-	if _intentos_ramon == 1 and not GameState.sellos_obtenidos.has(&"ramon"):
-		return "Ramón no arrancó. Perturbalo otra vez."
+	if _dial_abierto:
+		return "Cada letra del código, tres lugares atrás."
+	if not _estaciones_probadas.is_empty() and not GameState.sellos_obtenidos.has(&"ramon"):
+		return "Ramón sigue sin sintonizar. Perturbalo y probá otra estación."
 	if _saltos_ventana > 0 and not GameState.sellos_obtenidos.has(&"ventana"):
 		return "La ventana está alta. Buscá algo para subirte."
 	var alguno_mirado := false
@@ -378,16 +443,6 @@ func _texto_guia() -> String:
 	if sellos == 0:
 		return "Perturbá lo que conociste para asustar a la huésped."
 	return "%d de 3 sellos. ¡Seguí asustando!" % sellos
-
-
-## Lista de tareas debajo del HUD: una por prueba.
-func _crear_lista_tareas() -> void:
-	var lista := ListaTareas.new()
-	add_child(lista)
-	for datos in [["Lampara", &"lumi", "Lámpara"], ["Radio", &"ramon", "Radio"], ["Ventana", &"ventana", "Cortina"]]:
-		var obj := get_node_or_null(datos[0]) as ObjetoInteractivo
-		if obj != null:
-			lista.agregar(obj, datos[1], datos[2])
 
 
 ## Con los tres sellos vuelve la orden de trabajo, sellada.

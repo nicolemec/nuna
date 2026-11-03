@@ -30,6 +30,8 @@ var _textos_opciones: Dictionary = {}
 var _opciones_hover: Dictionary = {}
 var _casilleros: Array[Label] = []
 var _sellos_hud: Array[ColorRect] = []
+var _checks_sellos: Array[TextureRect] = []
+var _sellos_mostrados: int = 0
 var _sellos_cuaderno: Array[ColorRect] = []
 var _inventario_visual: HBoxContainer
 var _verbos: HBoxContainer
@@ -260,6 +262,13 @@ func _crear_hud_superior() -> void:
 		borde.add_child(relleno)
 		casilleros_sellos.add_child(borde)
 		_sellos_hud.append(relleno)
+		var check := TextureRect.new()
+		check.texture = _textura_check(relleno.size)
+		check.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		check.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		check.visible = false
+		relleno.add_child(check)
+		_checks_sellos.append(check)
 	hud.add_child(casilleros_sellos)
 
 	_inventario_visual = _crear_inventario()
@@ -514,8 +523,38 @@ func _actualizar_inventario() -> void:
 func _actualizar_sellos(cantidad: int) -> void:
 	for i in _sellos_hud.size():
 		_sellos_hud[i].color = COLOR_SELLO_LLENO if i < cantidad else COLOR_SELLO_VACIO
+		if i < _checks_sellos.size():
+			_checks_sellos[i].visible = i < cantidad
+		if i < cantidad and i >= _sellos_mostrados:
+			_parpadear(_sellos_hud[i].get_parent() as CanvasItem)
+	_sellos_mostrados = cantidad
 	for i in _sellos_cuaderno.size():
 		_sellos_cuaderno[i].color = COLOR_SELLO_LLENO if i < cantidad else COLOR_SELLO_VACIO
+
+
+## Un tilde de píxeles para el casillero de sello lleno.
+func _textura_check(tamano: Vector2) -> ImageTexture:
+	var w: int = int(tamano.x)
+	var h: int = int(tamano.y)
+	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0, 0, 0, 0))
+	var puntos: Array[Vector2i] = [
+		Vector2i(0, 3), Vector2i(1, 4), Vector2i(2, 5),
+		Vector2i(3, 4), Vector2i(4, 3), Vector2i(5, 2), Vector2i(6, 1),
+	]
+	for p in puntos:
+		if p.x < w and p.y < h:
+			img.set_pixelv(p, Color(0.08, 0.08, 0.1))
+	return ImageTexture.create_from_image(img)
+
+
+func _parpadear(nodo: CanvasItem) -> void:
+	if nodo == null:
+		return
+	var tw := create_tween()
+	for i in 4:
+		tw.tween_property(nodo, "modulate", Color(1, 1, 1, 0.2), 0.12)
+		tw.tween_property(nodo, "modulate", Color.WHITE, 0.12)
 
 
 func _actualizar_bruma(valor: float) -> void:
