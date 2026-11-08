@@ -45,7 +45,20 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_tiempo += delta
+	_aplicar_latido()
 	queue_redraw()
+
+
+## Latido: el objeto se ilumina suave mientras Nuna no lo miró (sin borde).
+func _aplicar_latido() -> void:
+	var luz: float = 1.0
+	if not nombrado:
+		luz = 1.0 + 0.25 * (0.5 + 0.5 * sin(_tiempo * 3.0))
+	var tinte := Color(luz, luz, luz, 1.0)
+	self_modulate = tinte
+	for hijo in get_children():
+		if hijo is AnimatedSprite2D:
+			hijo.self_modulate = tinte
 
 
 ## El rectángulo del objeto, alineado a pixeles enteros.
@@ -59,10 +72,6 @@ func _draw() -> void:
 		draw_texture(textura, rect.position)
 	else:
 		draw_rect(rect, color)
-	# Brillo: un borde amarillo que titila mientras Nuna no lo miró
-	if not nombrado:
-		var alfa: float = 0.35 + 0.35 * sin(_tiempo * 4.0)
-		draw_rect(rect.grow(1.0), Color(1.0, 0.9, 0.3, alfa), false, 1.0)
 
 
 ## ¿El punto (en coordenadas de pantalla) cae sobre este objeto?
@@ -117,6 +126,12 @@ func ejecutar(verbo: StringName) -> String:
 		return frase_agarrar
 
 	return ""
+
+
+## Cambia el lugar de reposo del objeto (por ejemplo, Ovi bajo la ventana).
+func fijar_anclaje(nueva_posicion: Vector2) -> void:
+	_posicion_base = nueva_posicion
+	restaurar_posicion()
 
 
 func restaurar_posicion() -> void:

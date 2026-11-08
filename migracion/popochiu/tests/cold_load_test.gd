@@ -37,7 +37,7 @@ func run() -> void:
 		return
 	if not _check(room.get_prop("Lumi").estado == Lumi.Estado.CUIDADA and room.get_prop("Lumi").get_node("Sprite").animation == &"cuidada" and room.get_prop("Ramon").get_node("Sprite").animation == &"sonando" and room.get_prop("Cortina").get_node("Sprite").animation == &"baila", "Estados visuales al arrancar en frío"):
 		return
-	if not _check(C.player.inventory.size() == 1 and Globals.tiene(&"dentadura") and not Globals.tiene(&"ovillo") and not room.get_prop("Ovillo").visible and not room.get_prop("Dentadura").visible and I.active == null, "Inventario y objetos consumidos sin caché anterior"):
+	if not _check(C.player.inventory.size() == 1 and Globals.tiene(&"dentadura") and not Globals.tiene(&"ovillo") and room.state.ovi_en_ventana and room.get_prop("Ovillo").visible and not room.get_prop("Dentadura").visible and I.active == null, "Inventario y objetos consumidos sin caché anterior"):
 		return
 	if not _check(G.gui.ui.visible and G.gui.ui._casilleros[0].text == "S" and G.gui.ui._vela.value == 100.0 and not G.is_blocked and not room.ocupado, "HUD y entrada restaurados"):
 		return

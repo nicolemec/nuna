@@ -33,7 +33,11 @@ static func error_en(room: PopochiuRoom) -> String:
 		var obj: ObjetoInteractivo = props[i]
 		if String(obj.name) != POSICIONES.keys()[i]:
 			return "Orden de dibujo distinto: " + String(obj.name)
-		if not obj.position.is_equal_approx(POSICIONES[String(obj.name)]):
+		var esperada: Vector2 = POSICIONES[String(obj.name)]
+		if String(obj.name) == "Ovillo" and room.state.get("ovi_en_ventana"):
+			# Después de usarlo, Ovi queda en el piso bajo la ventana.
+			esperada = room.get_script().get_script_constant_map()["OVI_POS_VENTANA"]
+		if not obj.position.is_equal_approx(esperada):
 			return "Posición alterada: %s (%s)" % [obj.name, obj.position]
 		if obj.z_index != 0 or obj.baseline != 0 or obj.scale != Vector2.ONE:
 			return "Capa, baseline o escala alterados: " + String(obj.name)

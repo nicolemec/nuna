@@ -93,7 +93,9 @@ func run(room: PopochiuRoom) -> void:
 	G.gui.ui._seleccionar_inventario(click, 0)
 	if not _check(I.active != null and I.active.script_name == "Ovillo", "Seleccionar Ovi desde HUD"):
 		return
+	PreguntaSiNo.respuesta_automatica = true
 	await _room.usar_objeto(I.active, _room.get_prop("Cortina"))
+	PreguntaSiNo.respuesta_automatica = null
 	if not _check(_room.state.cortina_bailando and not Globals.tiene(&"ovillo") and C.player.inventory.size() == 1 and I.active == null and Globals.sellos == 2 and Globals.vela_101 == 90.0, "Usar y consumir Ovi sin inventario paralelo"):
 		return
 	await _action("Cortina", Globals.PERTURBAR)
@@ -101,7 +103,7 @@ func run(room: PopochiuRoom) -> void:
 		return
 	if not await _save_restore("Ovi consumido"):
 		return
-	if not _check(not _room.get_prop("Ovillo").visible and not Globals.tiene(&"ovillo") and _room.state.cortina_bailando and _room.get_prop("Cortina").get_node("Sprite").animation == &"baila", "Ovi no reaparece y cortina sigue bailando"):
+	if not _check(_room.get_prop("Ovillo").visible and _room.state.ovi_en_ventana and not Globals.tiene(&"ovillo") and _room.state.cortina_bailando and _room.get_prop("Cortina").get_node("Sprite").animation == &"baila", "Ovi queda bajo la ventana y cortina sigue bailando"):
 		return
 	Globals.pausado = false
 	await get_tree().create_timer(20.2).timeout
@@ -123,7 +125,7 @@ func run(room: PopochiuRoom) -> void:
 		return
 	if not await _save_restore("misión completa y sombra"):
 		return
-	if not _check(_room.state.mision_completada and _room.state.sombra_gigante_activada and Globals.sellos == 3 and Globals.vela_101 == 100.0 and not _room.get_prop("Ovillo").visible, "Partida completa persistente"):
+	if not _check(_room.state.mision_completada and _room.state.sombra_gigante_activada and Globals.sellos == 3 and Globals.vela_101 == 100.0 and _room.state.ovi_en_ventana, "Partida completa persistente"):
 		return
 	Globals.pausado = false
 	G.gui.abrir_menu()

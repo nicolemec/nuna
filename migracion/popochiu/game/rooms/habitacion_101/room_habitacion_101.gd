@@ -8,6 +8,9 @@ const BAUTISMOS := {
 	&"ovillo": "¡Hola, ovillo! Te llamaré Ovi.",
 }
 const FRASES_PROGRESO := ["", "¡Sello uno! Faltan dos.", "¡Dos de tres! ¡Ya casi!", "¡Tres sellos! ¡Ya soy casi profesional!"]
+## Dónde queda Ovi cuando Nuna lo usa en la ventana, y cuánto sube Nuna al pararse encima.
+const OVI_POS_VENTANA := Vector2(219, 132)
+const OVI_ALTURA := 14.0
 var state: Data = load("res://game/rooms/habitacion_101/room_habitacion_101.tres")
 var ocupado := false
 var objeto_seleccionado: ObjetoInteractivo
@@ -45,11 +48,6 @@ func _on_room_entered() -> void:
 	$Props/Lumi.fogonazo_realizado.connect($Props/Huesped.asustarse)
 	$Props/Ramon.comenzo_a_sonar.connect($Props/Huesped.temblar)
 	_restaurar_visual()
-	var lista := ListaTareas.new()
-	add_child(lista)
-	lista.agregar($Props/Lumi, &"lumi", "Lámpara")
-	lista.agregar($Props/Ramon, &"ramon", "Radio")
-	lista.agregar($Props/Cortina, &"ventana", "Cortina")
 
 
 func _on_restore_from_savegame() -> void:
@@ -69,6 +67,8 @@ func _restaurar_visual() -> void:
 		obj.description = obj.nombre_visible()
 		if not obj.visible and obj.is_in_group("interactivos"):
 			obj.remove_from_group("interactivos")
+	if state.ovi_en_ventana:
+		_fijar_ovi_en_ventana()
 	G.gui.mostrar_habitacion(true)
 	_actualizar_guia()
 
@@ -84,6 +84,8 @@ func objeto_en(punto: Vector2) -> ObjetoInteractivo:
 	var elegido: ObjetoInteractivo = null
 	var area := INF
 	for obj: ObjetoInteractivo in get_props():
+		if state.ovi_en_ventana and obj == $Props/Ovillo:
+			continue
 		if obj.visible and obj.contiene(punto) and obj.tamano.x * obj.tamano.y < area:
 			elegido = obj
 			area = obj.tamano.x * obj.tamano.y
@@ -182,17 +184,10 @@ func _perturbar_ventana(ventana: VentanaAnimada) -> void:
 	if state.cortina_bailando:
 		await _decir("Ya está bailando. Falta luz.")
 		return
-	Globals.iniciar_goteo()
 	if Globals.tiene(&"ovillo"):
-		await _decir("Ovi, ¿me das una mano?")
-		await Globals.quitar_objeto(&"ovillo")
-		ventana.bailar()
-		state.cortina_bailando = true
-		$Props/Huesped.temblar()
-		await _decir("¡Doña Cortina baila sola!")
-		Globals.aumentar_vela(15.0)
-		Globals.otorgar_sello(&"ventana")
+		await _usar_ovi_en_ventana(ventana)
 		return
+	Globals.iniciar_goteo()
 	state.saltos_ventana += 1
 	Globals.cambiar_bruma(-2.0)
 	await C.player.mini_salto()
@@ -204,6 +199,47 @@ func _perturbar_ventana(ventana: VentanaAnimada) -> void:
 				C.player.mirar_a($Props/Ovillo.global_position)
 				_brillar($Props/Ovillo)
 			await _decir("Si tuviera un escaloncito…")
+
+
+## Pregunta si usar a Ovi; si dice que sí, Ovi queda en el piso, Nuna se sube y perturba la cortina.
+func _usar_ovi_en_ventana(ventana: VentanaAnimada) -> void:
+	var usar: bool = await PreguntaSiNo.preguntar(self, "¿Usar a Ovi?")
+	if not usar:
+		await _decir("Mejor la guardo para después.")
+		return
+	Globals.iniciar_goteo()
+	await _decir("Ovi, ¿me das una mano?")
+	await Globals.quitar_objeto(&"ovillo")
+	await _poner_ovi_en_ventana()
+	await C.player.subir_a(OVI_POS_VENTANA, OVI_ALTURA)
+	await C.player.interactuar(ventana.global_position)
+	ventana.bailar()
+	state.cortina_bailando = true
+	$Props/Huesped.temblar()
+	await _decir("¡Doña Cortina baila sola!")
+	Globals.aumentar_vela(15.0)
+	Globals.otorgar_sello(&"ventana")
+	await C.player.bajar_a(OVI_POS_VENTANA + Vector2(-18, 6))
+
+
+func _poner_ovi_en_ventana() -> void:
+	state.ovi_en_ventana = true
+	_fijar_ovi_en_ventana()
+	var ovi: ObjetoInteractivo = $Props/Ovillo
+	ovi.position.y = OVI_POS_VENTANA.y - 8.0
+	var tw := create_tween()
+	tw.tween_property(ovi, "position:y", OVI_POS_VENTANA.y, 0.3).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	await tw.finished
+
+
+## Ovi queda visible en el piso, bajo la ventana, pero ya no se puede clickear.
+func _fijar_ovi_en_ventana() -> void:
+	var ovi: ObjetoInteractivo = $Props/Ovillo
+	ovi.fijar_anclaje(OVI_POS_VENTANA)
+	ovi.visible = true
+	ovi.clickable = false
+	if ovi.is_in_group("interactivos"):
+		ovi.remove_from_group("interactivos")
 
 
 func _on_combo_sombra_activado() -> void:
