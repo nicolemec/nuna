@@ -38,7 +38,9 @@ func run(room: PopochiuRoom) -> void:
 		return
 	if not _check(_room.get_props().size() == 11 and not get_tree().root.has_node("GameState"), "11 Props nativos y controlador único"):
 		return
-	for name in ["Puerta", "Pantuflas", "Huesped", "Velador", "Lumi", "Comoda", "Dentadura", "Vaso", "Cortina", "Ramon", "Ovillo"]:
+	if not _check(not _room.get_prop("Dentadura").visible, "La dentadura empieza guardada en el cajón"):
+		return
+	for name in ["Puerta", "Pantuflas", "Huesped", "Velador", "Lumi", "Comoda", "Vaso", "Cortina", "Ramon", "Ovillo"]:
 		await _native_click(name)
 		if _failed:
 			return
@@ -46,12 +48,17 @@ func run(room: PopochiuRoom) -> void:
 		await _action(name, Globals.MIRAR)
 		if _failed:
 			return
+	if not _check(_room.state.cajon_abierto and _room.get_prop("Dentadura").visible, "Mirar el velador abre el cajón"):
+		return
+	await _native_click("Dentadura")
+	if _failed:
+		return
 	if not _check(G.gui.historial.has("No, se van a extrañar.") == false and G.gui.historial.has("¿Siempre juntitas?"), "Frases secundarias originales"):
 		return
 	await _action("Pantuflas", Globals.PERTURBAR)
 	await _action("Velador", Globals.PERTURBAR)
 	await _action("Ramon", Globals.MIRAR)
-	await _action("Ramon", Globals.PERTURBAR)
+	DialRadio.respuestas_automaticas = [3, 4]  # Radio Feriado (no cuesta) y la correcta
 	await _action("Ramon", Globals.PERTURBAR)
 	if not _check(Globals.sellos == 1 and Globals.vela_101 == 20.0, "Ramón: sello y recompensa"):
 		return

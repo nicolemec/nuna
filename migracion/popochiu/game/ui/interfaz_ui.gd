@@ -11,7 +11,7 @@ const COLOR_SELLO_VACIO := Color(0.30, 0.30, 0.34)
 const COLOR_SELLO_LLENO := Color.WHITE
 const COLOR_TEXTO_SECUNDARIO := Color(0.55, 0.55, 0.58)
 const COLOR_DESACTIVADO := Color(0.42, 0.42, 0.46)
-const COLOR_CONSOLA := Color(0.01, 0.01, 0.012, 0.98)
+const COLOR_CONSOLA := Color(0.0, 0.0, 0.0, 1.0)  # negro sólido: el juego no se ve detrás
 const COLOR_BORDE_SELLO := Color.WHITE
 const COLOR_BRUMA := Color(0.62, 0.48, 0.88)
 const COLOR_MIEDO := Color(0.96, 0.63, 0.25)
@@ -51,6 +51,11 @@ var _acciones_disponibles: Dictionary = {}
 func _ready() -> void:
 	_fuente_hud = _cargar_fuente(Ajustes.UI_FUENTE_HUD)
 	_fuente_dialogo = _cargar_fuente(Ajustes.UI_FUENTE_DIALOGO)
+	if _fuente_dialogo is FontFile:
+		# Pixel art: sin suavizado para que las letras queden nítidas.
+		_fuente_dialogo.antialiasing = TextServer.FONT_ANTIALIASING_NONE
+		_fuente_dialogo.hinting = TextServer.HINTING_NONE
+		_fuente_dialogo.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
 	_crear_hud_superior()
 	_crear_consola_inferior()
 	_refrescar_linea()
@@ -106,7 +111,7 @@ func mostrar_objeto(
 		Globals.PERTURBAR: puede_perturbar,
 	}
 	_texto_hover = ""
-	_texto_base = "%s · Elegí una acción" % nombre.to_upper()
+	_texto_base = "%s - Elegí una acción" % nombre.to_upper()
 	_linea.visible = true
 	_letra_chica.visible = false
 	_verbos.visible = not _certificacion_activa
@@ -125,7 +130,7 @@ func mostrar_dialogo(texto: String, id: int) -> void:
 	_dialogo_activo = true
 	_certificacion_activa = false
 	_letra_chica.visible = false
-	_verbos.visible = _hay_objeto_seleccionado
+	_verbos.visible = false  # la frase puede ocupar dos líneas
 	_actualizar_layout_consola()
 	_linea.visible = true
 	_linea.text = texto
@@ -152,7 +157,7 @@ func mostrar_certificacion(
 	_actualizar_layout_consola()
 	_linea.visible = true
 	_linea.text = etiqueta
-	_linea.add_theme_font_size_override("font_size", Ajustes.UI_CONSOLA_FUENTE)
+	_linea.add_theme_font_size_override("font_size", Ajustes.UI_CONSOLA_DIALOGO_FUENTE)
 	_letra_chica.text = letra_chica
 	_letra_chica.visible = true
 	_verbos.visible = false
@@ -318,15 +323,15 @@ func _crear_hud_superior() -> void:
 func _crear_consola_inferior() -> void:
 	# La consola ocupa y=148–180. Verificar filtraciones antes de modificar el límite lógico UI_Y.
 	_consola = ColorRect.new()
-	_consola.position = Ajustes.UI_CONSOLA_COMPACTA_POS
-	_consola.size = Ajustes.UI_CONSOLA_COMPACTA_TAMANO
+	_consola.position = Ajustes.UI_CONSOLA_EXPANDIDA_POS
+	_consola.size = Ajustes.UI_CONSOLA_EXPANDIDA_TAMANO
 	_consola.color = COLOR_CONSOLA
 	_consola.mouse_filter = Control.MOUSE_FILTER_STOP
 	_consola.z_index = 20
 
 	var borde_superior := ColorRect.new()
 	borde_superior.size = Vector2(
-		Ajustes.UI_CONSOLA_COMPACTA_TAMANO.x,
+		Ajustes.UI_CONSOLA_EXPANDIDA_TAMANO.x,
 		Ajustes.UI_CONSOLA_BORDE_SUPERIOR_ALTO
 	)
 	borde_superior.color = Color(0.28, 0.28, 0.32)
@@ -341,6 +346,8 @@ func _crear_consola_inferior() -> void:
 	_linea.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 	_linea.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_linea.max_lines_visible = 2
+	_linea.add_theme_font_size_override("font_size", Ajustes.UI_CONSOLA_DIALOGO_FUENTE)
+	_linea.add_theme_constant_override("line_spacing", -4)
 	_aplicar_fuente(_linea, _fuente_dialogo)
 	_consola.add_child(_linea)
 
@@ -350,7 +357,7 @@ func _crear_consola_inferior() -> void:
 	_letra_chica.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_letra_chica.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 	_letra_chica.add_theme_color_override("font_color", COLOR_TEXTO_SECUNDARIO)
-	_aplicar_fuente(_letra_chica, _fuente_dialogo)
+	_aplicar_fuente(_letra_chica, _fuente_hud)
 	_letra_chica.visible = false
 	_consola.add_child(_letra_chica)
 
@@ -574,12 +581,17 @@ func _refrescar_linea() -> void:
 
 func _actualizar_layout_consola() -> void:
 	var expandida: bool = _hay_objeto_seleccionado or _dialogo_activo or _certificacion_activa
+	# El fondo negro ocupa siempre toda la franja inferior: así nunca queda gris debajo del cuarto.
+	_consola.position = Ajustes.UI_CONSOLA_EXPANDIDA_POS
+	_consola.size = Ajustes.UI_CONSOLA_EXPANDIDA_TAMANO
 	if expandida:
-		_consola.position = Ajustes.UI_CONSOLA_EXPANDIDA_POS
-		_consola.size = Ajustes.UI_CONSOLA_EXPANDIDA_TAMANO
+		_linea.position = Ajustes.UI_CONSOLA_TEXTO_POS
 		_linea.size = Ajustes.UI_CONSOLA_TEXTO_TAMANO
 	else:
-		_consola.position = Ajustes.UI_CONSOLA_COMPACTA_POS
-		_consola.size = Ajustes.UI_CONSOLA_COMPACTA_TAMANO
+		# Sin nada seleccionado, la guía queda centrada en la franja.
+		_linea.position = Vector2(
+			Ajustes.UI_CONSOLA_TEXTO_POS.x,
+			floorf((Ajustes.UI_CONSOLA_EXPANDIDA_TAMANO.y - Ajustes.UI_CONSOLA_TEXTO_COMPACTO_TAMANO.y) / 2.0)
+		)
 		_linea.size = Ajustes.UI_CONSOLA_TEXTO_COMPACTO_TAMANO
-	_verbos.visible = _hay_objeto_seleccionado and not _certificacion_activa
+	_verbos.visible = _hay_objeto_seleccionado and not _certificacion_activa and not _dialogo_activo

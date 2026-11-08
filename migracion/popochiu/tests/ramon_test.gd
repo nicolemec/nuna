@@ -35,8 +35,9 @@ func run(room: PopochiuRoom) -> void:
 	await gui._ejecutar("mirar")
 	if not _expect(gui.historial.size() == lines_before + 1, "El bautismo se repitio"):
 		return
+	DialRadio.respuestas_automaticas = [1, 0]  # una estación equivocada y cerrar el dial
 	await gui._ejecutar("perturbar")
-	if not _expect(room.state.intentos_ramon == 1 and Globals.sellos == 0 and Globals.vela_101 == 0.0 and Globals.goteo_iniciado, "Primer intento"):
+	if not _expect(room.state.intentos_ramon == 1 and Globals.sellos == 0 and Globals.vela_101 == 0.0 and Globals.goteo_iniciado and Globals.bruma == 48.0, "Primer intento"):
 		return
 
 	var save_path := "user://save_%d.json" % SLOT
@@ -52,7 +53,7 @@ func run(room: PopochiuRoom) -> void:
 	E.load_game(SLOT)
 	await E.game_loaded
 	room = R.current
-	if not _expect(room.get_node("Props/Ramon").nombrado and room.state.intentos_ramon == 1 and Globals.bruma == 50.0, "Restauracion del primer intento"):
+	if not _expect(room.get_node("Props/Ramon").nombrado and room.state.intentos_ramon == 1 and Globals.bruma == 48.0, "Restauracion del primer intento"):
 		return
 	radio = room.get_node("Props/Ramon")
 	radio._on_click()
@@ -61,15 +62,16 @@ func run(room: PopochiuRoom) -> void:
 		if guest_sprite.animation == &"tiembla":
 			_reaction = true
 	)
+	DialRadio.respuestas_automaticas = [4]  # la estación correcta: CUATRO
 	await gui._ejecutar("perturbar")
-	if not _expect(room.state.intentos_ramon == 2 and room.state.ramon_sonando and Globals.sellos == 1 and Globals.vela_101 == 20.0 and Globals.bruma == 60.0, "Segundo intento y recompensa"):
+	if not _expect(room.state.intentos_ramon == 2 and room.state.ramon_sonando and Globals.sellos == 1 and Globals.vela_101 == 20.0 and Globals.bruma == 58.0, "Segundo intento y recompensa"):
 		return
 	if not _expect(radio.get_node("Sprite").animation == &"sonando", "Radio no quedo sonando"):
 		return
 	if not _expect(_reaction, "La huesped no temblo"):
 		return
 	await gui._ejecutar("perturbar")
-	if not _expect(room.state.intentos_ramon == 2 and Globals.sellos == 1 and Globals.vela_101 == 20.0 and Globals.bruma == 60.0, "Recompensa duplicada"):
+	if not _expect(room.state.intentos_ramon == 2 and Globals.sellos == 1 and Globals.vela_101 == 20.0 and Globals.bruma == 58.0, "Recompensa duplicada"):
 		return
 	E.save_game(SLOT, "Ramon completado")
 	room.state.ramon_sonando = false
@@ -86,7 +88,7 @@ func run(room: PopochiuRoom) -> void:
 	Globals.pausado = false
 	Globals.segundos_goteo = 4.9
 	Globals._process(0.2)
-	if not _expect(Globals.bruma == 59.0, "Goteo de bruma"):
+	if not _expect(Globals.bruma == 57.0, "Goteo de bruma"):
 		return
 	_cleanup()
 	print("RAMON PASS: seleccion, presentacion, 2 intentos, reaccion, recompensa unica, bloqueo y guardado/carga")

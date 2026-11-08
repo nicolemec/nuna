@@ -8,7 +8,7 @@ const POSICIONES := {
 	"Velador": Vector2(135, 130),
 	"Lumi": Vector2(140, 100),
 	"Comoda": Vector2(295, 145),
-	"Dentadura": Vector2(130, 100),
+	"Dentadura": Vector2(135, 110),  # ahora vive en el cajón del velador
 	"Vaso": Vector2(130, 101),
 	"Cortina": Vector2(219, 98),
 	"Ramon": Vector2(300, 122),

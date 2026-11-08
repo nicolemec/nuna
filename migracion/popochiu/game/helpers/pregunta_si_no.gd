@@ -1,34 +1,43 @@
 class_name PreguntaSiNo
 extends CanvasLayer
-## Pregunta Sí/No en la consola inferior, con el mismo estilo que los verbos.
-## Uso: var si: bool = await PreguntaSiNo.preguntar(self, "¿Usar a Ovi?")
+## Pregunta con opciones en la consola inferior, con el mismo estilo que los verbos.
+## Sí/No:     var si: bool = await PreguntaSiNo.preguntar(self, "¿Usar a Ovi?")
+## Opciones:  var i: int = await PreguntaSiNo.elegir(self, "¿Qué soy?", ["La bruma", "El miedo"])
 
-signal respondido(si: bool)
+signal elegido(indice: int)
 
-const COLOR_FONDO := Color(0.01, 0.01, 0.012, 0.98)
+const COLOR_FONDO := Color(0.0, 0.0, 0.0, 1.0)
 const COLOR_SECUNDARIO := Color(0.55, 0.55, 0.58)
 
-## Solo para las pruebas automáticas: si es true o false, responde sola.
+## Solo para las pruebas automáticas: true/false (Sí/No) o el número de opción (0, 1, 2…).
 static var respuesta_automatica: Variant = null
 
 var _texto := ""
+var _opciones: Array = ["Sí", "No"]
 var _fuente: Font
 var _respondida := false
 
 
 static func preguntar(padre: Node, texto: String) -> bool:
+	var indice: int = await elegir(padre, texto, ["Sí", "No"])
+	return indice == 0
+
+
+static func elegir(padre: Node, texto: String, opciones: Array) -> int:
 	var pregunta := PreguntaSiNo.new()
 	pregunta._texto = texto
+	pregunta._opciones = opciones
 	padre.add_child(pregunta)
-	var si: bool = await pregunta.respondido
+	var indice: int = await pregunta.elegido
 	pregunta.queue_free()
-	return si
+	return indice
 
 
 func _ready() -> void:
 	layer = 70
 	if respuesta_automatica != null:
-		_responder.call_deferred(bool(respuesta_automatica))
+		var indice: int = (0 if respuesta_automatica else 1) if respuesta_automatica is bool else int(respuesta_automatica)
+		_responder.call_deferred(indice)
 	if ResourceLoader.exists(Ajustes.UI_FUENTE_HUD):
 		_fuente = load(Ajustes.UI_FUENTE_HUD) as Font
 
@@ -39,41 +48,41 @@ func _ready() -> void:
 	fondo.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(fondo)
 
-	var titulo := _label(_texto.to_upper(), Color.WHITE)
+	var titulo := _label(_texto, Color.WHITE)
 	titulo.position = Ajustes.UI_CONSOLA_TEXTO_POS
 	titulo.size = Ajustes.UI_CONSOLA_TEXTO_TAMANO
+	titulo.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+	_usar_letra_grande(titulo)
 	fondo.add_child(titulo)
 
-	var opciones := HBoxContainer.new()
-	opciones.position = Ajustes.UI_CONSOLA_OPCIONES_POS
-	opciones.size = Ajustes.UI_CONSOLA_OPCIONES_TAMANO
-	opciones.add_theme_constant_override("separation", int(Ajustes.UI_CONSOLA_SEPARACION_ACCIONES))
-	opciones.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	fondo.add_child(opciones)
-	opciones.add_child(_boton("(1) SÍ", true))
-	opciones.add_child(_boton("(2) NO", false))
+	var fila := HBoxContainer.new()
+	fila.position = Ajustes.UI_CONSOLA_OPCIONES_POS
+	fila.size = Ajustes.UI_CONSOLA_OPCIONES_TAMANO
+	fila.add_theme_constant_override("separation", int(Ajustes.UI_CONSOLA_SEPARACION_ACCIONES))
+	fila.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fondo.add_child(fila)
+	for i in _opciones.size():
+		fila.add_child(_boton("(%d) %s" % [i + 1, _opciones[i]], i))
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	var tecla := event as InputEventKey
 	if tecla == null or not tecla.pressed or tecla.echo:
 		return
-	match tecla.keycode:
-		KEY_1, KEY_KP_1:
-			_responder(true)
-		KEY_2, KEY_KP_2:
-			_responder(false)
+	for i in _opciones.size():
+		if tecla.keycode == KEY_1 + i or tecla.keycode == KEY_KP_1 + i:
+			_responder(i)
 
 
-func _responder(si: bool) -> void:
+func _responder(indice: int) -> void:
 	if _respondida:
 		return
 	_respondida = true
 	get_viewport().set_input_as_handled()
-	respondido.emit(si)
+	elegido.emit(indice)
 
 
-func _boton(texto: String, valor: bool) -> Button:
+func _boton(texto: String, indice: int) -> Button:
 	var b := Button.new()
 	b.focus_mode = Control.FOCUS_NONE
 	b.custom_minimum_size = Vector2(Ajustes.UI_CONSOLA_ACCION_ANCHO, Ajustes.UI_CONSOLA_OPCIONES_TAMANO.y)
@@ -91,13 +100,20 @@ func _boton(texto: String, valor: bool) -> Button:
 	fila.add_child(prefijo)
 	var etiqueta := _label(texto, Color.WHITE)
 	etiqueta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_usar_letra_grande(etiqueta)  # misma letra que la pregunta: las tildes se leen bien
 	fila.add_child(etiqueta)
 	b.add_child(fila)
 
 	b.mouse_entered.connect(func (): prefijo.add_theme_color_override("font_color", Color.WHITE))
 	b.mouse_exited.connect(func (): prefijo.add_theme_color_override("font_color", COLOR_SECUNDARIO))
-	b.pressed.connect(_responder.bind(valor))
+	b.pressed.connect(_responder.bind(indice))
 	return b
+
+
+func _usar_letra_grande(l: Label) -> void:
+	if ResourceLoader.exists(Ajustes.UI_FUENTE_DIALOGO):
+		l.add_theme_font_override("font", load(Ajustes.UI_FUENTE_DIALOGO) as Font)
+		l.add_theme_font_size_override("font_size", Ajustes.UI_CONSOLA_DIALOGO_FUENTE)
 
 
 func _label(texto: String, color: Color) -> Label:
