@@ -21,6 +21,15 @@ var pausado := false
 var segundos_goteo := 0.0
 
 
+
+func _ready() -> void:
+	# El cursor de Popochiu se reemplaza cuando todos los autoloads están listos.
+	_aplicar_cursor.call_deferred()
+
+
+func _aplicar_cursor() -> void:
+	CursorPixel.aplicar()
+
 func _process(delta: float) -> void:
 	if not goteo_iniciado or pausado:
 		return

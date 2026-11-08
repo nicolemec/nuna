@@ -122,6 +122,14 @@ func obtener_frases_mirar() -> Array[String]:
 	return []
 
 
+## Adivinanza acertada: Lumi queda encendida y cuidada, como al leer su garantía.
+func resolver_adivinanza() -> void:
+	nombrado = true
+	estado = Estado.CUIDADA
+	_reproducir_animacion(&"cuidada")
+	susto_chico.emit()
+
+
 func obtener_frases_perturbar(cortina_bailando: bool) -> Array[String]:
 	if not nombrado or not puede_perturbar:
 		return [super.ejecutar(Globals.PERTURBAR)]

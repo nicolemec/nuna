@@ -47,7 +47,7 @@ position = Vector2(140, 100)
 position = Vector2(295, 145)
 
 [node name="Dentadura" parent="Props" instance=ExtResource("9")]
-position = Vector2(130, 100)
+position = Vector2(135, 110)
 
 [node name="Vaso" parent="Props" instance=ExtResource("10")]
 position = Vector2(130, 101)
