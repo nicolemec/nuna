@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3 uid="uid://bpj8jlet25coy"]
+
+[ext_resource type="Script" uid="uid://dijimwhk6hfa4" path="res://addons/popochiu/editor/main_dock/tab_audio/tab_audio.gd" id="1_u4f8v"]
+
+[node name="TabAudio" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_u4f8v")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+
+[node name="BtnScanAudioFiles" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Scan audio files"
+
+[node name="Filter" type="LineEdit" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Filter game objects"
+clear_button_enabled = true
+
+[node name="Tree" type="Tree" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

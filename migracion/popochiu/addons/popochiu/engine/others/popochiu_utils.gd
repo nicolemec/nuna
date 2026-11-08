@@ -1,0 +1,274 @@
+# @popochiu-docs-ignore-class
+@tool
+class_name PopochiuUtils
+extends Node
+## Utility functions for Popochiu.
+
+static var e: Popochiu = null:
+	get = get_popochiu
+static var r: PopochiuIRoom = null:
+	get = get_iroom
+static var c: PopochiuICharacter = null:
+	get = get_icharacter
+static var i: PopochiuIInventory = null:
+	get = get_iinventory
+static var d: PopochiuIDialog = null:
+	get = get_idialog
+static var a: PopochiuIAudio = null:
+	get = get_iaudio
+static var g: PopochiuIGraphicInterface = null:
+	get = get_igraphic_interface
+static var t: PopochiuITransitionLayer = null:
+	get = get_itransition_layer
+static var cursor: PopochiuCursor = null:
+	get = get_popochiu_cursor
+static var globals: Node = null:
+	get = get_popochiu_globals
+
+## @deprecated Available in 2.2 - Will be removed in 2.3 alongside the companion proxy functions.
+# Tracks deprecation notices already printed, so a deprecated call in a loop does not flood output.
+static var _warned_deprecations := {}
+
+
+#region Public #####################################################################################
+## Used by the GUI to get the position of [param node] in the scene transformed to the space of the
+## [CanvasLayer] where it is is rendered.
+static func get_screen_coords_for(node: Node, offset: Vector2 = Vector2.ZERO) -> Vector2:
+	return node.get_viewport().canvas_transform * (node.get_global_position() + offset)
+
+
+## Gets a random index from [param array].
+static func get_random_array_idx(array: Array) -> int:
+	randomize()
+	var idx := randi() % array.size()
+
+	return idx
+
+
+## Compares the name of files [param a] and [param b] to check which one comes first in alphabetical
+## order.
+static func sort_by_file_name(a: String, b: String) -> bool:
+	if a.get_file() < b.get_file():
+		return true
+	return false
+
+
+## Overrides the font [param font_name] in [param node] by [param font].
+static func override_font(node: Control, font_name: String, font: Font) -> void:
+	node.add_theme_font_override(font_name, font)
+
+
+## Prints [param msg] with Popochiu's error style.
+static func print_error(msg: String) -> void:
+	print_rich("[bgcolor=c46c71][color=ffffff][b][Popochiu][/b] %s[/color][/bgcolor]" % msg)
+
+
+## Prints [param msg] with Popochiu's warning style.
+static func print_warning(msg: String) -> void:
+	print_rich("[bgcolor=edf171][color=000000][b][Popochiu][/b] %s[/color][/bgcolor]" % msg)
+
+
+## Prints [param msg] with Popochiu's normal style.
+static func print_normal(msg: String) -> void:
+	print_rich("[bgcolor=75cec8][color=000000][b][Popochiu][/b] %s[/color][/bgcolor]" % msg)
+
+
+## Checks if [param event] is a mouse click event.
+##
+## On touchscreens a tap reaches the game as a mouse event: Godot emulates mouse events from touch
+## when [code]input_devices/pointing/emulate_mouse_from_touch[/code] is enabled (the default), and
+## most desktop OSes map touchscreen input to the mouse as well. Consuming raw
+## [InputEventScreenTouch] events on top of those would fire every click handler twice.
+static func is_click(event: InputEvent) -> bool:
+	return event is InputEventMouseButton
+
+
+## @deprecated Available in 2.2 - Will be removed in 2.3. Use [method is_click] instead.
+## Checks if [param event] is a mouse click event.
+static func is_click_or_touch(event: InputEvent) -> bool:
+	_warn_deprecated("is_click_or_touch", "is_click")
+	return is_click(event)
+
+
+## Checks if [param event] is an [InputEventMouseButton] with
+## [member InputEventMouseButton.double_click] as [code]true[/code].
+static func is_double_click(event: InputEvent) -> bool:
+	return event is InputEventMouseButton and event.double_click
+
+
+## @deprecated Available in 2.2 - Will be removed in 2.3. Use [method is_double_click] instead.
+## Checks if [param event] is a double click event.
+static func is_double_click_or_double_tap(event: InputEvent) -> bool:
+	_warn_deprecated("is_double_click_or_double_tap", "is_double_click")
+	return is_double_click(event)
+
+
+## Checks if [param event] is an [InputEventMouseButton] event and if it is pressed.
+static func is_click_pressed(event: InputEvent) -> bool:
+	return is_click(event) and event.pressed
+
+
+## @deprecated Available in 2.2 - Will be removed in 2.3. Use [method is_click_pressed] instead.
+## Checks if [param event] is a pressed mouse click event.
+static func is_click_or_touch_pressed(event: InputEvent) -> bool:
+	_warn_deprecated("is_click_or_touch_pressed", "is_click_pressed")
+	return is_click_pressed(event)
+
+
+## Returns the button index of [param event] when it is an [InputEventMouseButton] event, which is
+## [member InputEventMouseButton.button_index]. Returns [code]0[/code] if the event isn't pressed
+## or is not an [InputEventMouseButton].
+static func get_click_button_index(event: InputEvent) -> int:
+	var index := 0
+
+	if is_click_pressed(event):
+		index = event.button_index
+
+	return index
+
+
+## @deprecated Available in 2.2 - Will be removed in 2.3. Use [method get_click_button_index]
+## instead.
+## Returns the button index of a pressed mouse click event.
+static func get_click_or_touch_index(event: InputEvent) -> int:
+	_warn_deprecated("get_click_or_touch_index", "get_click_button_index")
+	return get_click_button_index(event)
+
+
+## For each element in [param array] calls [param callback] passing the element as a parameter. If
+## any of the calls returns [code]true[/code], then this function returns [code]true[/code],
+## otherwise [code]false[/code] is returned.
+##
+## This is an alternate version for [method Array.any] that doesn't stops execution even when one
+## of the results is [code]true[/code].
+static func any_exhaustive(array: Array, callback: Callable) -> bool:
+	var any_updated := false
+	for element in array:
+		var updated: bool = callback.call(element)
+		if updated:
+			any_updated = true
+	return any_updated
+
+
+## Returns a [Vector2] with the values of [param source]. If it is a [String], it will be unpacked
+## using a regular expression. If it is a [Dictionary], it's [code]x[/code] and [code]y[/code] keys
+## will be used. If it is a [Vector2], it will be returned as is. Otherwise [constant Vector2.ZERO]
+## is returned.
+static func unpack_vector_2(source) -> Vector2:
+	if source is Dictionary:
+		return Vector2(source.x, source.y)
+	elif source is String:
+		var regex = RegEx.new()
+		regex.compile(r'(Vector2\(|\()\s*(?<x>-?\d+)\s*,\s*(?<y>-?\d+)\s*\)')
+		var result := regex.search(source)
+		if result:
+			return Vector2(float(result.get_string("x")), float(result.get_string("y")))
+	elif source is Vector2:
+		return source
+	return Vector2.ZERO
+
+
+#endregion
+
+#region SetGet #####################################################################################
+static func get_popochiu() -> Popochiu:
+	if not is_instance_valid(e):
+		if Engine.get_singleton(&"E"):
+			e = Engine.get_singleton(&"E")
+		else:
+			e = Popochiu.new()
+	return e
+
+
+static func get_iroom() -> PopochiuIRoom:
+	if not is_instance_valid(r):
+		if Engine.get_singleton(&"R"):
+			r = Engine.get_singleton(&"R")
+		else:
+			r = PopochiuIRoom.new()
+	return r
+
+
+static func get_icharacter() -> PopochiuICharacter:
+	if not is_instance_valid(c):
+		if Engine.get_singleton(&"C"):
+			c = Engine.get_singleton(&"C")
+		else:
+			c = PopochiuICharacter.new()
+	return c
+
+
+static func get_iinventory() -> PopochiuIInventory:
+	if not is_instance_valid(i):
+		if Engine.get_singleton(&"I"):
+			i = Engine.get_singleton(&"I")
+		else:
+			i = PopochiuIInventory.new()
+	return i
+
+
+static func get_idialog() -> PopochiuIDialog:
+	if not is_instance_valid(d):
+		if Engine.get_singleton(&"D"):
+			d = Engine.get_singleton(&"D")
+		else:
+			d = PopochiuIDialog.new()
+	return d
+
+
+static func get_iaudio() -> PopochiuIAudio:
+	if not is_instance_valid(a):
+		if Engine.get_singleton(&"A"):
+			a = Engine.get_singleton(&"A")
+		else:
+			a = PopochiuIAudio.new()
+	return a
+
+
+static func get_igraphic_interface() -> PopochiuIGraphicInterface:
+	if not is_instance_valid(g):
+		if Engine.get_singleton(&"G"):
+			g = Engine.get_singleton(&"G")
+		else:
+			g = PopochiuIGraphicInterface.new()
+	return g
+
+
+static func get_itransition_layer() -> PopochiuITransitionLayer:
+	if not is_instance_valid(t):
+		if Engine.get_singleton(&"T"):
+			t = Engine.get_singleton(&"T")
+		else:
+			t = PopochiuITransitionLayer.new()
+	return t
+
+
+static func get_popochiu_cursor() -> PopochiuCursor:
+	if not is_instance_valid(cursor):
+		if Engine.get_singleton(&"Cursor"):
+			cursor = Engine.get_singleton(&"Cursor")
+		else:
+			cursor = PopochiuCursor.new()
+	return cursor
+
+
+static func get_popochiu_globals() -> Node:
+	if not is_instance_valid(globals):
+		globals = e.get_node("/root/Globals")
+	return globals
+
+
+#endregion
+
+#region Private ####################################################################################
+# Prints a deprecation warning for [param old_name] at most once per session, pointing to
+# [param new_name].
+static func _warn_deprecated(old_name: String, new_name: String) -> void:
+	if _warned_deprecations.has(old_name):
+		return
+
+	_warned_deprecations[old_name] = true
+	print_warning("%s() is deprecated. Use %s() instead." % [old_name, new_name])
+
+
+#endregion

@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="1"]
+[ext_resource type="Script" path="res://game/objects/huesped_101.gd" id="2"]
+[ext_resource type="Texture2D" path="res://arte/objetos/bed.png" id="3"]
+
+[node name="Huesped" instance=ExtResource("1")]
+script = ExtResource("2")
+script_name = "Huesped"
+description = "cama"
+textura = ExtResource("3")
+id = &"cama"
+nombre_desconocido = "cama"
+nombre = "Cama"
+frase_mirar = "Shhh… alguien duerme. Ideal."
+puede_perturbar = false
+frase_agarrar = ""
+tamano = Vector2(100, 40)
+interaction_polygon = PackedVector2Array(-50.0, -40.0, 50.0, -40.0, 50.0, 0, -50.0, 0)
+walk_to_point = Vector2(-16, 10)
+
+[node name="Sprite2D" parent="." index="0"]
+visible = false

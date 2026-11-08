@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://bynwdds8o3tcx"]
+
+[ext_resource type="Script" uid="uid://dy4a8apfejy88" path="res://addons/popochiu/editor/main_dock/tab_main/tab_main.gd" id="1_jdtyo"]
+
+[node name="Main" type="VBoxContainer"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_mode = 2
+script = ExtResource("1_jdtyo")
+metadata/_tab_index = 0
+
+[node name="Filter" type="LineEdit" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Filter game objects"
+clear_button_enabled = true
+
+[node name="Tree" type="Tree" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
