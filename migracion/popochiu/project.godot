@@ -1,0 +1,52 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Nuna - Base Popochiu"
+run/main_scene="res://game/menu/menu_inicio.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[aseprite_importers]
+
+aseprite_executable_path="aseprite"
+
+[autoload]
+
+Globals="*uid://dyxwp5kdacvbf"
+Cursor="*uid://c2pqh7ajiuiy0"
+E="*uid://rda8wggldt5o"
+R="*uid://blskwad5a3u"
+C="*uid://ya3quxp3s4nk"
+I="*uid://p6qk6625iqxx"
+D="*uid://k4vexklp63ol"
+A="*uid://cn040f58s8rlu"
+G="*uid://blk6nfpfiqrd2"
+T="*uid://30lm6k5s368s"
+
+[display]
+
+window/size/viewport_width=320
+window/size/viewport_height=180
+window/size/window_width_override=1280
+window/size/window_height_override=720
+window/stretch/mode="viewport"
+window/stretch/scale_mode="integer"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/popochiu/editor/gizmos/plugin.cfg", "res://addons/popochiu/editor/importers/plugin.cfg", "res://addons/popochiu/plugin.cfg", "res://addons/nklbdev.aseprite_importers/plugin.cfg")
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+2d/snap/snap_2d_transforms_to_pixel=true

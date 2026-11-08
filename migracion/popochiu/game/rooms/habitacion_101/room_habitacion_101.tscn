@@ -1,0 +1,77 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://game/rooms/habitacion_101/room_habitacion_101.gd" id="1"]
+[ext_resource type="Texture2D" path="res://arte/backgrounds/habitacion_101.png" id="2"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/puerta/prop_puerta.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/pantuflas/prop_pantuflas.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/cama/prop_cama.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/velador/prop_velador.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/lampara/prop_lampara.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/comoda/prop_comoda.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/dentadura/prop_dentadura.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/vaso/prop_vaso.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/ventana/prop_ventana.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/radio/prop_radio.tscn" id="12"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/ovillo/prop_ovillo.tscn" id="13"]
+
+[node name="RoomHabitacion101" type="Node2D"]
+script = ExtResource("1")
+script_name = "Habitacion101"
+width = 320
+height = 180
+
+[node name="Background" type="Sprite2D" parent="."]
+centered = false
+texture = ExtResource("2")
+
+[node name="WalkableAreas" type="Node2D" parent="."]
+
+[node name="Props" type="Node2D" parent="."]
+
+[node name="Puerta" parent="Props" instance=ExtResource("3")]
+position = Vector2(16, 152)
+
+[node name="Pantuflas" parent="Props" instance=ExtResource("4")]
+position = Vector2(70, 143)
+
+[node name="Huesped" parent="Props" instance=ExtResource("5")]
+position = Vector2(75, 135)
+
+[node name="Velador" parent="Props" instance=ExtResource("6")]
+position = Vector2(135, 130)
+
+[node name="Lumi" parent="Props" instance=ExtResource("7")]
+position = Vector2(140, 100)
+
+[node name="Comoda" parent="Props" instance=ExtResource("8")]
+position = Vector2(295, 145)
+
+[node name="Dentadura" parent="Props" instance=ExtResource("9")]
+position = Vector2(130, 100)
+
+[node name="Vaso" parent="Props" instance=ExtResource("10")]
+position = Vector2(130, 101)
+
+[node name="Cortina" parent="Props" instance=ExtResource("11")]
+position = Vector2(219, 98)
+
+[node name="Ramon" parent="Props" instance=ExtResource("12")]
+position = Vector2(300, 122)
+
+[node name="Ovillo" parent="Props" instance=ExtResource("13")]
+position = Vector2(200, 147)
+
+[node name="Hotspots" type="Node2D" parent="."]
+
+[node name="Regions" type="Node2D" parent="."]
+
+[node name="Markers" type="Node2D" parent="."]
+
+[node name="EntradaNuna" type="Marker2D" parent="Markers"]
+position = Vector2(16, 81)
+
+[node name="InicioNuna" type="Marker2D" parent="Markers"]
+position = Vector2(36, 140)
+
+[node name="Characters" type="Node2D" parent="."]
+

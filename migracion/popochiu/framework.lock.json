@@ -1,0 +1,32 @@
+{
+  "engine": {
+    "name": "Godot",
+    "version": "4.7.1",
+    "build": "4.7.1.stable.official.a13da4feb"
+  },
+  "framework": {
+    "name": "Popochiu",
+    "version": "2.2.1",
+    "repository": "https://github.com/carenalgas/popochiu",
+    "tag": "v2.2.1",
+    "commit": "1b3426252543a82b456be6a40735eff15d0f0a81",
+    "archive_url": "https://codeload.github.com/carenalgas/popochiu/zip/1b3426252543a82b456be6a40735eff15d0f0a81",
+    "archive_sha256": "2c65cf133aa3ec160b3af74eb82a70113b4d5691bf07761510b1dc2af14823a9",
+    "installed_directory": "addons/popochiu",
+    "license_file": "third_party/Popochiu-LICENSE.txt"
+  },
+  "aseprite_importers": {
+    "asset_library_id": 1880,
+    "version": "1.0.0",
+    "source_archive_directory": "godot-4-aseprite-importers-a9afe66b68b22474e7d75c3cc5e5b3e064530c7c",
+    "source_revision_from_archive_name": "a9afe66b68b22474e7d75c3cc5e5b3e064530c7c",
+    "installed_directory": "addons/nklbdev.aseprite_importers",
+    "license_file": "third_party/Aseprite-Importers-LICENSE.txt",
+    "aseprite_version_tested": "1.3.7-x64"
+  },
+  "prototype": {
+    "repository": "https://github.com/nicolemec/nuna",
+    "base_commit": "daa78799420331f7f506445186e3652faf54ee48",
+    "project": "../../project.godot"
+  }
+}
