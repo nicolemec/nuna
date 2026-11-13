@@ -1,8 +1,0 @@
-[gd_resource type="Resource" script_class="PopochiuRoomData" load_steps=2 format=3]
-
-[ext_resource type="Script" path="res://game/rooms/base_tecnica/room_base_tecnica_state.gd" id="1_state"]
-
-[resource]
-script = ExtResource("1_state")
-script_name = "BaseTecnica"
-scene = "res://game/rooms/base_tecnica/room_base_tecnica.tscn"

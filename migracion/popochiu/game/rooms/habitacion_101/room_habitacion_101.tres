@@ -1,9 +1,0 @@
-[gd_resource type="Resource" load_steps=2 format=3]
-
-[ext_resource type="Script" path="res://game/rooms/habitacion_101/room_habitacion_101_state.gd" id="1"]
-
-[resource]
-resource_name = "Habitacion101"
-script = ExtResource("1")
-script_name = "Habitacion101"
-scene = "res://game/rooms/habitacion_101/room_habitacion_101.tscn"
