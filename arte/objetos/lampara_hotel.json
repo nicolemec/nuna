@@ -1,0 +1,115 @@
+{
+ "frames": {
+  "lampara_hotel 0.aseprite": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   },
+   "duration": 100
+  },
+  "lampara_hotel 1.aseprite": {
+   "frame": {
+    "x": 32,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   },
+   "duration": 100
+  },
+  "lampara_hotel 2.aseprite": {
+   "frame": {
+    "x": 64,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 40
+   },
+   "duration": 100
+  }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "exportado por script (Copilot)",
+  "image": "lampara_hotel.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 96,
+   "h": 40
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "apagado",
+    "from": 0,
+    "to": 0,
+    "direction": "forward",
+    "color": "#000000ff"
+   },
+   {
+    "name": "encendiendo",
+    "from": 1,
+    "to": 1,
+    "direction": "forward",
+    "color": "#000000ff"
+   },
+   {
+    "name": "enccendido",
+    "from": 2,
+    "to": 2,
+    "direction": "forward",
+    "color": "#000000ff"
+   }
+  ],
+  "layers": [
+   {
+    "name": "Layer 1"
+   },
+   {
+    "name": "Layer 2"
+   },
+   {
+    "name": "Layer 2 Copy"
+   },
+   {
+    "name": "Layer 3"
+   }
+  ]
+ }
+}

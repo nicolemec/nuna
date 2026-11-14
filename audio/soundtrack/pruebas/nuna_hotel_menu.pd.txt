@@ -1,0 +1,112 @@
+#N canvas 50 50 900 750 10;
+#X obj 50 30 text 8-BIT CHIPTUNE ENGINE - NUNA: HOTEL MENU THEME;
+#X obj 50 60 text Tempo: 92 BPM | Key: D minor | Structure: A - B - A' (64 Steps);
+
+#X msg 50 120 1;
+#X msg 90 120 0;
+#X obj 50 150 metro 163.043;
+#X text 110 120 Start / Stop Clock;
+#X obj 50 180 counter 0 63;
+
+#X text 50 220 --- SEQUENCE TABLES (64 Steps: 0 = Rest, MIDI Numbers for Notes) ---;
+#X obj 50 250 table ch1_seq 64;
+#X obj 200 250 table ch2_seq 64;
+#X obj 350 250 table ch3_seq 64;
+#X obj 500 250 table ch4_seq 64;
+
+#X text 50 300 --- CHANNEL 1: PULSE 1 (Main Melody - D, F, A, C, Eb, Ab) ---;
+#X obj 50 330 tabread ch1_seq;
+#X obj 50 360 mtof;
+#X obj 50 390 phasor~;
+#X obj 50 420 expr~ ($f1 > 0.5) * 2 - 1;
+#X obj 50 450 *~ 0.15;
+#X obj 50 480 line~;
+#X obj 90 450 t b f;
+#X msg 90 480 1, 0 80;
+
+#X text 250 300 --- CHANNEL 2: PULSE 2 (Arpeggios / Counter-Melody) ---;
+#X obj 250 330 tabread ch2_seq;
+#X obj 250 360 mtof;
+#X obj 250 390 phasor~;
+#X obj 250 420 expr~ ($f1 > 0.3) * 2 - 1;
+#X obj 250 450 *~ 0.10;
+#X obj 250 480 line~;
+#X obj 290 450 t b f;
+#X msg 290 480 1, 0 60;
+
+#X text 450 300 --- CHANNEL 3: TRIANGLE (Bass Foundation) ---;
+#X obj 450 330 tabread ch3_seq;
+#X obj 450 360 mtof;
+#X obj 450 390 phasor~;
+#X obj 450 420 cos~;
+#X obj 450 450 *~ 0.20;
+#X obj 450 480 line~;
+#X obj 490 450 t b f;
+#X msg 490 480 1, 0 120;
+
+#X text 650 300 --- CHANNEL 4: NOISE (Retro Percussion) ---;
+#X obj 650 330 tabread ch4_seq;
+#X obj 650 360 noise~;
+#X obj 650 390 *~ 0.08;
+#X obj 650 420 line~;
+#X obj 690 390 t b f;
+#X msg 690 420 1, 0 40;
+
+#X text 50 550 --- MASTER MIXER & OUTPUT ---;
+#X obj 50 580 *~ 1;
+#X obj 150 580 *~ 1;
+#X obj 250 580 *~ 1;
+#X obj 350 580 *~ 1;
+#X obj 50 630 +~;
+#X obj 150 630 +~;
+#X obj 50 670 dac~;
+
+#X connect 2 0 4 0;
+#X connect 4 0 5 0;
+#X connect 4 0 20 0;
+#X connect 4 0 30 0;
+#X connect 4 0 40 0;
+#X connect 4 0 50 0;
+
+#X connect 5 0 6 0;
+#X connect 6 0 7 0;
+#X connect 7 0 8 0;
+#X connect 8 0 11 0;
+#X connect 9 0 10 0;
+#X connect 10 0 11 1;
+#X connect 11 0 55 0;
+
+#X connect 20 0 21 0;
+#X connect 21 0 22 0;
+#X connect 22 0 23 0;
+#X connect 23 0 24 0;
+#X connect 24 0 26 0;
+#X connect 25 0 27 0;
+#X connect 26 0 27 1;
+#X connect 27 0 56 0;
+
+#X connect 30 0 31 0;
+#X connect 31 0 32 0;
+#X connect 32 0 33 0;
+#X connect 33 0 34 0;
+#X connect 34 0 36 0;
+#X connect 35 0 37 0;
+#X connect 36 0 37 1;
+#X connect 37 0 57 0;
+
+#X connect 40 0 41 0;
+#X connect 41 0 42 0;
+#X connect 42 0 43 0;
+#X connect 43 0 45 0;
+#X connect 44 0 46 0;
+#X connect 45 0 46 1;
+#X connect 46 0 58 0;
+
+#X connect 55 0 60 0;
+#X connect 56 0 60 1;
+#X connect 57 0 61 0;
+#X connect 58 0 61 1;
+#X connect 60 0 62 0;
+#X connect 61 0 62 1;
+#X connect 62 0 63 0;
+#X connect 62 0 63 1;

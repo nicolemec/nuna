@@ -1,6 +1,0 @@
-# Godot 4+ specific ignores
-.godot/
-/android/
-
-# Local migration downloads and machine-specific settings
-/migracion/godot-4-aseprite-importers-*/

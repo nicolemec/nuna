@@ -1,0 +1,26 @@
+{ "frames": {
+   "recepcion_hotel_bg.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 885, "h": 152 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 885, "h": 152 },
+    "sourceSize": { "w": 885, "h": 152 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.7-x64",
+  "image": "recepcion_hotel_bg.png",
+  "format": "RGBA8888",
+  "size": { "w": 885, "h": 152 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "Flattened", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

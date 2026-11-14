@@ -1,0 +1,5 @@
+res://game/rooms/base_tecnica/room_base_tecnica.tscn
+res://addons/popochiu/editor/helpers/popochiu_editor_helper.gd
+res://game/helpers/musica.gd
+res://game/helpers/toma.gd
+res://game/rooms/calle/room_calle.gd

@@ -1,0 +1,34 @@
+{ "frames": {
+   "escenario 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 320, "h": 152 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 320, "h": 152 },
+    "sourceSize": { "w": 320, "h": 152 },
+    "duration": 100
+   },
+   "escenario 1.aseprite": {
+    "frame": { "x": 320, "y": 0, "w": 320, "h": 152 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 320, "h": 152 },
+    "sourceSize": { "w": 320, "h": 152 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.7-x64",
+  "image": "escenario.png",
+  "format": "RGBA8888",
+  "size": { "w": 640, "h": 152 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "escenario", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

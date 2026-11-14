@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="1"]
+[ext_resource type="Script" path="res://game/objects/objeto_interactivo.gd" id="2"]
+[ext_resource type="Texture2D" path="res://arte/objetos/vaso.png" id="3"]
+
+[node name="Vaso" instance=ExtResource("1")]
+script = ExtResource("2")
+script_name = "Vaso"
+description = "vaso"
+textura = ExtResource("3")
+id = &"vaso"
+nombre_desconocido = "vaso"
+nombre = "Vaso"
+frase_mirar = "Un vaso de agua… ¿y los dientes de la señora?"
+puede_perturbar = false
+frase_agarrar = ""
+tamano = Vector2(7, 10)
+interaction_polygon = PackedVector2Array(-3.5, -10.0, 3.5, -10.0, 3.5, 0, -3.5, 0)
+walk_to_point = Vector2(-16, 10)
+
+[node name="Sprite2D" parent="." index="0"]
+visible = false

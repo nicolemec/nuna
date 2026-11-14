@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="1"]
+[ext_resource type="Script" path="res://game/objects/objeto_interactivo.gd" id="2"]
+[ext_resource type="Texture2D" path="res://arte/objetos/lana.png" id="3"]
+
+[node name="Ovillo" instance=ExtResource("1")]
+script = ExtResource("2")
+script_name = "Ovillo"
+description = "ovillo"
+textura = ExtResource("3")
+id = &"ovillo"
+nombre_desconocido = "ovillo"
+nombre = "Ovi"
+frase_mirar = "Tan redondito y firme… ¡como un escalón!"
+frase_perturbar = "Ovi rueda un poquito."
+puede_agarrar = true
+frase_agarrar = "¿Me acompañás, Ovi?"
+tamano = Vector2(21, 20)
+interaction_polygon = PackedVector2Array(-10.5, -20.0, 10.5, -20.0, 10.5, 0, -10.5, 0)
+walk_to_point = Vector2(-16, 10)
+
+[node name="Sprite2D" parent="." index="0"]
+visible = false

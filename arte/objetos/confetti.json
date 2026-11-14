@@ -1,0 +1,274 @@
+{
+ "frames": {
+  "confetti 0.aseprite": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 183,
+    "h": 139
+   },
+   "duration": 100
+  },
+  "confetti 1.aseprite": {
+   "frame": {
+    "x": 183,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 183,
+    "h": 139
+   },
+   "duration": 100
+  },
+  "confetti 2.aseprite": {
+   "frame": {
+    "x": 366,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 183,
+    "h": 139
+   },
+   "duration": 100
+  },
+  "confetti 3.aseprite": {
+   "frame": {
+    "x": 549,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 183,
+    "h": 139
+   },
+   "duration": 100
+  },
+  "confetti 4.aseprite": {
+   "frame": {
+    "x": 732,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 183,
+    "h": 139
+   },
+   "duration": 100
+  },
+  "confetti 5.aseprite": {
+   "frame": {
+    "x": 915,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 183,
+    "h": 139
+   },
+   "duration": 100
+  },
+  "confetti 6.aseprite": {
+   "frame": {
+    "x": 1098,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 183,
+    "h": 139
+   },
+   "duration": 100
+  },
+  "confetti 7.aseprite": {
+   "frame": {
+    "x": 1281,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 183,
+    "h": 139
+   },
+   "duration": 100
+  },
+  "confetti 8.aseprite": {
+   "frame": {
+    "x": 1464,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 183,
+    "h": 139
+   },
+   "duration": 100
+  },
+  "confetti 9.aseprite": {
+   "frame": {
+    "x": 1647,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 183,
+    "h": 139
+   },
+   "duration": 100
+  },
+  "confetti 10.aseprite": {
+   "frame": {
+    "x": 1830,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 183,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 183,
+    "h": 139
+   },
+   "duration": 100
+  }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "exportado por script (Copilot)",
+  "image": "confetti.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 2013,
+   "h": 139
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "nace",
+    "from": 0,
+    "to": 0,
+    "direction": "forward",
+    "color": "#000000ff"
+   },
+   {
+    "name": "explota",
+    "from": 1,
+    "to": 9,
+    "direction": "forward",
+    "color": "#000000ff"
+   },
+   {
+    "name": "caido",
+    "from": 10,
+    "to": 10,
+    "direction": "forward",
+    "color": "#000000ff"
+   }
+  ],
+  "layers": [
+   {
+    "name": "Layer 1"
+   }
+  ]
+ }
+}

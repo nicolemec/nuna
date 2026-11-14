@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="PopochiuInventoryItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/inventory_items/dentadura/inventory_item_dentadura_state.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+script_name = "Dentadura"
+scene = "res://game/inventory_items/dentadura/inventory_item_dentadura.tscn"

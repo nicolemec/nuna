@@ -1,0 +1,8 @@
+res://game/rooms/base_tecnica/room_base_tecnica.tscn
+res://addons/popochiu/editor/helpers/popochiu_editor_helper.gd
+res://game/helpers/sala_intro.gd
+res://game/objects/lumi.gd
+res://game/objects/viejo_recepcion.gd
+res://game/rooms/habitacion_101/room_habitacion_101.gd
+res://game/rooms/recepcion/room_recepcion.gd
+res://game/ui/orden_trabajo.gd
