@@ -1,0 +1,98 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://game/rooms/recepcion/room_recepcion.gd" id="1"]
+[ext_resource type="Texture2D" path="res://arte/backgrounds/recepcion_hotel_bg.png" id="2"]
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="3"]
+[ext_resource type="Script" path="res://game/objects/zona_intro.gd" id="4"]
+[ext_resource type="Script" path="res://game/objects/lampara_recepcion.gd" id="5"]
+[ext_resource type="Script" path="res://game/objects/viejo_recepcion.gd" id="6"]
+[ext_resource type="Texture2D" path="res://arte/objetos/llavero_sin_llave.png" id="7"]
+[ext_resource type="Texture2D" path="res://arte/objetos/llave_101.png" id="8"]
+
+[node name="RoomRecepcion" type="Node2D"]
+script = ExtResource("1")
+script_name = "Recepcion"
+width = 885
+height = 180
+
+[node name="Background" type="Sprite2D" parent="."]
+texture = ExtResource("2")
+centered = false
+
+[node name="LlaveroSinLlave" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(215, 39)
+texture = ExtResource("7")
+centered = false
+
+[node name="Llave101" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(215, 39)
+texture = ExtResource("8")
+centered = false
+
+[node name="Viejo" type="Node2D" parent="."]
+position = Vector2(823, 146)
+script = ExtResource("6")
+
+[node name="SonidoTimbre" type="AudioStreamPlayer" parent="."]
+
+[node name="WalkableAreas" type="Node2D" parent="."]
+
+[node name="Props" type="Node2D" parent="."]
+
+[node name="Timbre" parent="Props" instance=ExtResource("3")]
+position = Vector2(194, 91)
+script = ExtResource("4")
+script_name = "Timbre"
+description = "timbre"
+id = &"timbre"
+nombre_desconocido = "timbre"
+nombre = "Timbre"
+puede_perturbar = false
+tamano = Vector2(20, 13)
+distancia_uso = -16.0
+
+[node name="Sprite2D" parent="Props/Timbre" index="0"]
+visible = false
+
+[node name="Lampara" parent="Props" instance=ExtResource("3")]
+position = Vector2(340, 92)
+script = ExtResource("5")
+script_name = "Lampara"
+description = "lámpara"
+id = &"lampara"
+nombre_desconocido = "lámpara"
+nombre = "Doña Luz"
+frase_mirar = "¡Hola, Doña Luz!"
+tamano = Vector2(26, 38)
+distancia_uso = -18.0
+
+[node name="Sprite2D" parent="Props/Lampara" index="0"]
+visible = false
+
+[node name="Hotspots" type="Node2D" parent="."]
+
+[node name="Regions" type="Node2D" parent="."]
+
+[node name="Markers" type="Node2D" parent="."]
+
+[node name="Entrada" type="Marker2D" parent="Markers"]
+position = Vector2(64, 146)
+
+[node name="Mostrador" type="Marker2D" parent="Markers"]
+position = Vector2(112, 146)
+
+[node name="PuertaViejo" type="Marker2D" parent="Markers"]
+position = Vector2(823, 146)
+
+[node name="ViejoMostrador" type="Marker2D" parent="Markers"]
+position = Vector2(300, 146)
+
+[node name="Libro" type="Marker2D" parent="Markers"]
+position = Vector2(258, 146)
+
+[node name="Puerta101" type="Marker2D" parent="Markers"]
+position = Vector2(477, 146)
+
+[node name="Characters" type="Node2D" parent="."]

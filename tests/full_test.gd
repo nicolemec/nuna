@@ -78,10 +78,10 @@ func run(room: PopochiuRoom) -> void:
 		return
 	for i in 3:
 		await _action("Lumi", Globals.PERTURBAR)
-	if not _check(_room.get_prop("Lumi").estado == Lumi.Estado.NIVEL_3 and Globals.vela_101 == 50.0 and Globals.bruma == 69.0, "Lumi: tres niveles y costes/recompensas"):
+	if not _check(_room.get_prop("Lumi").estado == Lumi.Estado.NIVEL_3 and Globals.sellos == 2 and Globals.vela_101 == 50.0 and Globals.bruma == 79.0, "Lumi: tres niveles, costes/recompensas y sello al leer la garantía"):
 		return
 	await _action("Lumi", Globals.PERTURBAR)
-	if not _check(_room.get_prop("Lumi").estado == Lumi.Estado.QUEMADA and Globals.vela_101 == 75.0 and Globals.bruma == 54.0, "Fogonazo y quemada"):
+	if not _check(_room.get_prop("Lumi").estado == Lumi.Estado.QUEMADA and Globals.sellos == 2 and Globals.vela_101 == 75.0 and Globals.bruma == 64.0, "Fogonazo y quemada (sin sello extra)"):
 		return
 	await _action("Ovillo", Globals.MIRAR)
 	await _action("Ovillo", Globals.AGARRAR)
@@ -103,10 +103,10 @@ func run(room: PopochiuRoom) -> void:
 	PreguntaSiNo.respuesta_automatica = true
 	await _room.usar_objeto(I.active, _room.get_prop("Cortina"))
 	PreguntaSiNo.respuesta_automatica = null
-	if not _check(_room.state.cortina_bailando and not Globals.tiene(&"ovillo") and C.player.inventory.size() == 1 and I.active == null and Globals.sellos == 2 and Globals.vela_101 == 90.0, "Usar y consumir Ovi sin inventario paralelo"):
+	if not _check(_room.state.cortina_bailando and not Globals.tiene(&"ovillo") and C.player.inventory.size() == 1 and I.active == null and Globals.sellos == 3 and Globals.vela_101 == 90.0 and _room.state.mision_completada and _completion_cards == 1, "Ovi: tercer sello, Ofelia salta y cierre de misión"):
 		return
 	await _action("Cortina", Globals.PERTURBAR)
-	if not _check(Globals.sellos == 2 and Globals.vela_101 == 90.0, "Recompensa de cortina única"):
+	if not _check(Globals.sellos == 3 and Globals.vela_101 == 90.0 and _completion_cards == 1, "Recompensa de cortina única"):
 		return
 	if not await _save_restore("Ovi consumido"):
 		return
@@ -124,7 +124,7 @@ func run(room: PopochiuRoom) -> void:
 	if not _check(Globals.vela_101 == vela_antes and Globals.bruma == bruma_antes - 15.0, "Niveles repetidos no vuelven a premiar"):
 		return
 	await _action("Lumi", Globals.MIRAR)
-	if not _check(_room.get_prop("Lumi").estado == Lumi.Estado.CUIDADA and Globals.sellos == 3 and _room.state.mision_completada and _completion_cards == 1, "Tercer sello y cierre de misión original"):
+	if not _check(_room.get_prop("Lumi").estado == Lumi.Estado.CUIDADA and Globals.sellos == 3 and _room.state.mision_completada and _completion_cards == 1, "Lumi cuidada sin repetir sello ni cierre"):
 		return
 	await _action("Lumi", Globals.MIRAR)
 	await _action("Lumi", Globals.PERTURBAR)

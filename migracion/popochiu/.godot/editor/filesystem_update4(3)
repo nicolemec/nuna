@@ -1,7 +1,0 @@
-res://game/rooms/base_tecnica/room_base_tecnica.tscn
-res://addons/popochiu/editor/helpers/popochiu_editor_helper.gd
-res://game/gui/gui.gd
-res://game/helpers/sala_intro.gd
-res://game/helpers/voz_nuna.gd
-res://game/menu/menu_inicio.gd
-res://game/rooms/recepcion/room_recepcion.gd

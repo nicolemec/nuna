@@ -9,3 +9,4 @@ var cajon_abierto := false
 var sombra_gigante_activada := false
 var entrada_completada := false
 var mision_completada := false
+var recibo_leido := false

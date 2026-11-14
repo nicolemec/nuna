@@ -104,17 +104,22 @@ func obtener_frases_mirar() -> Array[String]:
 			if not mirada_inicial:
 				mirada_inicial = true
 				_certificacion_pendiente = true
-				return ["¡Hola, lámpara! Te voy a llamar Lumi.", "¿Nunca se apagan? ¡Hay que encenderla!"]
-			return ["Lumi está apagadita."]
+				return [
+					"¡Hola, lámpara! Te voy a llamar Lumi.",
+					"Tiene algo grabado abajo… Muy oscuro para leerlo.",
+					"¿Nunca se apagan? ¡Hay que encenderla!",
+				]
+			return ["Lumi está apagadita. Así no leo lo grabado."]
 		Estado.NIVEL_1:
-			return ["Tiene algo grabado… no llego a leerlo."]
+			return ["Dice «Garan…». ¡Necesito más luz!"]
 		Estado.NIVEL_2:
-			return ["¡Ya casi lo leo! Un poquito más de luz…"]
+			return ["«Garantía: 3…» ¡Un empujoncito más!"]
 		Estado.NIVEL_3:
+			# El sello ya se ganó al llegar al nivel 3: mirarla ahora es cuidarla.
 			estado = Estado.CUIDADA
 			_reproducir_animacion(&"cuidada")
 			Globals.otorgar_sello(&"lumi")
-			return ["Garantía: 3 noches.", "Lumi, ya diste suficiente. Quedate así."]
+			return ["Lumi, ya diste suficiente. Quedate así."]
 		Estado.CUIDADA:
 			return ["Lumi brilla tranquila. Ya no corre peligro."]
 		Estado.QUEMADA:
@@ -152,21 +157,23 @@ func obtener_frases_perturbar(cortina_bailando: bool) -> Array[String]:
 			_aplicar_recompensa_nivel(Estado.NIVEL_1)
 			_bloquear_clics()
 			_reproducir_animacion(&"sube")
-			return ["¡Arriba, Lumi!"]
+			return ["¡Arriba, Lumi!", "Abajo aparece algo grabado: «Garan…»."]
 		Estado.NIVEL_1:
 			estado = Estado.NIVEL_2
 			susto_chico.emit()
 			_aplicar_recompensa_nivel(Estado.NIVEL_2)
 			_bloquear_clics()
 			_reproducir_animacion(&"sube")
-			return ["¡Más brillo! ¡Más rendimiento!"]
+			return ["¡Más brillo! ¡Más rendimiento!", "«Garantía: 3…» ¡Ya casi lo leo!"]
 		Estado.NIVEL_2:
 			estado = Estado.NIVEL_3
 			susto_chico.emit()
 			_aplicar_recompensa_nivel(Estado.NIVEL_3)
 			_bloquear_clics()
 			_reproducir_animacion(&"sube")
-			return ["¡Brillás como una profesional!", "Lumi… ¿estás transpirando?"]
+			# A pleno brillo se lee la garantía entera: ese es el sello de Lumi.
+			Globals.otorgar_sello(&"lumi")
+			return ["¡Brillás como una profesional!", "Ahora sí se lee: «Garantía: 3 noches».", "Lumi… ¿estás transpirando?"]
 		Estado.NIVEL_3:
 			Globals.cambiar_bruma(-Ajustes.LUMI_COSTO_BRUMA_FOGONAZO)
 			estado = Estado.QUEMADA
@@ -176,7 +183,7 @@ func obtener_frases_perturbar(cortina_bailando: bool) -> Array[String]:
 				_fogonazo_recompensado = true
 				Globals.aumentar_vela(Ajustes.LUMI_HABITACION_ID, Ajustes.LUMI_RECOMPENSA_VELA_FOGONAZO)
 			_iniciar_temporizador_quemada = true
-			return ["¡WOW, Lumi!", "¡Perdón, Lumi!"]
+			return ["¡WOW, Lumi!", "¡Perdón, Lumi! Trabajó tanto que se quemó."]
 	return []
 
 

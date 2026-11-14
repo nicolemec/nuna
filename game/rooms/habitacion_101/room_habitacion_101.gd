@@ -12,8 +12,11 @@ const FRASES_PROGRESO := ["", "¡Sello uno! Faltan dos.", "¡Dos de tres! ¡Ya c
 const OVI_POS_VENTANA := Vector2(219, 132)
 const OVI_ALTURA := 14.0
 ## Ramón: la etiqueta trae el código al revés (ORTAUC = CUATRO).
+## Las estaciones son un día de trabajo (Mérito, Ocupada, Feriado, Hora Extra) y Ofelia las
+## escuchó 45 años: ya no la despiertan. Solo la Radio Revés llega: pasa su vida para atrás,
+## hasta la canción de cuna. Es la única frecuencia que no transmite Din (ver el documento).
 const ETIQUETA_RAMON := "¡Sintonizá ORTAUC y llegás!"
-const LETRA_CHICA_RAMON := "(Radio Revés: se lee al revés.)"
+const LETRA_CHICA_RAMON := "(Radio Revés: se lee al revés. Din no llega hasta acá.)"
 const ESTACION_CORRECTA := 4
 const COSTO_ESTACION_EQUIVOCADA := 2.0
 ## Lumi: adivinanza sobre la bruma (el sueldo de los fantasmas).
@@ -21,11 +24,20 @@ const OPCIONES_ADIVINANZA := ["La bruma", "El miedo", "Un sello"]
 const COSTO_ADIVINANZA_ERRADA := 2.0
 const VELA_ADIVINANZA := 30.0
 const VELADOR_ABIERTO_PNG := "res://arte/objetos/velador_abierto.png"
+## Debajo de la dentadura: el recibo de jubilación de Ofelia y la tarifa del hotel.
+## Si existe la toma (2 cuadros de 320x152: recibo y tarifa), se muestra a pantalla completa;
+## si no, las mismas frases van en la tarjeta de la consola.
+const TOMA_RECIBO := "res://arte/tomas/toma_recibo.png"
+const RECIBO_ETIQUETA := "RECIBO DE JUBILACIÓN. Ofelia. 45 años de aportes."
+const RECIBO_LETRA_CHICA := "(Monto: casi nada.)"
+const TARIFA_ETIQUETA := "HOTEL. Estadía permanente: tarifa jubilados."
+const TARIFA_LETRA_CHICA := "(Incluye: cama, desayuno y silencio.)"
 var state: Data = load("res://game/rooms/habitacion_101/room_habitacion_101.tres")
 var ocupado := false
 var objeto_seleccionado: ObjetoInteractivo
 var _estaciones_probadas: Array[int] = []
 var _dial_abierto := false
+var _saliendo := false
 var _textura_velador_cerrado: Texture2D
 var _textura_velador_abierto: Texture2D
 
@@ -60,7 +72,8 @@ func _on_room_entered() -> void:
 		C.player.position = Vector2(36, 140)
 	$Props/Lumi.combo_sombra_activado.connect(_on_combo_sombra_activado)
 	$Props/Lumi.susto_chico.connect($Props/Huesped.temblar)
-	$Props/Lumi.fogonazo_realizado.connect($Props/Huesped.asustarse)
+	# Ofelia solo tiembla con cada susto; salta de la cama con el tercer sello.
+	$Props/Lumi.fogonazo_realizado.connect($Props/Huesped.temblar)
 	$Props/Ramon.comenzo_a_sonar.connect($Props/Huesped.temblar)
 	_restaurar_visual()
 
@@ -72,7 +85,7 @@ func _on_restore_from_savegame() -> void:
 func _restaurar_visual() -> void:
 	ocupado = false
 	objeto_seleccionado = null
-	$Props/Ramon.sonar() if state.ramon_sonando else $Props/Ramon.mostrar_quieto()
+	$Props/Ramon.sonar(true) if state.ramon_sonando else $Props/Ramon.mostrar_quieto()
 	$Props/Cortina.bailar() if state.cortina_bailando else $Props/Cortina.mostrar_quieta()
 	$Props/Lumi.restaurar()
 	$Props/Puerta.mostrar_cerrada()
@@ -85,6 +98,8 @@ func _restaurar_visual() -> void:
 	if state.ovi_en_ventana:
 		_fijar_ovi_en_ventana()
 	_mostrar_cajon(state.cajon_abierto)
+	if state.recibo_leido:
+		_presentar_ofelia()
 	G.gui.mostrar_habitacion(true)
 	_actualizar_guia()
 
@@ -142,6 +157,10 @@ func ejecutar_accion(verbo: String) -> void:
 		func (): await C.player.interactuar(obj.global_position),
 		func (): await _resolver_accion(obj, StringName(verbo)),
 	])
+	if _saliendo:
+		# Durante el cambio de sala la GUI sigue bloqueada (E.queue la desbloquea al terminar).
+		G.block()
+		return
 	ocupado = false
 	_actualizar_guia()
 	_mostrar_contexto_seleccionado()
@@ -155,6 +174,8 @@ func _resolver_accion(obj: ObjetoInteractivo, verbo: StringName) -> void:
 		await _perturbar_ventana(obj)
 	elif obj == $Props/Velador and verbo == Globals.MIRAR:
 		await _mirar_velador(obj)
+	elif obj == $Props/Puerta and verbo == Globals.MIRAR and state.mision_completada:
+		await _salir_de_la_101()
 	elif obj is Lumi and verbo == Globals.MIRAR and _lumi_tiene_adivinanza(obj):
 		await _adivinanza_lumi(obj)
 	elif obj is Lumi:
@@ -181,8 +202,12 @@ func _resolver_accion(obj: ObjetoInteractivo, verbo: StringName) -> void:
 		if obj.id == &"ovillo" and Globals.tiene(&"ovillo"):
 			await _decir("¡Contigo llego a la ventana, Ovi!")
 			_brillar($Props/Cortina)
+		if obj.id == &"dentadura" and Globals.tiene(&"dentadura"):
+			await _leer_recibo()
 	obj.description = obj.nombre_visible()
 	if Globals.sellos > sellos_antes:
+		if Globals.sellos >= Globals.SELLOS_TOTALES:
+			await _ofelia_salta()
 		await _decir(FRASES_PROGRESO[Globals.sellos])
 		if Globals.sellos >= Globals.SELLOS_TOTALES:
 			await _mision_cumplida()
@@ -227,43 +252,50 @@ func _abrir_dial(ramon: Ramon) -> void:
 func _sintonizar_estacion(ramon: Ramon, numero: int) -> bool:
 	var a_la_primera: bool = state.intentos_ramon == 0
 	state.intentos_ramon += 1
+	if numero != ESTACION_CORRECTA:
+		ramon.estatica()
+		await get_tree().create_timer(0.35).timeout
+		ramon.reproducir_estacion(numero)  # suena mientras Nuna habla
 	match numero:
 		1:  # Radio Mérito
 			ramon._sacudir()
 			await _decir("RAMÓN: ¡Si cumplís, llegás! ¡Si cumplís, llegás!")
 			$Props/Huesped.roncar(2.0)
-			await _decir("Zzz… La señora ronca. Así no se asusta.")
+			await _decir("Zzz… %s ronca. Esa la escuchó toda la vida." % _mayuscula(_ella()))
 			Globals.cambiar_bruma(-COSTO_ESTACION_EQUIVOCADA)
 		2:  # Radio Ocupada
 			ramon._sacudir()
 			await _decir("RAMÓN: Su llamada es importante para nosotros…")
-			await _decir("La señora se da vuelta. Ni se enteró.")
+			await _decir("%s se da vuelta. Ni se enteró." % _mayuscula(_ella()))
 			Globals.cambiar_bruma(-COSTO_ESTACION_EQUIVOCADA)
 		3:  # Radio Feriado: no cuesta nada, pero tampoco rinde
 			await _decir("RAMÓN: …")
 			await _decir("¿Feriado? ¿Y eso qué es?")
 		ESTACION_CORRECTA:  # Radio Revés
-			await ramon.sintonizar()  # al sonar, la señora tiembla
+			await ramon.sintonizar()  # estática, y al sonar Ofelia tiembla
 			state.ramon_sonando = true
 			await _decir("RAMÓN: ♪ oñin etemréud, oñin etemréud ♪")
 			if a_la_primera:
 				await _decir("¡A la primera!")
 				Globals.cambiar_bruma(5.0)
+			await _decir("%s (dormida): …¿Mamá?" % _hablante())
 			await _decir("¡Una canción de cuna al revés! ¡Qué miedo!")
+			await _decir("Lo que más asusta es oír tu vida para atrás.")
 			Globals.aumentar_vela(20.0)
 			Globals.otorgar_sello(&"ramon")
 			return true
 		5:  # Radio Hora Extra
 			ramon._sacudir()
 			await _decir("RAMÓN: ¡Un ratito más! ¡Un ratito más!")
-			await _decir("SEÑORA: Cinco minutitos más…")
+			await _decir("%s: Cinco minutitos más…" % _hablante())
 			Globals.cambiar_bruma(-COSTO_ESTACION_EQUIVOCADA)
 	return false
 
 
 ## Lumi propone la adivinanza cuando ya se presentó y todavía no dio su sello.
 func _lumi_tiene_adivinanza(lumi: Lumi) -> bool:
-	return lumi.mirada_inicial and lumi.estado in [Lumi.Estado.APAGADA, Lumi.Estado.NIVEL_1, Lumi.Estado.NIVEL_2] \
+	# Solo con Lumi apagada: encendida, mirarla muestra cuánto falta para leer lo grabado.
+	return lumi.mirada_inicial and lumi.estado == Lumi.Estado.APAGADA \
 		and not Globals.sellos_obtenidos.has("lumi")
 
 
@@ -280,11 +312,10 @@ func _adivinanza_lumi(lumi: Lumi) -> void:
 		return
 	await _decir("¡La bruma! ¡Mi sueldo de fantasma!")
 	await _decir("LUMI: ¡Correcto! Que no se te escape.")
-	lumi.resolver_adivinanza()
-	$Props/Huesped.asustarse()
+	lumi.resolver_adivinanza()  # Lumi se enciende y Ofelia tiembla
 	Globals.aumentar_vela(VELA_ADIVINANZA)
 	Globals.otorgar_sello(&"lumi")
-	await _decir("¡Lumi brilla y la señora salta de la cama!")
+	await _decir("¡Lumi brilla y %s tiembla!" % _ella())
 
 
 ## Mirar el velador abre el cajón; volver a mirarlo lo cierra.
@@ -299,9 +330,11 @@ func _mirar_velador(velador: ObjetoInteractivo) -> void:
 		await _decir(velador.frase_mirar)
 	_mostrar_cajon(true)
 	if $Props/Dentadura.recogido or Globals.tiene(&"dentadura"):
-		await _decir("Vacío. La sonrisa ya viene conmigo.")
+		await _decir("Solo queda el recibo de Ofelia. Lo dejo donde estaba." if state.recibo_leido else "Vacío. La sonrisa ya viene conmigo.")
 	else:
 		await _decir("¡Una sonrisa escondida en el cajón!")
+		await _decir("El viejo dijo que guarde lo que encuentre. Una sonrisa siempre sirve. ¡Me la llevo!")
+		_brillar($Props/Dentadura)
 
 
 ## Abre o cierra el cajón: cambia el dibujo del velador y muestra la dentadura adentro.
@@ -367,7 +400,7 @@ func _perturbar_ventana(ventana: VentanaAnimada) -> void:
 	await C.player.mini_salto()
 	match state.saltos_ventana:
 		1: await _decir("¡Hop! …¡Hop! Uf… los profesionales flotan más alto, ¿no?")
-		2: await _decir("Todavía soy un fantasma bebé…")
+		2: await _decir("Todavía floto a ras del piso… Soy un fantasma bebé.")
 		_:
 			if $Props/Ovillo.visible:
 				C.player.mirar_a($Props/Ovillo.global_position)
@@ -422,14 +455,24 @@ func _on_combo_sombra_activado() -> void:
 
 
 func _texto_guia() -> String:
+	if state.cajon_abierto and not Globals.tiene(&"dentadura"):
+		return "Llevate la sonrisa del cajón: la vas a necesitar."
 	if Globals.sellos >= Globals.SELLOS_TOTALES:
-		return "¡3 de 3 sellos! Turno cumplido."
+		if not Globals.tiene(&"dentadura"):
+			return "¡3 de 3 sellos! Antes de irte, llevate la sonrisa del velador."
+		return "¡Turno cumplido! Mirá la puerta para volver a la recepción."
 	if _dial_abierto:
 		return "Leé el código de Ramón al revés."
 	if Globals.tiene(&"ovillo"):
 		return "Llevá a Ovi a la ventana."
-	if $Props/Lumi.estado == Lumi.Estado.NIVEL_3:
-		return "Lumi brilla fuerte. Mirala de nuevo."
+	var lumi: Lumi = $Props/Lumi
+	if lumi.estado in [Lumi.Estado.NIVEL_1, Lumi.Estado.NIVEL_2] and not Globals.sellos_obtenidos.has("lumi"):
+		return "Lumi tiene algo grabado. Perturbala otra vez para leerlo."
+	if lumi.mirada_inicial and lumi.estado == Lumi.Estado.APAGADA and not Globals.sellos_obtenidos.has("lumi") \
+			and Globals.sellos_obtenidos.size() == 2:
+		return "Falta Lumi: perturbala varias veces seguidas."
+	if lumi.estado == Lumi.Estado.NIVEL_3:
+		return "Lumi está al máximo. Mirala para que descanse."
 	if state.intentos_ramon > 0 and not Globals.sellos_obtenidos.has("ramon"):
 		return "Ramón sigue sin sintonizar. Perturbalo y probá otra estación."
 	if state.saltos_ventana > 0 and not state.cortina_bailando:
@@ -510,6 +553,96 @@ func _mision_cumplida() -> void:
 	await _decir("¿Una más?…")
 	await _decir("Los profesionales siempre se ponen la 10, ¿no?")
 	state.mision_completada = true
+	if not Globals.tiene(&"dentadura"):
+		await _decir("Antes de irme… ¿no me olvido de algo?")
+		_brillar($Props/Velador)
+
+
+## Debajo de la dentadura está el recibo de jubilación de la huésped: así se llama Ofelia.
+func _leer_recibo() -> void:
+	if state.recibo_leido:
+		return
+	await _decir("¡Ey! Debajo de la sonrisa hay unos papeles.")
+	var toma: Toma = null
+	if ResourceLoader.exists(TOMA_RECIBO) or FileAccess.file_exists(TOMA_RECIBO):
+		toma = await Toma.mostrar(self, TOMA_RECIBO, 0)
+	else:
+		await G.gui.ui.mostrar_certificacion(RECIBO_ETIQUETA, RECIBO_LETRA_CHICA)
+	await _decir("¿Jubilación? ¡Viene de júbilo! ¡Debe ser lo más lindo del mundo!")
+	await _decir("Ofelia… ¡La señora se llama Ofelia!")
+	await _decir("Cuarenta y cinco años trabajando…")
+	await _decir("¿Y el monto? A ver con la lupa…")
+	await _decir("¿Eso es todo? ¡Uff! ¿Y con tan poquito le alcanza?")
+	if toma != null:
+		if toma._atlas.atlas.get_width() >= Toma.ANCHO * 2:
+			toma.cuadro(1)
+	else:
+		await G.gui.ui.mostrar_certificacion(TARIFA_ETIQUETA, TARIFA_LETRA_CHICA)
+	await _decir("…y con lo que le pagan, vive en el hotel.")
+	await _decir("Incluye cama, desayuno y silencio. ¿Y el almuerzo? ¿Y la cena?")
+	await _decir("Ah, ya entiendo: desayuna tanto que le dura hasta el día siguiente.")
+	await _decir("Trabajó toda la vida y ganó una cama.")
+	if toma != null:
+		await toma.cerrar()
+	state.recibo_leido = true
+	_presentar_ofelia()
+	await _decir("Cuando yo me jubile, ¿qué me van a dar? ¿Una nube?")
+
+
+## La huésped deja de ser "cama": desde el recibo, Nuna sabe su nombre.
+func _presentar_ofelia() -> void:
+	var huesped: ObjetoInteractivo = $Props/Huesped
+	huesped.nombre = "Ofelia"
+	huesped.nombrado = true
+	huesped.frase_mirar = "Ofelia duerme. Cuarenta y cinco años… se merece la siesta."
+	huesped.description = huesped.nombre_visible()
+
+
+## Con el turno cumplido, la puerta lleva de vuelta a la recepción (cinemática 2).
+func _salir_de_la_101() -> void:
+	if not Globals.tiene(&"dentadura"):
+		if state.cajon_abierto:
+			await _decir("¡Ay, me olvido la sonrisa! Sin sonrisa no se sale a trabajar.")
+			_brillar($Props/Dentadura)
+		else:
+			await _decir("Todavía no… Me parece que el velador guarda algo.")
+			_brillar($Props/Velador)
+		return
+	var salir: bool = await PreguntaSiNo.preguntar(self, "¿Volver a la recepción?")
+	if not salir:
+		await _decir("Un ratito más con Ofelia.")
+		return
+	await _decir("¡Chau, Ofelia! ¡Chau, Lumi, Ramón, Doña Cortina!")
+	await $Props/Puerta.abrir()
+	await C.player.walk($Markers/EntradaNuna.global_position)
+	C.player.hide()
+	await $Props/Puerta.cerrar()
+	C.player.show()
+	_saliendo = true
+	_cancelar_seleccion()
+	R.goto_room("Recepcion")
+
+
+## El tercer sello: el único susto grande. Ofelia salta de la cama y grita.
+func _ofelia_salta() -> void:
+	await get_tree().create_timer(0.3).timeout
+	$Props/Huesped.asustarse()
+	await get_tree().create_timer(1.9).timeout
+	await _decir("¡%s saltó de la cama!" % _mayuscula(_ella()))
+
+
+## Cómo llama Nuna a la huésped: "la señora" hasta leer el recibo, después "Ofelia".
+func _ella() -> String:
+	return "Ofelia" if state.recibo_leido else "la señora"
+
+
+## Cómo aparece en los diálogos cuando habla dormida.
+func _hablante() -> String:
+	return "OFELIA" if state.recibo_leido else "SEÑORA"
+
+
+func _mayuscula(texto: String) -> String:
+	return texto.left(1).to_upper() + texto.substr(1)
 
 
 func _brillar(nodo: CanvasItem) -> void:

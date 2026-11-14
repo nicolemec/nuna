@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/rooms/teatro/room_teatro.gd" id="1"]
+[ext_resource type="Texture2D" path="res://arte/backgrounds/escenario.png" id="2"]
+
+[node name="RoomTeatro" type="Node2D"]
+script = ExtResource("1")
+script_name = "Teatro"
+con_consola = false
+width = 320
+height = 180
+
+[node name="Background" type="Sprite2D" parent="."]
+texture = ExtResource("2")
+centered = false
+region_enabled = true
+region_rect = Rect2(320, 0, 320, 152)
+
+[node name="Confetti" type="Node2D" parent="."]
+position = Vector2(60, -8)
+
+[node name="WalkableAreas" type="Node2D" parent="."]
+
+[node name="Props" type="Node2D" parent="."]
+
+[node name="Hotspots" type="Node2D" parent="."]
+
+[node name="Regions" type="Node2D" parent="."]
+
+[node name="Markers" type="Node2D" parent="."]
+
+[node name="Nuna" type="Marker2D" parent="Markers"]
+position = Vector2(160, 122)
+
+[node name="Characters" type="Node2D" parent="."]

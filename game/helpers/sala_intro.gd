@@ -19,6 +19,19 @@ var ocupado := false
 var objeto_seleccionado: ObjetoInteractivo
 var _saliendo := false
 
+## Botón "SALTAR »": abre un cartelito con "Esta escena" / "Toda la intro" / "Seguir mirando".
+const ESTADO_TEATRO := "res://game/rooms/teatro/room_teatro.tres"
+const ESTADO_CALLE := "res://game/rooms/calle/room_calle.tres"
+const ESTADO_RECEPCION := "res://game/rooms/recepcion/room_recepcion.tres"
+const RECEPCION_TERMINADA := 3  # Paso.TERMINADO de room_recepcion.gd
+## Nunca se emite: cuando se salta, las charlas pendientes se quedan esperando acá
+## y se descartan solas al liberarse la sala.
+signal _nunca
+var _saltando := false
+var _capa_saltar: CanvasLayer
+var _boton_saltar: Button
+var _cartel_saltar: PanelContainer
+
 
 func _enter_tree() -> void:
 	super()
@@ -48,6 +61,8 @@ func _on_room_entered() -> void:
 	if con_consola:
 		_cancelar_seleccion()
 		_actualizar_guia()
+	if _intro_en_curso():
+		_crear_boton_saltar()
 
 
 ## En la intro la cámara se mueve, y el "hover" de Popochiu puede quedar pegado a un objeto
@@ -184,12 +199,17 @@ func _cancelar_seleccion() -> void:
 
 ## Nuna habla. Las líneas de otros personajes van con prefijo, como en la 101 ("LUMI: …").
 func _decir(texto: String) -> void:
+	if _saltando:
+		await _nunca
+		return
 	if not texto.is_empty():
 		await C.player.say(texto)
 
 
 ## Pasa a otra sala. Sin await: esta sala se libera durante el cambio.
 func _ir_a(sala: String) -> void:
+	if _saliendo:
+		return
 	_saliendo = true
 	ocupado = true
 	_cancelar_seleccion()
@@ -244,3 +264,104 @@ func _habilitar(obj: ObjetoInteractivo) -> void:
 		obj.resaltar = true
 	if not obj.is_in_group("interactivos"):
 		obj.add_to_group("interactivos")
+
+
+# ---------- Saltar la intro ----------
+## Cada sala dice a dónde lleva "Esta escena" y qué deja hecho al saltarla.
+
+## ¿Se muestra el botón? En la recepción, solo hasta que Nuna entra a la 101.
+func _intro_en_curso() -> bool:
+	return true
+
+
+func _sala_siguiente() -> String:
+	return "Habitacion101"
+
+
+## Lo que la sala deja anotado como si se hubiera visto entera.
+func _completar_esta_sala() -> void:
+	pass
+
+
+func _completar_toda_la_intro() -> void:
+	load(ESTADO_TEATRO).celebracion_vista = true
+	load(ESTADO_CALLE).anuncio_leido = true
+	load(ESTADO_RECEPCION).paso = RECEPCION_TERMINADA
+	# Con el contrato firmado, Nuna ya recibió el adelanto de Bruma: vuelve a estar entero.
+	_poner_alfa_nuna(1.0)
+
+
+func _crear_boton_saltar() -> void:
+	_capa_saltar = CanvasLayer.new()
+	_capa_saltar.layer = 65  # sobre la consola, las tomas y el HUD
+	add_child(_capa_saltar)
+	var orden := OrdenTrabajo.new()
+	var tema: Theme = orden._crear_tema()
+	orden.free()
+	_boton_saltar = Button.new()
+	_boton_saltar.text = "SALTAR »"
+	_boton_saltar.theme = tema
+	_boton_saltar.focus_mode = Control.FOCUS_NONE
+	_boton_saltar.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_boton_saltar.pressed.connect(_abrir_cartel_saltar)
+	_capa_saltar.add_child(_boton_saltar)
+	_cartel_saltar = PanelContainer.new()
+	_cartel_saltar.theme = tema
+	_cartel_saltar.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	var lista := VBoxContainer.new()
+	lista.add_theme_constant_override("separation", 2)
+	_cartel_saltar.add_child(lista)
+	var titulo := Label.new()
+	titulo.text = "¿Saltar?"
+	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lista.add_child(titulo)
+	for datos in [["Esta escena", _saltar.bind(false)], ["Toda la intro", _saltar.bind(true)], ["Seguir mirando", _cerrar_cartel_saltar]]:
+		var boton := Button.new()
+		boton.text = datos[0]
+		boton.focus_mode = Control.FOCUS_NONE
+		boton.pressed.connect(datos[1])
+		lista.add_child(boton)
+	_cartel_saltar.hide()
+	_capa_saltar.add_child(_cartel_saltar)
+	get_tree().process_frame.connect(_ubicar_boton_saltar)
+	_ubicar_boton_saltar()
+
+
+## Arriba a la derecha; si la barra de arriba está visible, justo debajo de ella.
+func _ubicar_boton_saltar() -> void:
+	if not is_instance_valid(_boton_saltar):
+		return
+	var hud_visible: bool = is_instance_valid(G.gui) and is_instance_valid(G.gui.ui) \
+			and G.gui.ui.visible and is_instance_valid(G.gui.ui._hud) and G.gui.ui._hud.visible
+	var y := Ajustes.UI_HUD_TAMANO.y + 2.0 if hud_visible else 2.0
+	_boton_saltar.position = Vector2(320.0 - _boton_saltar.size.x - 2.0, y)
+	_boton_saltar.visible = not _saltando and not _saliendo and _intro_en_curso()
+	if _cartel_saltar.visible:
+		_cartel_saltar.position = ((Vector2(320, 180) - _cartel_saltar.size) / 2.0).floor()
+
+
+func _abrir_cartel_saltar() -> void:
+	if _saltando or _saliendo:
+		return
+	_cartel_saltar.show()
+	_ubicar_boton_saltar()
+
+
+func _cerrar_cartel_saltar() -> void:
+	_cartel_saltar.hide()
+
+
+func _saltar(toda: bool) -> void:
+	if _saltando or _saliendo:
+		return
+	_saltando = true
+	_cerrar_cartel_saltar()
+	if toda:
+		_completar_toda_la_intro()
+	else:
+		_completar_esta_sala()
+	var destino := "Habitacion101" if toda else _sala_siguiente()
+	# Cierra la línea que se esté mostrando; lo que seguía de la charla queda esperando en _nunca.
+	if is_instance_valid(G.gui) and G.gui.has_method("completar_dialogo"):
+		G.gui.completar_dialogo(true)
+	_ir_a(destino)

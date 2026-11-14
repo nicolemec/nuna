@@ -1,0 +1,125 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/rooms/calle/room_calle.gd" id="1"]
+[ext_resource type="Texture2D" path="res://arte/backgrounds/calle.png" id="2"]
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="3"]
+[ext_resource type="Script" path="res://game/objects/zona_intro.gd" id="4"]
+[ext_resource type="Script" path="res://game/objects/fantasma_banco.gd" id="5"]
+
+[node name="RoomCalle" type="Node2D"]
+script = ExtResource("1")
+script_name = "Calle"
+width = 675
+height = 180
+
+[node name="Background" type="Sprite2D" parent="."]
+texture = ExtResource("2")
+centered = false
+
+[node name="WalkableAreas" type="Node2D" parent="."]
+
+[node name="Props" type="Node2D" parent="."]
+
+[node name="Fantasma" parent="Props" instance=ExtResource("3")]
+position = Vector2(180, 137)
+script = ExtResource("5")
+script_name = "Fantasma"
+description = "fantasma"
+id = &"fantasma"
+nombre_desconocido = "fantasma"
+nombre = "Fantasma del banco"
+puede_perturbar = false
+tamano = Vector2(24, 28)
+distancia_uso = -22.0
+
+[node name="Sprite2D" parent="Props/Fantasma" index="0"]
+visible = false
+
+[node name="CartelVagando" parent="Props" instance=ExtResource("3")]
+position = Vector2(305, 64)
+script = ExtResource("4")
+script_name = "CartelVagando"
+description = "cartel"
+id = &"cartel_vagando"
+nombre_desconocido = "cartel"
+nombre = "¿Seguís vagando?"
+puede_perturbar = false
+tamano = Vector2(70, 62)
+distancia_uso = 0.0
+
+[node name="Sprite2D" parent="Props/CartelVagando" index="0"]
+visible = false
+
+[node name="CartelEternidad" parent="Props" instance=ExtResource("3")]
+position = Vector2(283, 128)
+script = ExtResource("4")
+script_name = "CartelEternidad"
+description = "cartel"
+id = &"cartel_eternidad"
+nombre_desconocido = "cartel"
+nombre = "No dejes que se te pase la eternidad"
+puede_perturbar = false
+tamano = Vector2(60, 58)
+distancia_uso = -8.0
+
+[node name="Sprite2D" parent="Props/CartelEternidad" index="0"]
+visible = false
+
+[node name="PuertaHotel" parent="Props" instance=ExtResource("3")]
+position = Vector2(457, 142)
+script = ExtResource("4")
+script_name = "PuertaHotel"
+description = "puerta del hotel"
+id = &"puerta_hotel"
+nombre_desconocido = "puerta del hotel"
+nombre = "Hotel"
+puede_perturbar = false
+tamano = Vector2(50, 62)
+distancia_uso = 0.0
+
+[node name="Sprite2D" parent="Props/PuertaHotel" index="0"]
+visible = false
+
+[node name="CartelBruma" parent="Props" instance=ExtResource("3")]
+position = Vector2(526, 131)
+script = ExtResource("4")
+script_name = "CartelBruma"
+description = "cartel"
+id = &"cartel_bruma"
+nombre_desconocido = "cartel"
+nombre = "Un espíritu sano"
+puede_perturbar = false
+tamano = Vector2(40, 102)
+distancia_uso = -8.0
+
+[node name="Sprite2D" parent="Props/CartelBruma" index="0"]
+visible = false
+
+[node name="Anuncio" parent="Props" instance=ExtResource("3")]
+position = Vector2(588, 131)
+script = ExtResource("4")
+script_name = "Anuncio"
+description = "anuncio"
+id = &"anuncio"
+nombre_desconocido = "anuncio"
+nombre = "Se busca aprendiz"
+puede_perturbar = false
+tamano = Vector2(62, 74)
+distancia_uso = -8.0
+
+[node name="Sprite2D" parent="Props/Anuncio" index="0"]
+visible = false
+
+[node name="Hotspots" type="Node2D" parent="."]
+
+[node name="Regions" type="Node2D" parent="."]
+
+[node name="Markers" type="Node2D" parent="."]
+
+[node name="SalidaTeatro" type="Marker2D" parent="Markers"]
+position = Vector2(30, 146)
+
+[node name="InicioNuna" type="Marker2D" parent="Markers"]
+position = Vector2(80, 146)
+
+[node name="Characters" type="Node2D" parent="."]

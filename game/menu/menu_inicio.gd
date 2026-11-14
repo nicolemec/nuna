@@ -24,6 +24,18 @@ var _botones: Array[Button] = []
 var _lienzo: Control
 var _nuna: AnimatedSprite2D
 var _tiempo := 0.0
+## Placa de créditos antes del menú: solo la primera vez que se abre el juego
+## (al volver al menú desde una partida no se repite). Un clic o una tecla la saltea.
+const CREDITOS := [
+	["CASI HUMANO", 40, 32, Color8(203, 219, 252)],
+	["un juego creado por", 84, 16, Color8(155, 173, 183)],
+	["Lorena Garzón y Nicole Mejía Cruz", 100, 16, Color8(203, 219, 252)],
+	["Artes Multimediales 4 - 2026", 128, 16, Color8(155, 173, 183)],
+]
+const CREDITOS_SEGUNDOS := 3.5
+static var _creditos_vistos := false
+var _placa: ColorRect
+var _saltar_placa := false
 
 
 func _ready() -> void:
@@ -78,6 +90,10 @@ func _ready() -> void:
 	_lienzo.add_child(mensaje)
 	_set_ocupado(true)
 	_ocultar_hud()
+	# En las pruebas automáticas (sin ventana) no hace falta esperar los créditos.
+	if not _creditos_vistos and DisplayServer.get_name() != "headless":
+		_crear_placa()
+		_mostrar_creditos()
 	# E._ready() termina después de un frame (inventarios y estados iniciales).
 	for _frame in range(300):
 		await get_tree().process_frame
@@ -95,6 +111,8 @@ func _ready() -> void:
 				boton.disabled = false
 				boton.grab_focus()
 		return
+	while is_instance_valid(_placa):
+		await get_tree().process_frame
 	_set_ocupado(false)
 	jugar.grab_focus()
 	# Otra vez, ya con el motor listo: si la primera no arrancó, esta sí (si ya suena, no hace nada).
@@ -105,6 +123,56 @@ func _process(delta: float) -> void:
 	_tiempo += delta
 	if is_instance_valid(_nuna):
 		_nuna.position.y = 90 + roundf(sin(_tiempo * 3.0) * 2.0)
+
+
+func _input(event: InputEvent) -> void:
+	if not is_instance_valid(_placa) or not event.is_pressed():
+		return
+	if event is InputEventMouseButton or event is InputEventKey:
+		_saltar_placa = true
+		get_viewport().set_input_as_handled()
+
+
+func _crear_placa() -> void:
+	_placa = ColorRect.new()
+	_placa.color = COLOR_OSCURO
+	_placa.size = Vector2(320, 180)
+	_placa.mouse_filter = Control.MOUSE_FILTER_STOP
+	for datos: Array in CREDITOS:
+		var linea := Label.new()
+		linea.text = datos[0]
+		linea.position = Vector2(0, datos[1])
+		linea.size = Vector2(320, datos[2] + 4)
+		linea.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		linea.add_theme_font_size_override("font_size", datos[2])
+		linea.add_theme_color_override("font_color", datos[3])
+		linea.modulate.a = 0.0
+		_placa.add_child(linea)
+	_lienzo.add_child(_placa)  # último hijo: queda encima del menú
+
+
+## Las líneas aparecen en escalones (pixel art), se quedan un rato y se van.
+func _mostrar_creditos() -> void:
+	for linea in _placa.get_children():
+		await _fundir(linea, 1.0)
+	var espera := 0.0
+	while espera < CREDITOS_SEGUNDOS and not _saltar_placa:
+		await get_tree().process_frame
+		espera += get_process_delta_time()
+	await _fundir(_placa, 0.0)
+	_creditos_vistos = true
+	_placa.queue_free()
+	_placa = null
+
+
+func _fundir(nodo: CanvasItem, hasta: float) -> void:
+	var desde := nodo.modulate.a
+	for escalon in [0.34, 0.67, 1.0]:
+		if _saltar_placa and hasta > 0.0:
+			nodo.modulate.a = hasta
+			return
+		nodo.modulate.a = lerpf(desde, hasta, escalon)
+		await get_tree().create_timer(0.12).timeout
 
 
 func _centrar() -> void:

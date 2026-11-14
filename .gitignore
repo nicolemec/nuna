@@ -1,0 +1,10 @@
+# Caché de Godot (se regenera sola al abrir el proyecto)
+.godot/
+/android/
+/export/
+
+# Archivos temporales
+*.tmp
+*~
+.DS_Store
+Thumbs.db

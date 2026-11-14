@@ -22,12 +22,29 @@ const ANIMACIONES_SIN_LOOP: Array = ["sintonizando"]
 
 signal comenzo_a_sonar
 
+## Volumen de la canción al revés: fuerte al sintonizar y después de fondo, bajo la música.
+const VOLUMEN_CANCION_DB := -6.0
+const VOLUMEN_CANCION_FONDO_DB := -20.0
+const SEGUNDOS_ANTES_DE_BAJAR := 7.0
+const VOLUMEN_PARLANTE_DB := -6.0
+
 var _anim_sprite: AnimatedSprite2D
 var _sintonizando: bool = false
+## Sonidos hechos con código (Chip): no hay archivos de audio para la radio.
+var _parlante: AudioStreamPlayer   # estática y estaciones
+var _cancion: AudioStreamPlayer    # Radio Revés, en loop
+var _fundido: Tween
+var _tarea_cancion := -1
 
 
 func _ready() -> void:
 	super._ready()
+	_parlante = _crear_reproductor("Parlante", VOLUMEN_PARLANTE_DB)
+	_cancion = _crear_reproductor("Cancion", VOLUMEN_CANCION_DB)
+	# La canción al revés se arma en segundo plano para que no trabe el juego al sonar.
+	if not Chip.cancion_reves_lista():
+		_tarea_cancion = WorkerThreadPool.add_task(func (): Chip.radio_reves())
+		tree_exiting.connect(_esperar_cancion)
 	_anim_sprite = AnimatedSprite2D.new()
 	_anim_sprite.name = "Sprite"
 	_anim_sprite.centered = false
@@ -61,6 +78,20 @@ func _draw() -> void:
 func mostrar_quieto() -> void:
 	_sintonizando = false
 	_reproducir_animacion(ANIM_QUIETO)
+	if _cancion != null:
+		_cancion.stop()
+
+
+## Ruido de dial entre estación y estación.
+func estatica() -> void:
+	_parlante.stream = Chip.radio_estatica()
+	_parlante.play()
+
+
+## Lo que suena en la estación elegida (1 a 5). No espera: suena mientras Nuna habla.
+func reproducir_estacion(numero: int) -> void:
+	_parlante.stream = Chip.radio_estacion(numero)
+	_parlante.play()
 
 
 func sintonizar() -> void:
@@ -68,6 +99,7 @@ func sintonizar() -> void:
 		return
 
 	_sintonizando = true
+	estatica()
 
 	if not _preparar_animacion_finita(ANIM_SINTONIZANDO):
 		_sintonizando = false
@@ -85,9 +117,44 @@ func sintonizar() -> void:
 	sonar()
 
 
-func sonar() -> void:
-	if _reproducir_animacion(ANIM_SONANDO):
+## Ramón canta la canción de cuna al revés. Con de_fondo = true (al volver a la sala) suena bajito.
+func sonar(de_fondo := false) -> void:
+	if _reproducir_animacion(ANIM_SONANDO) and not de_fondo:
 		comenzo_a_sonar.emit()
+	_tocar_cancion(de_fondo)
+
+
+func _tocar_cancion(de_fondo: bool) -> void:
+	if _cancion == null:
+		return
+	if _fundido != null and _fundido.is_valid():
+		_fundido.kill()
+	_esperar_cancion()
+	_cancion.stream = Chip.radio_reves()
+	if not _cancion.playing:
+		_cancion.play()
+	if de_fondo:
+		_cancion.volume_db = VOLUMEN_CANCION_FONDO_DB
+		return
+	_cancion.volume_db = VOLUMEN_CANCION_DB
+	_fundido = create_tween()
+	_fundido.tween_interval(SEGUNDOS_ANTES_DE_BAJAR)
+	_fundido.tween_property(_cancion, "volume_db", VOLUMEN_CANCION_FONDO_DB, 3.0)
+
+
+func _esperar_cancion() -> void:
+	if _tarea_cancion != -1:
+		WorkerThreadPool.wait_for_task_completion(_tarea_cancion)
+		_tarea_cancion = -1
+
+
+func _crear_reproductor(nombre: String, volumen: float) -> AudioStreamPlayer:
+	var reproductor := AudioStreamPlayer.new()
+	reproductor.name = nombre
+	reproductor.volume_db = volumen
+	reproductor.bus = Musica.bus_retro()
+	add_child(reproductor)
+	return reproductor
 
 
 func detener() -> void:

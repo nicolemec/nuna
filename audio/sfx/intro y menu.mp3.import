@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://drlp4d44tnfnc"
+path="res://.godot/imported/intro y menu.mp3-9ab26ef0d39e81083617b91b4ef6c9b6.mp3str"
+
+[deps]
+
+source_file="res://audio/sfx/intro y menu.mp3"
+dest_files=["res://.godot/imported/intro y menu.mp3-9ab26ef0d39e81083617b91b4ef6c9b6.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

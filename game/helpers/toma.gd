@@ -40,7 +40,7 @@ static func mostrar(padre: Node, ruta_png: String, cuadro_inicial := 0) -> Toma:
 func _preparar(ruta_png: String, cuadro_inicial: int) -> void:
 	# Debajo de la interfaz (capa 10): la consola de diálogo queda por encima.
 	layer = 9
-	var textura: Texture2D = load(ruta_png)
+	var textura: Texture2D = Toma.cargar_textura(ruta_png)
 	_atlas = AtlasTexture.new()
 	_atlas.atlas = textura
 	# La región va antes que la textura: sin región, el atlas mide toda la tira (640 px
@@ -61,6 +61,17 @@ func _preparar(ruta_png: String, cuadro_inicial: int) -> void:
 	if is_instance_valid(G.gui) and is_instance_valid(G.gui.ui):
 		_hud_previo = G.gui.ui._hud.visible if is_instance_valid(G.gui.ui._hud) else true
 		G.gui.ui.mostrar_hud(false)
+
+
+## Si Godot todavía no importó el PNG (recién copiado a la carpeta), lo lee directo del archivo.
+static func cargar_textura(ruta_png: String) -> Texture2D:
+	if ResourceLoader.exists(ruta_png):
+		return load(ruta_png)
+	var imagen := Image.load_from_file(ruta_png)
+	if imagen == null or imagen.is_empty():
+		push_warning("Toma: no se encontró la imagen " + ruta_png)
+		imagen = Image.create(ANCHO, ALTO, false, Image.FORMAT_RGBA8)
+	return ImageTexture.create_from_image(imagen)
 
 
 func cuadro(indice: int) -> void:
