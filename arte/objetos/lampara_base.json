@@ -1,0 +1,190 @@
+{ "frames": [
+   {
+    "filename": "lampara_base #apagada.aseprite",
+    "frame": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 200
+   },
+   {
+    "filename": "lampara_base #sube 0.aseprite",
+    "frame": { "x": 25, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 120
+   },
+   {
+    "filename": "lampara_base #sube 1.aseprite",
+    "frame": { "x": 50, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 120
+   },
+   {
+    "filename": "lampara_base #sube 2.aseprite",
+    "frame": { "x": 75, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 120
+   },
+   {
+    "filename": "lampara_base #sube 3.aseprite",
+    "frame": { "x": 100, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 120
+   },
+   {
+    "filename": "lampara_base #nivel_1.aseprite",
+    "frame": { "x": 125, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 200
+   },
+   {
+    "filename": "lampara_base #nivel_2.aseprite",
+    "frame": { "x": 150, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 200
+   },
+   {
+    "filename": "lampara_base #nivel_3 0.aseprite",
+    "frame": { "x": 175, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 350
+   },
+   {
+    "filename": "lampara_base #nivel_3 1.aseprite",
+    "frame": { "x": 200, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 350
+   },
+   {
+    "filename": "lampara_base #cuidada.aseprite",
+    "frame": { "x": 225, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 200
+   },
+   {
+    "filename": "lampara_base #fogonazo 0.aseprite",
+    "frame": { "x": 250, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 80
+   },
+   {
+    "filename": "lampara_base #fogonazo 1.aseprite",
+    "frame": { "x": 275, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 80
+   },
+   {
+    "filename": "lampara_base #fogonazo 2.aseprite",
+    "frame": { "x": 300, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 80
+   },
+   {
+    "filename": "lampara_base #fogonazo 3.aseprite",
+    "frame": { "x": 325, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 100
+   },
+   {
+    "filename": "lampara_base #fogonazo 4.aseprite",
+    "frame": { "x": 350, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 180
+   },
+   {
+    "filename": "lampara_base #quemada 0.aseprite",
+    "frame": { "x": 375, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 150
+   },
+   {
+    "filename": "lampara_base #quemada 1.aseprite",
+    "frame": { "x": 400, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 150
+   },
+   {
+    "filename": "lampara_base #quemada 2.aseprite",
+    "frame": { "x": 425, "y": 0, "w": 25, "h": 30 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 30 },
+    "sourceSize": { "w": 25, "h": 30 },
+    "duration": 1000
+   }
+ ],
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.7-x64",
+  "image": "lampara_base.png",
+  "format": "RGBA8888",
+  "size": { "w": 450, "h": 30 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "apagada", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
+   { "name": "sube", "from": 1, "to": 4, "direction": "forward", "color": "#000000ff" },
+   { "name": "nivel_1", "from": 5, "to": 5, "direction": "forward", "color": "#000000ff" },
+   { "name": "nivel_2", "from": 6, "to": 6, "direction": "forward", "color": "#000000ff" },
+   { "name": "nivel_3", "from": 7, "to": 8, "direction": "forward", "color": "#000000ff" },
+   { "name": "cuidada", "from": 9, "to": 9, "direction": "forward", "color": "#000000ff" },
+   { "name": "fogonazo", "from": 10, "to": 14, "direction": "forward", "color": "#000000ff" },
+   { "name": "quemada", "from": 15, "to": 17, "direction": "forward", "color": "#000000ff" }
+  ],
+  "layers": [
+   { "name": "cuerpo", "opacity": 255, "blendMode": "normal" },
+   { "name": "sudor", "opacity": 255, "blendMode": "normal" },
+   { "name": "humo", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}
