@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="1"]
+[ext_resource type="Script" path="res://game/objects/objeto_animado.gd" id="2"]
+[ext_resource type="Texture2D" path="res://arte/objetos/cafetera_202.png" id="3"]
+
+[node name="Cafetera" instance=ExtResource("1")]
+script = ExtResource("2")
+ruta_tira = "res://arte/objetos/cafetera_202_anim.png"
+frame_ancho = 14
+frame_alto = 22
+etiquetas = {
+"quieta": [0, 0],
+"vapor": [1, 4]
+}
+duraciones_ms = {
+"quieta": [100],
+"vapor": [150, 150, 150, 150]
+}
+anim_reposo = &"quieta"
+anim_perturbar = &"vapor"
+vueltas_perturbar = 2
+script_name = "Cafetera"
+description = "cafetera"
+textura = ExtResource("3")
+id = &"cafetera_202"
+nombre_desconocido = "cafetera"
+nombre = "Doña Cafetera"
+frase_mirar = "Huele a noche larga."
+frase_perturbar = "¡Echa vapor! Está tan apurada como el muchacho."
+frase_agarrar = "Quema. Y yo ya me morí una vez."
+distancia_uso = -16.0
+interaction_polygon = PackedVector2Array(-7.0, -22.0, 7.0, -22.0, 7.0, 0, -7.0, 0)
+walk_to_point = Vector2(-16, 10)
+
+[node name="Sprite2D" parent="." index="0"]
+visible = false

@@ -1,0 +1,36 @@
+{ "frames": {
+   "toma_recibo 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 320, "h": 152 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 320, "h": 152 },
+    "sourceSize": { "w": 320, "h": 152 },
+    "duration": 100
+   },
+   "toma_recibo 1.aseprite": {
+    "frame": { "x": 320, "y": 0, "w": 320, "h": 152 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 320, "h": 152 },
+    "sourceSize": { "w": 320, "h": 152 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.7-x64",
+  "image": "toma_recibo.png",
+  "format": "RGBA8888",
+  "size": { "w": 640, "h": 152 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "recibo", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
+   { "name": "tarifa", "from": 1, "to": 1, "direction": "forward", "color": "#000000ff" }
+  ],
+  "layers": [
+   { "name": "Layer 2", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="1"]
+[ext_resource type="Script" path="res://game/objects/objeto_animado.gd" id="2"]
+[ext_resource type="Texture2D" path="res://arte/objetos/telefono_202.png" id="3"]
+
+[node name="Telefono" instance=ExtResource("1")]
+script = ExtResource("2")
+ruta_tira = "res://arte/objetos/telefono_202_anim.png"
+frame_ancho = 16
+frame_alto = 8
+etiquetas = {
+"quieto": [0, 0],
+"vibra": [1, 4]
+}
+duraciones_ms = {
+"quieto": [100],
+"vibra": [60, 60, 60, 400]
+}
+anim_reposo = &"quieto"
+anim_perturbar = &"vibra"
+vueltas_perturbar = 2
+script_name = "Telefono"
+description = "teléfono"
+textura = ExtResource("3")
+id = &"telefono_202"
+nombre_desconocido = "teléfono"
+nombre = "Telefonito"
+frase_mirar = "Un audio sin escuchar de su mamá: «¿Comiste algo, hijo?»."
+frase_perturbar = "¡Bzz! Nadie atiende."
+frase_agarrar = "Es del muchacho. Mejor no."
+distancia_uso = -16.0
+interaction_polygon = PackedVector2Array(-8.0, -8.0, 8.0, -8.0, 8.0, 0, -8.0, 0)
+walk_to_point = Vector2(-16, 10)
+
+[node name="Sprite2D" parent="." index="0"]
+visible = false

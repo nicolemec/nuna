@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="1"]
+[ext_resource type="Script" path="res://game/objects/objeto_animado.gd" id="2"]
+[ext_resource type="Texture2D" path="res://arte/objetos/mesa_noche_202.png" id="3"]
+
+[node name="MesaNoche" instance=ExtResource("1")]
+script = ExtResource("2")
+ruta_tira = "res://arte/objetos/mesa_noche_202_anim.png"
+frame_ancho = 20
+frame_alto = 24
+etiquetas = {
+"quieta": [0, 0],
+"hipo": [1, 8]
+}
+duraciones_ms = {
+"quieta": [100],
+"hipo": [100, 100, 100, 100, 100, 100, 100, 100]
+}
+anim_reposo = &"quieta"
+anim_perturbar = &"hipo"
+vueltas_perturbar = 1
+script_name = "MesaNoche"
+description = "mesa de noche"
+textura = ExtResource("3")
+id = &"mesa_noche_202"
+nombre_desconocido = "mesa de noche"
+nombre = "Hipólita"
+frase_mirar = "¡Hola, mesa de noche! ¿Y de día qué sos?"
+frase_perturbar = "¡Hip! Le agarró hipo. Debe ser de tanto café."
+frase_agarrar = "Pesa más que yo."
+distancia_uso = -16.0
+interaction_polygon = PackedVector2Array(-10.0, -24.0, 10.0, -24.0, 10.0, 0, -10.0, 0)
+walk_to_point = Vector2(-16, 10)
+
+[node name="Sprite2D" parent="." index="0"]
+visible = false

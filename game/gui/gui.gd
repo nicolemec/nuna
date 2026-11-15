@@ -127,6 +127,74 @@ func _mostrar_dialogo(_character: PopochiuCharacter, texto: String) -> void:
 	G.dialog_line_started.emit()
 
 
+# ---------- Manito: el cursor cambia sobre lo que se puede tocar ----------
+
+## Mano pixel art (el dedo apunta arriba a la izquierda, donde está la punta de la flecha).
+const MANO := [
+	"..OO.......",
+	".OLLO......",
+	".OLLO......",
+	".OLLOOOO...",
+	".OLLOLLOOO.",
+	".OLLOLLOLLO",
+	"OOLLLLLLLLO",
+	"OLOLLLLLLLO",
+	"OLLLLLLLLLO",
+	".OLLLLLLLMO",
+	".OLLLLLLMO.",
+	"..OLLLLLMO.",
+	"..OOOOOOO..",
+]
+## Animaciones del cursor que la manito puede reemplazar (no toca el relojito de espera).
+const CURSORES_LIBRES := [&"normal", &"active", &"mano"]
+
+
+func _process(_delta: float) -> void:
+	_actualizar_manito()
+
+
+func _actualizar_manito() -> void:
+	var cursor = get_node_or_null("/root/Cursor")
+	if cursor == null or not is_instance_valid(cursor.main_cursor):
+		return
+	var sprite: AnimatedSprite2D = cursor.main_cursor
+	var frames: SpriteFrames = sprite.sprite_frames
+	if frames == null:
+		return
+	if not frames.has_animation(&"mano"):
+		frames.add_animation(&"mano")
+		frames.set_animation_loop(&"mano", true)
+		frames.add_frame(&"mano", _textura_mano())
+	if sprite.animation not in CURSORES_LIBRES:
+		return
+	var quiero := &"mano" if _hay_algo_clickeable_bajo_el_mouse() else &"normal"
+	if sprite.animation != quiero:
+		sprite.play(quiero)
+
+
+func _hay_algo_clickeable_bajo_el_mouse() -> bool:
+	var sala = R.current if is_instance_valid(R.current) else null
+	if sala == null or not sala.has_method("objeto_en") or G.is_blocked or (is_instance_valid(_menu) and _menu.visible):
+		return false
+	if sala.get("ocupado") == true:
+		return false
+	if get_viewport().get_mouse_position().y >= Ajustes.UI_Y:
+		return false
+	var obj: ObjetoInteractivo = sala.objeto_en(sala.get_global_mouse_position())
+	return obj != null and obj.visible and obj.clickable
+
+
+func _textura_mano() -> ImageTexture:
+	var colores := {"O": Color8(28, 16, 40), "L": Color8(236, 228, 250), "M": Color8(176, 146, 226)}
+	var imagen := Image.create(MANO[0].length(), MANO.size(), false, Image.FORMAT_RGBA8)
+	for y in MANO.size():
+		var fila: String = MANO[y]
+		for x in fila.length():
+			if colores.has(fila[x]):
+				imagen.set_pixel(x, y, colores[fila[x]])
+	return ImageTexture.create_from_image(imagen)
+
+
 func _input(event: InputEvent) -> void:
 	if not dialogo_actual.is_empty() and puede_continuar and event.is_action_pressed("ui_accept"):
 		get_viewport().set_input_as_handled()

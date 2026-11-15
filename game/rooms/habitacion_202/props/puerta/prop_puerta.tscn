@@ -1,0 +1,40 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="1"]
+[ext_resource type="Script" path="res://game/objects/puerta_habitacion.gd" id="2"]
+[ext_resource type="Texture2D" path="res://arte/objetos/puerta_202.png" id="3"]
+
+[node name="Puerta" instance=ExtResource("1")]
+script = ExtResource("2")
+ruta_tira = "res://arte/objetos/puerta_202_anim.png"
+frame_ancho = 23
+frame_alto = 94
+etiquetas = {
+"cerrada": [0, 0],
+"abre": [1, 5],
+"abierta": [6, 6],
+"cierra": [7, 11]
+}
+duraciones_ms = {
+"cerrada": [100],
+"abre": [100, 100, 100, 100, 100],
+"abierta": [100],
+"cierra": [100, 100, 100, 100, 100]
+}
+anim_reposo = &"cerrada"
+anim_perturbar = &""
+script_name = "Puerta"
+description = "puerta"
+textura = ExtResource("3")
+id = &"puerta_202"
+nombre_desconocido = "puerta"
+nombre = "Señor Puerta"
+frase_mirar = "¡Señor Puerta! ¿También trabaja en la 202?"
+puede_perturbar = false
+frase_agarrar = "Es más grande que yo."
+distancia_uso = 16.0
+interaction_polygon = PackedVector2Array(-11.0, -94.0, 12.0, -94.0, 12.0, 0, -11.0, 0)
+walk_to_point = Vector2(16, 10)
+
+[node name="Sprite2D" parent="." index="0"]
+visible = false

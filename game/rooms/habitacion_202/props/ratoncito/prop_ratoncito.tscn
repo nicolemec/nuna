@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="1"]
+[ext_resource type="Script" path="res://game/objects/objeto_animado.gd" id="2"]
+[ext_resource type="Texture2D" path="res://arte/objetos/ratoncito_202.png" id="3"]
+
+[node name="Ratoncito" instance=ExtResource("1")]
+script = ExtResource("2")
+ruta_tira = "res://arte/objetos/ratoncito_202_anim.png"
+frame_ancho = 14
+frame_alto = 8
+etiquetas = {
+"quieto": [0, 0],
+"moviendose": [1, 4]
+}
+duraciones_ms = {
+"quieto": [100],
+"moviendose": [120, 120, 120, 120]
+}
+anim_reposo = &"moviendose"
+anim_perturbar = &"moviendose"
+vueltas_perturbar = 1
+script_name = "Ratoncito"
+description = "aparatito"
+textura = ExtResource("3")
+id = &"ratoncito_202"
+nombre_desconocido = "aparatito"
+nombre = "Ratoncito Inquieto"
+frase_mirar = "Mueve el mouse solito para que la compu crea que alguien trabaja. ¡Qué buen empleado!"
+frase_perturbar = "Ya está bastante inquieto."
+frase_agarrar = "Todavía no… está de turno."
+distancia_uso = -16.0
+interaction_polygon = PackedVector2Array(-7.0, -8.0, 7.0, -8.0, 7.0, 0, -7.0, 0)
+walk_to_point = Vector2(-16, 10)
+
+[node name="Sprite2D" parent="." index="0"]
+visible = false

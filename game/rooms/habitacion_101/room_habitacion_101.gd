@@ -11,6 +11,9 @@ const FRASES_PROGRESO := ["", "¡Sello uno! Faltan dos.", "¡Dos de tres! ¡Ya c
 ## Dónde queda Ovi cuando Nuna lo usa en la ventana, y cuánto sube Nuna al pararse encima.
 const OVI_POS_VENTANA := Vector2(219, 132)
 const OVI_ALTURA := 14.0
+## La puerta de la 101 está en el borde izquierdo: Nuna entra y sale del cuadro por ahí.
+const POS_PUERTA := Vector2(16, 140)
+const POS_AFUERA := Vector2(-14, 140)
 ## Ramón: la etiqueta trae el código al revés (ORTAUC = CUATRO).
 ## Las estaciones son un día de trabajo (Mérito, Ocupada, Feriado, Hora Extra) y Ofelia las
 ## escuchó 45 años: ya no la despiertan. Solo la Radio Revés llega: pasa su vida para atrás,
@@ -68,8 +71,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_room_entered() -> void:
 	Musica.tocar(&"habitacion")
-	if state.visited_first_time:
-		C.player.position = Vector2(36, 140)
+	if not state.entrada_completada:
+		# Que no se vea a Nuna adentro antes de que entre por la puerta.
+		C.player.hide()
+		C.player.position = POS_AFUERA
+	else:
+		C.player.show()
+		if state.visited_first_time:
+			C.player.position = Vector2(36, 140)
 	$Props/Lumi.combo_sombra_activado.connect(_on_combo_sombra_activado)
 	$Props/Lumi.susto_chico.connect($Props/Huesped.temblar)
 	# Ofelia solo tiembla con cada susto; salta de la cama con el tercer sello.
@@ -515,6 +524,8 @@ func _on_room_transition_finished() -> void:
 			add_child(test)
 			test.run.call_deferred(self)
 		break
+	if testing:
+		C.player.show()
 	if not testing and not state.entrada_completada:
 		ocupado = true
 		await E.queue([_reproducir_entrada])
@@ -526,8 +537,10 @@ func _reproducir_entrada() -> void:
 	Globals.pausado = true
 	C.player.hide()
 	await $Props/Puerta.abrir()
-	C.player.global_position = $Markers/EntradaNuna.global_position
+	# Entra desde afuera del cuadro, cruzando la puerta.
+	C.player.position = POS_AFUERA
 	C.player.show()
+	await _cruzar_puerta(POS_PUERTA)
 	await C.player.walk($Markers/InicioNuna.global_position)
 	C.player.volver_a_reposo_frontal()
 	await $Props/Puerta.cerrar()
@@ -614,13 +627,27 @@ func _salir_de_la_101() -> void:
 		return
 	await _decir("¡Chau, Ofelia! ¡Chau, Lumi, Ramón, Doña Cortina!")
 	await $Props/Puerta.abrir()
-	await C.player.walk($Markers/EntradaNuna.global_position)
+	await C.player.walk(POS_PUERTA)
+	# Sigue de largo y sale del cuadro por la puerta (la recepción la vuelve a mostrar).
+	await _cruzar_puerta(POS_AFUERA)
 	C.player.hide()
 	await $Props/Puerta.cerrar()
-	C.player.show()
 	_saliendo = true
 	_cancelar_seleccion()
 	R.goto_room("Recepcion")
+
+
+## Nuna cruza la puerta sin el límite de la pantalla (walk no la deja salir del cuadro).
+func _cruzar_puerta(destino: Vector2) -> void:
+	var sprite: AnimatedSprite2D = C.player.get_node("AnimatedSprite2D")
+	sprite.flip_h = destino.x < C.player.position.x
+	if sprite.sprite_frames.has_animation(&"flota_derecha"):
+		sprite.play(&"flota_derecha")
+	var tw := create_tween()
+	tw.tween_property(C.player, "position", destino, absf(destino.x - C.player.position.x) / 40.0)
+	await tw.finished
+	C.player.sync_buffered_position()
+	C.player.volver_a_reposo_frontal()
 
 
 ## El tercer sello: el único susto grande. Ofelia salta de la cama y grita.

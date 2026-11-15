@@ -71,6 +71,70 @@ distancia_uso = -18.0
 [node name="Sprite2D" parent="Props/Lampara" index="0"]
 visible = false
 
+[node name="Mostrador" parent="Props" instance=ExtResource("3")]
+position = Vector2(240, 92)
+script = ExtResource("4")
+script_name = "Mostrador"
+description = "mostrador"
+id = &"mostrador"
+nombre_desconocido = "mostrador"
+nombre = "Mostrador"
+frase_mirar = "El mostrador."
+puede_perturbar = false
+tamano = Vector2(24, 12)
+distancia_uso = -16.0
+
+[node name="Sprite2D" parent="Props/Mostrador" index="0"]
+visible = false
+
+[node name="Tubo" parent="Props" instance=ExtResource("3")]
+position = Vector2(372, 96)
+script = ExtResource("4")
+script_name = "Tubo"
+description = "tubo"
+id = &"tubo"
+nombre_desconocido = "tubo"
+nombre = "Tubo"
+frase_mirar = "Un tubo que va para arriba."
+puede_perturbar = false
+tamano = Vector2(14, 96)
+distancia_uso = -16.0
+
+[node name="Sprite2D" parent="Props/Tubo" index="0"]
+visible = false
+
+[node name="Llavero" parent="Props" instance=ExtResource("3")]
+position = Vector2(219, 55)
+script = ExtResource("4")
+script_name = "Llavero"
+description = "llavero"
+id = &"llavero"
+nombre_desconocido = "llavero"
+nombre = "Llavero"
+frase_mirar = "El llavero."
+puede_perturbar = false
+tamano = Vector2(8, 16)
+distancia_uso = -12.0
+
+[node name="Sprite2D" parent="Props/Llavero" index="0"]
+visible = false
+
+[node name="Cartel202" parent="Props" instance=ExtResource("3")]
+position = Vector2(871, 96)
+script = ExtResource("4")
+script_name = "Cartel202"
+description = "cartel"
+id = &"cartel_202"
+nombre_desconocido = "cartel"
+nombre = "Cartel 202"
+frase_mirar = "La 202 es para arriba."
+puede_perturbar = false
+tamano = Vector2(26, 14)
+distancia_uso = -16.0
+
+[node name="Sprite2D" parent="Props/Cartel202" index="0"]
+visible = false
+
 [node name="Hotspots" type="Node2D" parent="."]
 
 [node name="Regions" type="Node2D" parent="."]
@@ -94,5 +158,8 @@ position = Vector2(258, 146)
 
 [node name="Puerta101" type="Marker2D" parent="Markers"]
 position = Vector2(477, 146)
+
+[node name="Escalera" type="Marker2D" parent="Markers"]
+position = Vector2(866, 146)
 
 [node name="Characters" type="Node2D" parent="."]

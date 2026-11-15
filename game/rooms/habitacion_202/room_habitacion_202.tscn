@@ -1,0 +1,168 @@
+[gd_scene format=3 uid="uid://c5a7kbgydqun3"]
+
+[ext_resource type="Script" uid="uid://cu55w8hun17s5" path="res://game/rooms/habitacion_202/room_habitacion_202.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://ds0qht2wawy5d" path="res://arte/backgrounds/habitacion_202.png" id="2"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/bruno/prop_bruno.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/mesa_noche/prop_mesa_noche.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/reloj/prop_reloj.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/silla/prop_silla.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/corbata/prop_corbata.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/calendario/prop_calendario.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/escritorio/prop_escritorio.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/telefono/prop_telefono.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/laptop/prop_laptop.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/ratoncito/prop_ratoncito.tscn" id="12"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/taza/prop_taza.tscn" id="13"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/cafetera/prop_cafetera.tscn" id="14"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/ventana/prop_ventana.tscn" id="15"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/pantuflas/prop_pantuflas.tscn" id="16"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/puerta/prop_puerta.tscn" id="99"]
+
+[node name="RoomHabitacion202" type="Node2D" unique_id=1911475338]
+script = ExtResource("1")
+script_name = "Habitacion202"
+width = 320
+height = 180
+
+[node name="Background" type="Sprite2D" parent="." unique_id=784905192]
+texture = ExtResource("2")
+centered = false
+
+[node name="WalkableAreas" type="Node2D" parent="." unique_id=12037075]
+
+[node name="Props" type="Node2D" parent="." unique_id=2039748976]
+
+[node name="Puerta" parent="Props" unique_id=66361344 instance=ExtResource("99")]
+position = Vector2(18, 138)
+vueltas_perturbar = 2
+frase_perturbar = ""
+es_prueba = false
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Bruno" parent="Props" unique_id=568514624 instance=ExtResource("3")]
+position = Vector2(68, 128)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="MesaNoche" parent="Props" unique_id=2087222381 instance=ExtResource("4")]
+position = Vector2(126, 128)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Reloj" parent="Props" unique_id=441634085 instance=ExtResource("5")]
+position = Vector2(126, 105)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Silla" parent="Props" unique_id=1035977121 instance=ExtResource("6")]
+position = Vector2(148, 128)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Corbata" parent="Props" unique_id=1310931384 instance=ExtResource("7")]
+position = Vector2(141, 110)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Calendario" parent="Props" unique_id=832339614 instance=ExtResource("8")]
+position = Vector2(232, 74)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Escritorio" parent="Props" unique_id=697585311 instance=ExtResource("9")]
+position = Vector2(200, 128)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Telefono" parent="Props" unique_id=930463091 instance=ExtResource("10")]
+position = Vector2(164, 99)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Laptop" parent="Props" unique_id=995738871 instance=ExtResource("11")]
+position = Vector2(186, 99)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Ratoncito" parent="Props" unique_id=1601041623 instance=ExtResource("12")]
+position = Vector2(208, 99)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Taza" parent="Props" unique_id=277182349 instance=ExtResource("13")]
+position = Vector2(221, 99)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Cafetera" parent="Props" unique_id=1960121988 instance=ExtResource("14")]
+position = Vector2(236, 99)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Ventana" parent="Props" unique_id=223345118 instance=ExtResource("15")]
+position = Vector2(268, 100)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Pantuflas" parent="Props" unique_id=1450792629 instance=ExtResource("16")]
+position = Vector2(150, 146)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="Hotspots" type="Node2D" parent="." unique_id=1220543234]
+
+[node name="Regions" type="Node2D" parent="." unique_id=238694102]
+
+[node name="Markers" type="Node2D" parent="." unique_id=2111330483]
+
+[node name="EntradaNuna" type="Marker2D" parent="Markers" unique_id=1767043145]
+position = Vector2(18, 112)
+
+[node name="InicioNuna" type="Marker2D" parent="Markers" unique_id=2020754579]
+position = Vector2(40, 140)
+
+[node name="Characters" type="Node2D" parent="." unique_id=1087460615]

@@ -327,13 +327,12 @@ func _crear_boton_saltar() -> void:
 	_ubicar_boton_saltar()
 
 
-## Arriba a la derecha; si la barra de arriba está visible, justo debajo de ella.
+## Abajo a la derecha; si se ve la consola, justo encima de ella.
 func _ubicar_boton_saltar() -> void:
 	if not is_instance_valid(_boton_saltar):
 		return
-	var hud_visible: bool = is_instance_valid(G.gui) and is_instance_valid(G.gui.ui) \
-			and G.gui.ui.visible and is_instance_valid(G.gui.ui._hud) and G.gui.ui._hud.visible
-	var y := Ajustes.UI_HUD_TAMANO.y + 2.0 if hud_visible else 2.0
+	var abajo := Ajustes.UI_Y if con_consola else 180.0
+	var y := abajo - _boton_saltar.size.y - 2.0
 	_boton_saltar.position = Vector2(320.0 - _boton_saltar.size.x - 2.0, y)
 	_boton_saltar.visible = not _saltando and not _saliendo and _intro_en_curso()
 	if _cartel_saltar.visible:

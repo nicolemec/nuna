@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="1"]
+[ext_resource type="Script" path="res://game/objects/objeto_animado.gd" id="2"]
+[ext_resource type="Texture2D" path="res://arte/objetos/corbata_202.png" id="3"]
+
+[node name="Corbata" instance=ExtResource("1")]
+script = ExtResource("2")
+ruta_tira = "res://arte/objetos/corbata_202_anim.png"
+frame_ancho = 13
+frame_alto = 26
+etiquetas = {
+"quieta": [0, 0],
+"balancea": [1, 7]
+}
+duraciones_ms = {
+"quieta": [100],
+"balancea": [140, 140, 140, 140, 140, 140, 140]
+}
+anim_reposo = &"quieta"
+anim_perturbar = &"balancea"
+vueltas_perturbar = 3
+script_name = "Corbata"
+description = "corbata"
+textura = ExtResource("3")
+id = &"corbata_202"
+nombre_desconocido = "corbata"
+nombre = "Don Nudo"
+frase_mirar = "Está colgada, esperando la próxima reunión."
+frase_perturbar = "¡Se hamaca! Por lo menos alguien en esta pieza se divierte."
+frase_agarrar = "Me queda larga. Soy más de sábana."
+distancia_uso = 16.0
+interaction_polygon = PackedVector2Array(-6.0, -26.0, 7.0, -26.0, 7.0, 0, -6.0, 0)
+walk_to_point = Vector2(-16, 10)
+
+[node name="Sprite2D" parent="." index="0"]
+visible = false
