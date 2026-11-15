@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="1"]
+[ext_resource type="Script" path="res://game/objects/objeto_animado.gd" id="2"]
+[ext_resource type="Texture2D" path="res://arte/objetos/silla_202.png" id="3"]
+
+[node name="Silla" instance=ExtResource("1")]
+script = ExtResource("2")
+ruta_tira = "res://arte/objetos/silla_202_anim.png"
+frame_ancho = 20
+frame_alto = 46
+etiquetas = {
+"quieta": [0, 0],
+"cruje": [1, 2]
+}
+duraciones_ms = {
+"quieta": [100],
+"cruje": [250, 250]
+}
+anim_reposo = &"quieta"
+anim_perturbar = &"cruje"
+vueltas_perturbar = 2
+script_name = "Silla"
+description = "silla"
+textura = ExtResource("3")
+id = &"silla_202"
+nombre_desconocido = "silla"
+nombre = "Doña Silla"
+frase_mirar = "Una silla con una corbata colgada. Ella sí que espera reuniones."
+frase_perturbar = "¡Cric! Se queja como el muchacho."
+frase_agarrar = "Pesa como un lunes."
+distancia_uso = -16.0
+interaction_polygon = PackedVector2Array(-10.0, -46.0, 10.0, -46.0, 10.0, 0, -10.0, 0)
+walk_to_point = Vector2(-16, 10)
+
+[node name="Sprite2D" parent="." index="0"]
+visible = false

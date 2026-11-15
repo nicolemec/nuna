@@ -1,0 +1,39 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="1"]
+[ext_resource type="Script" path="res://game/objects/objeto_animado.gd" id="2"]
+[ext_resource type="Texture2D" path="res://arte/objetos/taza_202.png" id="3"]
+
+[node name="Taza" instance=ExtResource("1")]
+script = ExtResource("2")
+ruta_tira = "res://arte/objetos/taza_202_anim.png"
+frame_ancho = 12
+frame_alto = 14
+etiquetas = {
+"sin_dientes": [0, 0],
+"con_dientes": [1, 1],
+"castanetea": [2, 3]
+}
+duraciones_ms = {
+"sin_dientes": [100],
+"con_dientes": [100],
+"castanetea": [90, 90]
+}
+anim_reposo = &"sin_dientes"
+anim_perturbar = &""
+vueltas_perturbar = 1
+script_name = "Taza"
+description = "taza"
+textura = ExtResource("3")
+id = &"taza_202"
+nombre_desconocido = "taza"
+nombre = "Taza Sonriente"
+frase_mirar = "«Sonreír es parte del trabajo». La boca dibujada no tiene dientes."
+frase_perturbar = "Le falta algo para sonreír de verdad."
+frase_agarrar = "Está pegada de café."
+distancia_uso = -16.0
+interaction_polygon = PackedVector2Array(-6.0, -14.0, 6.0, -14.0, 6.0, 0, -6.0, 0)
+walk_to_point = Vector2(-16, 10)
+
+[node name="Sprite2D" parent="." index="0"]
+visible = false

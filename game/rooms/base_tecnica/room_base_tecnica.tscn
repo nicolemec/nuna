@@ -72,3 +72,12 @@ offset_right = 210.0
 offset_bottom = 170.0
 theme_override_font_sizes/font_size = 10
 text = "Abrir 101 (arte y movimiento)"
+
+[node name="Abrir202" type="Button" parent="Panel"]
+layout_mode = 0
+offset_left = 216.0
+offset_top = 145.0
+offset_right = 312.0
+offset_bottom = 170.0
+theme_override_font_sizes/font_size = 10
+text = "Abrir 202 (Bruno)"
