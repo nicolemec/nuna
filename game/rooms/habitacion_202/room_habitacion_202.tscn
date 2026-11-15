@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://game/rooms/habitacion_202/room_habitacion_202.gd" id="1"]
 [ext_resource type="Texture2D" path="res://arte/backgrounds/habitacion_202.png" id="2"]
@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/cafetera/prop_cafetera.tscn" id="14"]
 [ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/ventana/prop_ventana.tscn" id="15"]
 [ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/pantuflas/prop_pantuflas.tscn" id="16"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/puerta/prop_puerta.tscn" id="99"]
 
 [node name="RoomHabitacion202" type="Node2D"]
 script = ExtResource("1")
@@ -30,6 +31,9 @@ texture = ExtResource("2")
 [node name="WalkableAreas" type="Node2D" parent="."]
 
 [node name="Props" type="Node2D" parent="."]
+
+[node name="Puerta" parent="Props" instance=ExtResource("99")]
+position = Vector2(18, 138)
 
 [node name="Bruno" parent="Props" instance=ExtResource("3")]
 position = Vector2(78, 128)
@@ -78,6 +82,9 @@ position = Vector2(150, 146)
 [node name="Regions" type="Node2D" parent="."]
 
 [node name="Markers" type="Node2D" parent="."]
+
+[node name="EntradaNuna" type="Marker2D" parent="Markers"]
+position = Vector2(18, 112)
 
 [node name="InicioNuna" type="Marker2D" parent="Markers"]
 position = Vector2(40, 140)
