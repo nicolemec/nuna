@@ -17,6 +17,7 @@ const RECETA := {"cafe": 9, "agua": 3, "azucar": 8}
 var state: Data = load("res://game/rooms/habitacion_202/room_habitacion_202.tres")
 var ocupado := false
 var objeto_seleccionado: ObjetoInteractivo
+var _saliendo := false
 
 
 func _enter_tree() -> void:
@@ -72,6 +73,7 @@ func _restaurar_visual() -> void:
 		obj.restaurar_posicion()
 		obj.visible = not obj.recogido
 		obj.description = obj.nombre_visible()
+	$Props/Puerta.mostrar_cerrada()
 	if state.laptop_quemada:
 		$Props/Laptop.quemar()
 	if state.taza_con_dientes:
@@ -87,11 +89,25 @@ func _on_room_transition_finished() -> void:
 		state.entrada_completada = true
 		ocupado = true
 		await E.queue([
+			_reproducir_entrada,
 			func (): await _decir("¡La 202! Acá vive alguien que no duerme mucho."),
 			func (): await _decir("DIN: ¡Nuevo turno, equipo! Tres sellos y a otra cosa. ♥"),
 		])
 		ocupado = false
 		_actualizar_guia()
+
+
+## Igual que en la 101: se abre la puerta, entra Nuna y se cierra.
+func _reproducir_entrada() -> void:
+	Globals.pausado = true
+	C.player.hide()
+	await $Props/Puerta.abrir()
+	C.player.global_position = $Markers/EntradaNuna.global_position
+	C.player.show()
+	await C.player.walk($Markers/InicioNuna.global_position)
+	C.player.volver_a_reposo_frontal()
+	await $Props/Puerta.cerrar()
+	Globals.pausado = false
 
 
 func seleccionar_objeto(obj: ObjetoInteractivo) -> void:
@@ -147,6 +163,9 @@ func ejecutar_accion(verbo: String) -> void:
 		func (): await C.player.interactuar(obj.global_position),
 		func (): await _resolver_accion(obj, StringName(verbo)),
 	])
+	if _saliendo:
+		G.block()
+		return
 	ocupado = false
 	_actualizar_guia()
 	_mostrar_contexto_seleccionado()
@@ -154,7 +173,15 @@ func ejecutar_accion(verbo: String) -> void:
 
 func _resolver_accion(obj: ObjetoInteractivo, verbo: StringName) -> void:
 	var sellos_antes: int = Globals.sellos
-	if verbo == Globals.PERTURBAR:
+	if obj == $Props/Puerta and verbo == Globals.MIRAR:
+		obj.nombrado = true
+		if state.mision_completada:
+			await _salir_de_la_202()
+		else:
+			await _decir("¡Señor Puerta! Todavía no salgo: me faltan sellos.")
+	elif verbo == Globals.PERTURBAR and not obj.puede_perturbar:
+		await _decir(obj.frase_perturbar if not obj.frase_perturbar.is_empty() else "Mejor no lo molesto.")
+	elif verbo == Globals.PERTURBAR:
 		await _perturbar(obj)
 	else:
 		await _decir(obj.ejecutar(verbo))
@@ -191,7 +218,7 @@ func _perturbar(obj: ObjetoInteractivo) -> void:
 
 ## El primer susto de cada objeto suma un poquito de miedo.
 func _sumar_miedo_primera_vez(obj: ObjetoInteractivo) -> void:
-	if obj == $Props/Bruno or state.perturbados.has(String(obj.name)):
+	if obj == $Props/Bruno or obj == $Props/Puerta or state.perturbados.has(String(obj.name)):
 		return
 	state.perturbados.append(String(obj.name))
 	Globals.aumentar_vela(MIEDO_PRIMER_SUSTO)
@@ -329,6 +356,31 @@ func _mision_cumplida() -> void:
 	await _decir("No fue el fantasma. Fue darlo todo y que igual no alcance.")
 	await _decir("Bruno se quemó como la compu. A la compu la pueden cambiar.")
 	await _decir("DIN: ¡Turno cumplido, equipo! ♥")
+	_brillar($Props/Puerta)
+
+
+## Con el turno cumplido, la puerta lleva de vuelta a la recepción (cinemática 3).
+func _salir_de_la_202() -> void:
+	var salir: bool = await PreguntaSiNo.preguntar(self, "¿Volver a la recepción?")
+	if not salir:
+		await _decir("Un ratito más con Bruno.")
+		return
+	await _decir("¡Chau, Bruno! ¡Chau, Compu, Tic y Doña Cafetera!")
+	await $Props/Puerta.abrir()
+	await C.player.walk($Markers/EntradaNuna.global_position)
+	C.player.hide()
+	await $Props/Puerta.cerrar()
+	C.player.show()
+	_saliendo = true
+	_cancelar_seleccion()
+	R.goto_room("Recepcion")
+
+
+func _brillar(nodo: CanvasItem) -> void:
+	var tw := create_tween()
+	for i in 4:
+		tw.tween_property(nodo, "modulate", Color(1.8, 1.8, 1.8), 0.15)
+		tw.tween_property(nodo, "modulate", Color.WHITE, 0.15)
 
 
 # ---------- Guía y consola ----------
@@ -340,7 +392,7 @@ func _poner_dientes_a_taza() -> void:
 
 func _texto_guia() -> String:
 	if state.mision_completada:
-		return "¡Turno cumplido en la 202!"
+		return "¡Turno cumplido! Mirá la puerta para volver a la recepción."
 	if state.mails_resueltos > 0 and not state.laptop_quemada:
 		return "La compu todavía aguanta. Seguí contestando sus mails."
 	if $Props/Calendario.nombrado and not state.alarma_sonada:

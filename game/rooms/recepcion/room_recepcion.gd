@@ -8,6 +8,12 @@ const RUTA_TIMBRE := "res://audio/sfx/timbre.wav"
 const TOMA_CONTRATO := "res://arte/tomas/toma_contrato.png"
 const TOMA_REGISTRO := "res://arte/tomas/toma_registro.png"  ## 2 cuadros: vacío y firmado
 const TOMA_CUADERNO := "res://arte/tomas/toma_cuaderno.png"
+## Cinemática 3: si existen estas tomas se muestran; si no, el texto va en la tarjeta de la consola.
+const TOMA_CERTIFICADO_APARICION := "res://arte/tomas/toma_certificado_aparicion.png"
+const TOMA_REGISTRO_DESAPARECIDOS := "res://arte/tomas/toma_registro_desaparecidos.png"
+## El fantasma de la calle, ahora trabajando en la recepción, cada vez más transparente.
+const RUTA_FANTASMA := "res://arte/objetos/fantasmaextra.png"
+const POS_FANTASMA := Vector2(385, 116)
 ## Zonas donde el jugador hace clic dentro de las tomas (en píxeles del dibujo, 320x152).
 const ZONA_FIRMA := Rect2i(112, 103, 118, 15)        # la línea "Firma:" del contrato
 const CRUZ_FIRMA := Vector2i(160, 104)
@@ -17,13 +23,16 @@ const ZONA_TERROR := Rect2i(97, 118, 142, 15)        # "Terror" en el cuaderno
 enum Paso { TIMBRE, MIRAR_LAMPARA, PERTURBAR_LAMPARA, TERMINADO }
 
 var state: Data = load("res://game/rooms/recepcion/room_recepcion.tres")
+var _fantasma: Sprite2D
 
 
 func _on_room_entered() -> void:
 	# Después de la 101 Nuna ya no lleva birrete (lo lee super() al entrar).
 	nuna_con_birrete = state.paso != Paso.TERMINADO
 	super()
-	C.player.position = $Markers/Puerta101.position if _vuelve_de_la_101() else $Markers/Entrada.position
+	C.player.position = $Markers/Puerta101.position if (_vuelve_de_la_101() or _vuelve_de_la_202()) else $Markers/Entrada.position
+	if _vuelve_de_la_202() or state.cinematica_3:
+		_poner_fantasma(0.15 if state.cinematica_3 else 0.45)
 	if state.paso == Paso.TERMINADO:
 		G.gui.ui.mostrar_hud(true)
 	var timbre: ZonaIntro = $Props/Timbre
@@ -44,6 +53,9 @@ func _on_room_transition_finished() -> void:
 	if _vuelve_de_la_101():
 		await _cinematica_2()
 		return
+	if _vuelve_de_la_202():
+		await _cinematica_3()
+		return
 	ocupado = true
 	_actualizar_guia()
 	await C.player.walk($Markers/Mostrador.position)
@@ -54,8 +66,10 @@ func _on_room_transition_finished() -> void:
 
 
 func _texto_guia() -> String:
+	if state.cinematica_3:
+		return "Fin del turno 2. La 303 todavía está en obra."
 	if state.cinematica_2:
-		return "Fin del turno 1. La 202 todavía está en obra."
+		return "Próxima prioridad: la 202."
 	match state.paso:
 		Paso.TIMBRE:
 			return "Hay un timbre en el mostrador."
@@ -338,7 +352,7 @@ func _cinematica_2() -> void:
 	await _viejo("Los de tu promoción no se jubilan. Ni vivos ni muertos.")
 	await _decir("¡Ah! Como una leyenda urbana.")
 	await G.gui.ui.mostrar_certificacion("Jubilación: leyenda urbana.", "(Como nosotros.)")
-	await _viejo("Mañana, la 202. Un muchacho. No duerme mucho.")
+	await _viejo("Ahora, la 202. Un muchacho. No duerme mucho.")
 	await _decir("¿Por qué no duerme?")
 	await _viejo("Porque trabaja.")
 	await _decir("¿Y cuándo trabaja?")
@@ -349,8 +363,117 @@ func _cinematica_2() -> void:
 	await E.wait(0.6)
 	await G.gui.ui.mostrar_certificacion("Hoy aprendí a perturbar y que a Lumi hay que cuidarla…", "(…y que la jubilación es una leyenda.)")
 	state.cinematica_2 = true
+	# Din dijo que la próxima prioridad es la 202: Nuna va por la puerta de las habitaciones.
+	await _decir("¡A la 202!")
+	await C.player.walk($Markers/Puerta101.position)
+	C.player.mirar_a(C.player.global_position + Vector2(0, -20))
+	await E.wait(0.4)
+	_ir_a("Habitacion202")
+
+
+# ---------- Cinemática 3: vuelta de la 202, los que no llegaron ----------
+
+func _vuelve_de_la_202() -> bool:
+	if not state.cinematica_2 or state.cinematica_3:
+		return false
+	var estado_202: Resource = load("res://game/rooms/habitacion_202/room_habitacion_202.tres")
+	return estado_202 != null and estado_202.get("mision_completada") == true
+
+
+func _cinematica_3() -> void:
+	ocupado = true
+	_actualizar_guia()
+	await C.player.walk($Markers/Mostrador.position)
+	C.player.volver_a_reposo_frontal()
+	await _decir("¡Volví de la 202!")
+	$SonidoTimbre.play()
+	await E.wait(0.8)
+	await _llega_el_viejo()
+	await _decir("¡Tengo otra certificación!")
+	await _mostrar_certificado_aparicion()
+	await _viejo("Bien. Ya podés considerarte un espíritu competente.")
+	await _decir("¿Y qué pasa cuando soy competente?")
+	await _viejo("Te dan más trabajo.")
+	await _decir("¡Qué emocionante!")
+	await _viejo("No te emociones.")
+	# Nuna mira el Registro y encuentra la columna que nadie mira.
+	await C.player.walk($Markers/Libro.position)
+	await C.player.interactuar($Markers/Libro.position + Vector2(0, -60))
+	var toma: Toma = null
+	if ResourceLoader.exists(TOMA_REGISTRO_DESAPARECIDOS):
+		toma = await Toma.mostrar(self, TOMA_REGISTRO_DESAPARECIDOS, 0)
+	else:
+		await G.gui.ui.mostrar_certificacion("REGISTRO · Espíritus desaparecidos", "(La lista sigue en la página siguiente. Y en la otra.)")
+	await _decir("¿Qué significa esta columna? «Espíritus desaparecidos».")
+	await _viejo("Los que no llegaron.")
+	await _decir("¿A dónde?")
+	await _viejo("A ninguna parte.")
+	if toma != null:
+		await toma.cerrar()
+	# Din interrumpe por el timbre. Mientras habla, el fantasma de atrás se apaga un poco más.
+	$SonidoTimbre.play()
+	await E.wait(0.5)
+	_atenuar_fantasma(0.25)
+	await _decir("DIN: Recordatorio: tu eficiencia está 4% por debajo del promedio de tu promoción. ♥")
+	await _decir("DIN: ¡Vos podés!")
+	await _decir("¿Tengo una promoción? No conozco a nadie.")
+	await $Viejo.desaparecer()
+	await E.wait(0.4)
+	# El fantasma de la calle: trabaja acá, cada vez más transparente, y no contesta.
+	await C.player.walk(Vector2(POS_FANTASMA.x - 10, 146))
+	C.player.mirar_a(_fantasma.global_position + Vector2(15, 15))
+	await _decir("Hola… ¿Vos también sos aprendiz? ¿Cómo te llamás?")
+	await E.wait(1.2)
+	await _decir("…")
+	_atenuar_fantasma(0.15)
+	await _decir("No contesta. Casi no se lo ve.")
+	await E.wait(0.6)
+	await G.gui.ui.mostrar_certificacion("Llevo 6 velas trabajando. Aprendí a aparecerme y que la compu se quemó como Bruno.", "(A la compu la pueden cambiar. No aprendí: para qué junto bruma.)")
+	state.cinematica_3 = true
 	ocupado = false
 	_actualizar_guia()
+
+
+func _mostrar_certificado_aparicion() -> void:
+	if ResourceLoader.exists(TOMA_CERTIFICADO_APARICION):
+		var toma := await Toma.mostrar(self, TOMA_CERTIFICADO_APARICION)
+		await E.wait(1.5)
+		await toma.cerrar()
+	else:
+		await G.gui.ui.mostrar_certificacion("CERTIFICADO DE APARICIÓN · Nuna, aprendiz.", "(Válido solo en superficies que reflejan.)")
+
+
+func _poner_fantasma(alfa: float) -> void:
+	if not ResourceLoader.exists(RUTA_FANTASMA):
+		return
+	var recorte := AtlasTexture.new()
+	recorte.atlas = load(RUTA_FANTASMA)
+	recorte.region = Rect2(0, 0, 30, 30)
+	_fantasma = Sprite2D.new()
+	_fantasma.name = "FantasmaRecepcion"
+	_fantasma.texture = recorte
+	_fantasma.centered = false
+	_fantasma.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_fantasma.position = POS_FANTASMA
+	_fantasma.modulate.a = alfa
+	add_child(_fantasma)
+	move_child(_fantasma, $Characters.get_index())
+	# Parpadea como una señal que se corta.
+	var tw := create_tween().set_loops()
+	tw.tween_interval(2.4)
+	tw.tween_callback(func(): _fantasma.visible = false)
+	tw.tween_interval(0.08)
+	tw.tween_callback(func(): _fantasma.visible = true)
+	tw.tween_interval(0.12)
+	tw.tween_callback(func(): _fantasma.visible = false)
+	tw.tween_interval(0.06)
+	tw.tween_callback(func(): _fantasma.visible = true)
+
+
+func _atenuar_fantasma(alfa: float) -> void:
+	if _fantasma == null:
+		return
+	create_tween().tween_property(_fantasma, "modulate:a", alfa, 1.2)
 
 
 ## Una línea del viejo: mueve la boca mientras se ve el texto.
