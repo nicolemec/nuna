@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b6e5iyafvvwse"
-path="res://.godot/imported/mesa_noche_202.aseprite-d8ebc63b468a6f4d4ebfcbe8a23d3914.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://arte/objetos/mesa_noche_202.aseprite"
-dest_files=["res://.godot/imported/mesa_noche_202.aseprite-d8ebc63b468a6f4d4ebfcbe8a23d3914.ctex"]
 
 [params]
 

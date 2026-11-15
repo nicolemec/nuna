@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://opyc0fwvd5j6"
-path="res://.godot/imported/cafetera_202.aseprite-e7a935f26905a4107a8ce2be6a16043e.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://arte/objetos/cafetera_202.aseprite"
-dest_files=["res://.godot/imported/cafetera_202.aseprite-e7a935f26905a4107a8ce2be6a16043e.ctex"]
 
 [params]
 

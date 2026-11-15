@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://baik07w2dxhsi"
-path="res://.godot/imported/escritorio_202.aseprite-5aeb5742726042b64045b41dd43067f0.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://arte/objetos/escritorio_202.aseprite"
-dest_files=["res://.godot/imported/escritorio_202.aseprite-5aeb5742726042b64045b41dd43067f0.ctex"]
 
 [params]
 

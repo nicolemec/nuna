@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c1octyvk6y2u7"
-path="res://.godot/imported/calendario_202.aseprite-7c6f30b98fd093a0b94b7570469e82ab.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://arte/objetos/calendario_202.aseprite"
-dest_files=["res://.godot/imported/calendario_202.aseprite-7c6f30b98fd093a0b94b7570469e82ab.ctex"]
 
 [params]
 

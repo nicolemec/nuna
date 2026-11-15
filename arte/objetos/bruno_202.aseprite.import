@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b1jxl0u0c1fcu"
-path="res://.godot/imported/bruno_202.aseprite-28fafa1cfbe9b9fc5235a7815cc4895e.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://arte/objetos/bruno_202.aseprite"
-dest_files=["res://.godot/imported/bruno_202.aseprite-28fafa1cfbe9b9fc5235a7815cc4895e.ctex"]
 
 [params]
 

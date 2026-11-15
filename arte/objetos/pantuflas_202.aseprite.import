@@ -3,15 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cqgrpdk8o6gv2"
-path="res://.godot/imported/pantuflas_202.aseprite-4b546dba3ba292f48713515d00f181a6.ctex"
-metadata={
-"vram_texture": false
-}
+valid=false
 
 [deps]
 
 source_file="res://arte/objetos/pantuflas_202.aseprite"
-dest_files=["res://.godot/imported/pantuflas_202.aseprite-4b546dba3ba292f48713515d00f181a6.ctex"]
 
 [params]
 
