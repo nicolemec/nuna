@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="1"]
+[ext_resource type="Script" path="res://game/objects/objeto_animado.gd" id="2"]
+[ext_resource type="Texture2D" path="res://arte/objetos/escritorio_202.png" id="3"]
+
+[node name="Escritorio" instance=ExtResource("1")]
+script = ExtResource("2")
+ruta_tira = "res://arte/objetos/escritorio_202_anim.png"
+frame_ancho = 86
+frame_alto = 30
+etiquetas = {
+"quieta": [0, 0],
+"respira": [1, 2]
+}
+duraciones_ms = {
+"quieta": [100],
+"respira": [1200, 800]
+}
+anim_reposo = &"quieta"
+anim_perturbar = &"respira"
+vueltas_perturbar = 2
+script_name = "Escritorio"
+description = "escritorio"
+textura = ExtResource("3")
+id = &"escritorio_202"
+nombre_desconocido = "escritorio"
+nombre = "Don Escritorio"
+frase_mirar = "Acá trabaja el muchacho. Mucho escritorio y nada de escrito."
+frase_perturbar = "¡Cruje! Está cansado de cargar tanto trabajo."
+frase_agarrar = "Ni con diez fantasmas lo muevo."
+distancia_uso = -24.0
+interaction_polygon = PackedVector2Array(-43.0, -30.0, 43.0, -30.0, 43.0, 0, -43.0, 0)
+walk_to_point = Vector2(-16, 10)
+
+[node name="Sprite2D" parent="." index="0"]
+visible = false

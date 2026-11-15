@@ -13,6 +13,7 @@ func _on_room_entered() -> void:
 func _on_room_transition_finished() -> void:
 	$Panel/Verificar.pressed.connect(_verificar_secuencia)
 	$Panel/Abrir101.pressed.connect(func (): await R.goto_room("Habitacion101"))
+	$Panel/Abrir202.pressed.connect(func (): await R.goto_room("Habitacion202"))
 	$Panel/Estado.text = "Motor listo. Sin contenido narrativo."
 	if "--smoke-test" in OS.get_cmdline_user_args():
 		var test := load("res://tests/smoke_test.gd").new() as Node

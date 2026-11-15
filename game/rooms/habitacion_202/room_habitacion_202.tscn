@@ -1,0 +1,85 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://game/rooms/habitacion_202/room_habitacion_202.gd" id="1"]
+[ext_resource type="Texture2D" path="res://arte/backgrounds/habitacion_202.png" id="2"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/bruno/prop_bruno.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/mesa_noche/prop_mesa_noche.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/reloj/prop_reloj.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/silla/prop_silla.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/corbata/prop_corbata.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/calendario/prop_calendario.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/escritorio/prop_escritorio.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/telefono/prop_telefono.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/laptop/prop_laptop.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/ratoncito/prop_ratoncito.tscn" id="12"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/taza/prop_taza.tscn" id="13"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/cafetera/prop_cafetera.tscn" id="14"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/ventana/prop_ventana.tscn" id="15"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_202/props/pantuflas/prop_pantuflas.tscn" id="16"]
+
+[node name="RoomHabitacion202" type="Node2D"]
+script = ExtResource("1")
+script_name = "Habitacion202"
+width = 320
+height = 180
+
+[node name="Background" type="Sprite2D" parent="."]
+centered = false
+texture = ExtResource("2")
+
+[node name="WalkableAreas" type="Node2D" parent="."]
+
+[node name="Props" type="Node2D" parent="."]
+
+[node name="Bruno" parent="Props" instance=ExtResource("3")]
+position = Vector2(78, 128)
+
+[node name="MesaNoche" parent="Props" instance=ExtResource("4")]
+position = Vector2(126, 128)
+
+[node name="Reloj" parent="Props" instance=ExtResource("5")]
+position = Vector2(126, 105)
+
+[node name="Silla" parent="Props" instance=ExtResource("6")]
+position = Vector2(148, 128)
+
+[node name="Corbata" parent="Props" instance=ExtResource("7")]
+position = Vector2(141, 110)
+
+[node name="Calendario" parent="Props" instance=ExtResource("8")]
+position = Vector2(232, 74)
+
+[node name="Escritorio" parent="Props" instance=ExtResource("9")]
+position = Vector2(200, 128)
+
+[node name="Telefono" parent="Props" instance=ExtResource("10")]
+position = Vector2(164, 99)
+
+[node name="Laptop" parent="Props" instance=ExtResource("11")]
+position = Vector2(186, 99)
+
+[node name="Ratoncito" parent="Props" instance=ExtResource("12")]
+position = Vector2(208, 99)
+
+[node name="Taza" parent="Props" instance=ExtResource("13")]
+position = Vector2(221, 99)
+
+[node name="Cafetera" parent="Props" instance=ExtResource("14")]
+position = Vector2(236, 99)
+
+[node name="Ventana" parent="Props" instance=ExtResource("15")]
+position = Vector2(268, 100)
+
+[node name="Pantuflas" parent="Props" instance=ExtResource("16")]
+position = Vector2(150, 146)
+
+[node name="Hotspots" type="Node2D" parent="."]
+
+[node name="Regions" type="Node2D" parent="."]
+
+[node name="Markers" type="Node2D" parent="."]
+
+[node name="InicioNuna" type="Marker2D" parent="Markers"]
+position = Vector2(40, 140)
+
+[node name="Characters" type="Node2D" parent="."]

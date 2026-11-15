@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="1"]
+[ext_resource type="Script" path="res://game/objects/objeto_animado.gd" id="2"]
+[ext_resource type="Texture2D" path="res://arte/objetos/cama_202.png" id="3"]
+
+[node name="Cama" instance=ExtResource("1")]
+script = ExtResource("2")
+ruta_tira = "res://arte/objetos/cama_202_anim.png"
+frame_ancho = 76
+frame_alto = 36
+etiquetas = {
+"quieta": [0, 0],
+"respira": [1, 2]
+}
+duraciones_ms = {
+"quieta": [100],
+"respira": [1000, 1000]
+}
+anim_reposo = &"quieta"
+anim_perturbar = &"respira"
+vueltas_perturbar = 2
+script_name = "Cama"
+description = "cama"
+textura = ExtResource("3")
+id = &"cama_202"
+nombre_desconocido = "cama"
+nombre = "Doña Arruga"
+frase_mirar = "Una cama deshecha y nadie la usa. ¿Se deshizo sola de tanto esperar?"
+frase_perturbar = "Suspira… Hace mucho que nadie se acuesta en ella."
+frase_agarrar = "No entra en el bolsillo."
+distancia_uso = -16.0
+interaction_polygon = PackedVector2Array(-38.0, -36.0, 38.0, -36.0, 38.0, 0, -38.0, 0)
+walk_to_point = Vector2(-16, 10)
+
+[node name="Sprite2D" parent="." index="0"]
+visible = false
