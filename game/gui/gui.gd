@@ -48,6 +48,8 @@ func _ready() -> void:
 		_inventario_nativo.add_child(item)
 	I.item_added.connect(_item_added)
 	I.item_removed.connect(_item_removed)
+	# Lo que no cubre la escena (por ejemplo, la franja de abajo en el teatro) se ve negro, no gris.
+	RenderingServer.set_default_clear_color(Color.BLACK)
 	_crear_menu_partida()
 	mostrar_habitacion(false)
 

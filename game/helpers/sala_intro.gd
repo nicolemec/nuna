@@ -291,6 +291,29 @@ func _completar_toda_la_intro() -> void:
 	_poner_alfa_nuna(1.0)
 
 
+## Letra más chica para "SALTAR »": Silkscreen a 8 (nítida en pixel art, como el HUD),
+## con margen a los costados para que no se corte la S.
+func _achicar_boton_saltar() -> void:
+	const FUENTE_CHICA := "res://arte/fuentes/Silkscreen-Regular.ttf"
+	if ResourceLoader.exists(FUENTE_CHICA):
+		var fuente: FontFile = load(FUENTE_CHICA)
+		fuente.antialiasing = TextServer.FONT_ANTIALIASING_NONE
+		fuente.hinting = TextServer.HINTING_NONE
+		fuente.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
+		_boton_saltar.add_theme_font_override("font", fuente)
+		_boton_saltar.add_theme_font_size_override("font_size", 8)
+	for estado in ["normal", "hover", "pressed", "disabled"]:
+		var caja: StyleBox = _boton_saltar.get_theme_stylebox(estado)
+		if caja == null:
+			continue
+		caja = caja.duplicate()
+		caja.content_margin_left = 4
+		caja.content_margin_right = 4
+		caja.content_margin_top = 3
+		caja.content_margin_bottom = 3
+		_boton_saltar.add_theme_stylebox_override(estado, caja)
+
+
 func _crear_boton_saltar() -> void:
 	_capa_saltar = CanvasLayer.new()
 	_capa_saltar.layer = 65  # sobre la consola, las tomas y el HUD
@@ -303,6 +326,7 @@ func _crear_boton_saltar() -> void:
 	_boton_saltar.theme = tema
 	_boton_saltar.focus_mode = Control.FOCUS_NONE
 	_boton_saltar.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_achicar_boton_saltar()
 	_boton_saltar.pressed.connect(_abrir_cartel_saltar)
 	_capa_saltar.add_child(_boton_saltar)
 	_cartel_saltar = PanelContainer.new()

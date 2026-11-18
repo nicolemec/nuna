@@ -40,6 +40,8 @@ var _saltar_placa := false
 
 func _ready() -> void:
 	Musica.tocar(&"menu")
+	# Flecha y manito del juego también en el menú (acá se ve el mouse del sistema).
+	CursorPixel.aplicar_al_sistema()
 	var capa := CanvasLayer.new()
 	capa.layer = 11 # Sobre el HUD, debajo de las transiciones de Popochiu.
 	add_child(capa)
@@ -215,6 +217,7 @@ func _crear_boton(texto: String, contenedor: Container, accion: Callable) -> But
 	var boton := Button.new()
 	boton.text = texto
 	boton.custom_minimum_size = Vector2(68, 16)
+	boton.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	contenedor.add_child(boton)
 	boton.pressed.connect(accion)
 	_botones.append(boton)
