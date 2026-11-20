@@ -103,3 +103,46 @@ static func _textura(filas: Array, colores: Dictionary) -> ImageTexture:
 			if colores.has(c):
 				img.set_pixel(x, y, colores[c])
 	return ImageTexture.create_from_image(img)
+
+
+## Mano para los botones (la misma de la manito del juego, en gui.gd).
+const MANO := [
+	"..OO.......",
+	".OLLO......",
+	".OLLO......",
+	".OLLOOOO...",
+	".OLLOLLOOO.",
+	".OLLOLLOLLO",
+	"OOLLLLLLLLO",
+	"OLOLLLLLLLO",
+	"OLLLLLLLLLO",
+	".OLLLLLLLMO",
+	".OLLLLLLMO.",
+	"..OLLLLLMO.",
+	"..OOOOOOO..",
+]
+
+
+## En pantallas donde se ve el mouse del sistema (el menú de inicio, los créditos),
+## lo reemplaza por la flecha pixel art del juego, agrandada al tamaño de la ventana.
+## Sobre los botones aparece la manito. Se vuelve a calcular si cambia el tamaño.
+static func aplicar_al_sistema() -> void:
+	var arbol := Engine.get_main_loop() as SceneTree
+	var ventana := arbol.root
+	_poner_cursores_sistema(ventana)
+	if not ventana.size_changed.is_connected(_poner_cursores_sistema.bind(ventana)):
+		ventana.size_changed.connect(_poner_cursores_sistema.bind(ventana))
+
+
+static func _poner_cursores_sistema(ventana: Window) -> void:
+	var escala := maxi(1, floori(float(ventana.size.y) / 180.0))
+	var colores := {"O": O, "L": L, "M": M, "V": V}
+	Input.set_custom_mouse_cursor(_agrandada(FLECHA, colores, escala), Input.CURSOR_ARROW, Vector2.ZERO)
+	Input.set_custom_mouse_cursor(_agrandada(MANO, colores, escala), Input.CURSOR_POINTING_HAND, Vector2(2, 0) * escala)
+	Input.set_custom_mouse_cursor(_agrandada(FLECHA, colores, escala), Input.CURSOR_IBEAM, Vector2.ZERO)
+
+
+static func _agrandada(filas: Array, colores: Dictionary, escala: int) -> ImageTexture:
+	var img := _textura(filas, colores).get_image()
+	img.resize(img.get_width() * escala, img.get_height() * escala, Image.INTERPOLATE_NEAREST)
+	return ImageTexture.create_from_image(img)
