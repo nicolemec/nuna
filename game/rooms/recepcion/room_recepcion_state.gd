@@ -8,3 +8,5 @@ var cinematica_2 := false
 var dijo_timbre_alto := false
 ## La cinemática de vuelta de la 202 (el Registro y los espíritus desaparecidos) ya se vio.
 var cinematica_3 := false
+## La cinemática 4 (la silla vacía y el ascenso) ya se vio: Nuna sube a la Gerencia.
+var cinematica_4 := false

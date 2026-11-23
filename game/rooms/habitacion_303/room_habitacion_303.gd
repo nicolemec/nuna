@@ -16,7 +16,9 @@ extends PopochiuRoom
 
 const Data := preload("room_habitacion_303_state.gd")
 const RUTA_FONDO := "res://arte/backgrounds/habitacion_303.png"
+## El vistazo usa la toma si existe; si no, el fondo de la máquina (el mismo de la Gerencia).
 const RUTA_TOMA_MAQUINA := "res://arte/tomas/toma_maquina.png"
+const RUTA_FONDO_MAQUINA := "res://arte/backgrounds/maquina.png"
 const RUTA_CUADROS := "res://arte/objetos/cuadros_303.png"
 const FRASES_PROGRESO := ["", "¡Sello uno! Faltan dos.", "¡Dos de tres! ¡Ya casi!", "¡Tres sellos!"]
 const MIEDO_PRIMER_SUSTO := 4.0
@@ -39,17 +41,21 @@ const TEXTOS := {
 	"Puerta": ["puerta", "Señor Puerta", "¡Señor Puerta! Versión 303: con aro de luz en la mirilla.", "Mejor no lo molesto.", "Es más grande que yo."],
 	"Cama": ["cama", "Sábana Impecable", "Sábanas blancas sin una arruga. Del set: también son alquiladas.", "¡Se arrugó la sábana impecable!", "No entra en el bolsillo."],
 	"Vale": ["chica", "Vale", "Vale. Hace vivos desde la cama. No le pagan: le dan «visibilidad».", "Solo objetos, nunca personas. Lo dice el certificado.", "No entra en el bolsillo."],
-	"Aro": ["aro de luz", "Santa Aureola", "¡La aureola de un santo! …«Convertite en la mejor versión de tu espanto», decía el cartel de la calle.", "", "Si me lo llevo, Vale se queda a oscuras."],
-	"Tripode": ["trípode", "Ojo de Vidrio", "El teléfono de Vale, en un trípode. Apunta al rincón perfecto: lo que entra en el cuadro REC es lo único que existe.", "", "Lo necesita para trabajar."],
+	"Aro": ["aro de luz", "Santa Aureola", "¡La aureola de un santo! «La mejor versión de tu espanto», decía el cartel.", "", "Si me lo llevo, Vale se queda a oscuras."],
+	"Tripode": ["trípode", "Ojo de Vidrio", "El teléfono de Vale, en un trípode. Solo existe lo que entra en el cuadro REC.", "", "Lo necesita para trabajar."],
 	"Tocador": ["mesa de luz", "Doña Mesita", "Una mesa de luz llena de cosas para tapar a la persona.", "¡Tiemblan los frasquitos!", "Pesa más que yo."],
-	"Espejo": ["espejo", "Espejo Juez", "Un espejo que califica caras: «Piel 6/10. Simetría 7/10». Tiene cuatro botones: FILTRO, LUZ, CONTRASTE y LIKE.", "Me califica: «Fantasma 0/10». ¡No me registra!", "Está atornillado. Como sus notas."],
+	"Espejo": ["espejo", "Espejo Juez", "Un espejo que pone nota: «Piel 6/10». Botones: FILTRO, LUZ, CONTRASTE y LIKE.", "Me califica: «Fantasma 0/10». ¡No me registra!", "Está atornillado. Como sus notas."],
 	"Maquillaje": ["maquillaje", "Pintura Tapadora", "Pintura para tapar a la persona.", "¡Se cae un pincel!", "No me va a tapar nada: ya soy transparente."],
 	"Delineador": ["delineador", "Delineador", "Un delineador. Sirve para remarcar lo que uno quiere que se vea.", "Rueda un poquito.", "Me lo llevo. Algo voy a tener que escribir."],
-	"Flacozem": ["frasquito", "FLACOZEM™", "FLACOZEM™: «¡Hace desaparecer lo que sobra!». …¿Y si lo que sobra soy yo? Esto es veneno para mí.", "No lo toco ni con un susto.", "Lo escondo. Por las dudas."],
-	"Placard": ["placard", "Placard Explosivo", "Lleno hasta el techo. Ropa con etiqueta: «DEVOLVER EL LUNES». Ni la ropa es suya. Acá va todo lo que no sale en cámara.", "", "Ni con diez fantasmas."],
+	"Flacozem": ["frasquito", "FLACOZEM™", "FLACOZEM™: «¡Hace desaparecer lo que sobra!». ¿Y si lo que sobra soy yo?", "No lo toco ni con un susto.", "Lo escondo. Por las dudas."],
+	"Placard": ["placard", "Placard Explosivo", "Ropa con etiqueta: «DEVOLVER EL LUNES». Acá va todo lo que no sale en cámara.", "", "Ni con diez fantasmas."],
 }
 
 var state: Data = load("res://game/rooms/habitacion_303/room_habitacion_303.tres")
+## Nuna camina por adelante (la franja de piso más cercana a la cámara), así no queda
+## escondida detrás de la cama ni del placard. Lo usa punto_de_uso() de cada objeto.
+var piso_y := 146.0
+const PISO_DELANTE_MIN := 140.0
 var ocupado := false
 var objeto_seleccionado: ObjetoInteractivo
 var _saliendo := false
@@ -161,10 +167,18 @@ func _unhandled_input(event: InputEvent) -> void:
 	I.set_active_item(null)
 	if C.player.is_moving:
 		C.player.stop_walking()
+	destino.y = clampf(destino.y, PISO_DELANTE_MIN, Ajustes.PISO_Y_MAX)  # siempre por adelante
 	C.player.walk(destino)
 
 
 func _on_room_entered() -> void:
+	# Si se abre la 303 directo (para probar), la recepción no sabe que la historia avanzó:
+	# la dejamos como si Nuna ya hubiera hecho la intro, la 101 y la 202.
+	var recepcion: Resource = load("res://game/rooms/recepcion/room_recepcion.tres")
+	if recepcion.paso != 3:
+		recepcion.paso = 3
+		recepcion.cinematica_2 = true
+		recepcion.cinematica_3 = true
 	Musica.tocar(&"habitacion")
 	if ResourceLoader.exists(RUTA_FONDO):
 		$Background.texture = load(RUTA_FONDO)
@@ -231,6 +245,7 @@ func _restaurar_visual() -> void:
 
 
 func _on_room_transition_finished() -> void:
+	C.player.poner_birrete(false)  # en las habitaciones Nuna ya no lleva birrete
 	if state.entrada_completada:
 		return
 	state.entrada_completada = true
@@ -659,7 +674,9 @@ func _perturbar_placard() -> void:
 	if placard_anim != null and placard_anim.reproducir(&"abre"):
 		await get_tree().create_timer(0.42).timeout
 		placard_anim.reproducir(&"avalancha")
-	await _avalancha()
+		await get_tree().create_timer(1.0).timeout  # la avalancha ya está dibujada en el placard
+	else:
+		await _avalancha()  # sin arte: rectangulitos de prueba
 	_reposo(placard, &"abierto")
 	await _decir("CHAT: «¿¿ESA ES SU PIEZA DE VERDAD??»")
 	await _decir("CHAT: «igual que la mía jajaja»")
@@ -791,8 +808,9 @@ func _salir_de_la_303() -> void:
 ## Unos segundos: la puerta entreabierta de Gerencia y la Gran Máquina. Sin explicaciones.
 func _vistazo_maquina() -> void:
 	G.block()
-	if ResourceLoader.exists(RUTA_TOMA_MAQUINA):
-		var toma := await Toma.mostrar(self, RUTA_TOMA_MAQUINA)
+	var ruta_maquina := RUTA_TOMA_MAQUINA if ResourceLoader.exists(RUTA_TOMA_MAQUINA) else RUTA_FONDO_MAQUINA
+	if ResourceLoader.exists(ruta_maquina):
+		var toma := await Toma.mostrar(self, ruta_maquina)
 		await get_tree().create_timer(3.5).timeout
 		await toma.cerrar()
 	else:
@@ -1129,8 +1147,8 @@ class PanelMemoria extends CanvasLayer:
 			b.text = NOMBRES[i]
 			b.theme = tema
 			b.focus_mode = Control.FOCUS_NONE
-			b.custom_minimum_size = Vector2(62, 22)
-			b.position = Vector2(20 + i * 72, 54)
+			b.custom_minimum_size = Vector2(74, 22)
+			b.position = Vector2(6 + i * 77, 54)  # anchos para que CONTRASTE no pise a LIKE
 			if tira:
 				for prendido in [false, true]:
 					var a := AtlasTexture.new()
@@ -1152,6 +1170,11 @@ class PanelMemoria extends CanvasLayer:
 		cerrar.theme = tema
 		cerrar.focus_mode = Control.FOCUS_NONE
 		cerrar.position = Vector2(270, 130)
+		for estado in ["normal", "hover", "pressed"]:  # margen para que no se corte la S
+			var caja: StyleBox = tema.get_stylebox(estado, "Button").duplicate()
+			caja.content_margin_left = 4
+			caja.content_margin_right = 4
+			cerrar.add_theme_stylebox_override(estado, caja)
 		cerrar.pressed.connect(func():
 			cancelado = true
 			_tocado.emit(-1))

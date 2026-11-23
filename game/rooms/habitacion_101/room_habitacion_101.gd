@@ -554,6 +554,7 @@ func _cancelar_seleccion() -> void:
 
 
 func _on_room_transition_finished() -> void:
+	C.player.poner_birrete(false)  # en las habitaciones Nuna ya no lleva birrete
 	var testing := false
 	for flag in ["migration-test", "ramon-test", "full-test"]:
 		if "--" + flag not in OS.get_cmdline_user_args():
