@@ -3,11 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://6trgr3m6gomy"
-valid=false
+path="res://.godot/imported/cama_202.aseprite-4463af0fe7830b773e216572a3c7f916.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://arte/objetos/cama_202.aseprite"
+dest_files=["res://.godot/imported/cama_202.aseprite-4463af0fe7830b773e216572a3c7f916.ctex"]
 
 [params]
 

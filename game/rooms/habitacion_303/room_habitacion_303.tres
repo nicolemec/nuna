@@ -1,0 +1,9 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/rooms/habitacion_303/room_habitacion_303_state.gd" id="1"]
+
+[resource]
+resource_name = "Habitacion303"
+script = ExtResource("1")
+script_name = "Habitacion303"
+scene = "res://game/rooms/habitacion_303/room_habitacion_303.tscn"

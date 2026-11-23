@@ -1,7 +1,7 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene format=3 uid="uid://863gx6wu6fan"]
 
-[ext_resource type="Script" path="res://game/rooms/habitacion_101/room_habitacion_101.gd" id="1"]
-[ext_resource type="Texture2D" path="res://arte/backgrounds/habitacion_101.png" id="2"]
+[ext_resource type="Script" uid="uid://7tskksa6rw0x" path="res://game/rooms/habitacion_101/room_habitacion_101.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dteqowlo11d7d" path="res://arte/backgrounds/habitacion_101.png" id="2"]
 [ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/puerta/prop_puerta.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/pantuflas/prop_pantuflas.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/cama/prop_cama.tscn" id="5"]
@@ -14,64 +14,123 @@
 [ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/radio/prop_radio.tscn" id="12"]
 [ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/ovillo/prop_ovillo.tscn" id="13"]
 
-[node name="RoomHabitacion101" type="Node2D"]
+[node name="RoomHabitacion101" type="Node2D" unique_id=352513103]
 script = ExtResource("1")
 script_name = "Habitacion101"
 width = 320
 height = 180
 
-[node name="Background" type="Sprite2D" parent="."]
-centered = false
+[node name="Background" type="Sprite2D" parent="." unique_id=482414392]
 texture = ExtResource("2")
+centered = false
 
-[node name="WalkableAreas" type="Node2D" parent="."]
+[node name="WalkableAreas" type="Node2D" parent="." unique_id=1830828215]
 
-[node name="Props" type="Node2D" parent="."]
+[node name="Props" type="Node2D" parent="." unique_id=853019090]
 
-[node name="Puerta" parent="Props" instance=ExtResource("3")]
+[node name="Puerta" parent="Props" unique_id=1361008955 instance=ExtResource("3")]
 position = Vector2(16, 152)
+textura = null
+frase_perturbar = ""
+es_prueba = false
+puede_agarrar = false
+color = Color(0.7, 0.7, 0.7, 1)
+distancia_uso = -16.0
 
-[node name="Pantuflas" parent="Props" instance=ExtResource("4")]
+[node name="Pantuflas" parent="Props" unique_id=1897254207 instance=ExtResource("4")]
 position = Vector2(70, 143)
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+color = Color(0.7, 0.7, 0.7, 1)
+distancia_uso = -16.0
 
-[node name="Huesped" parent="Props" instance=ExtResource("5")]
+[node name="Huesped" parent="Props" unique_id=130289073 instance=ExtResource("5")]
 position = Vector2(75, 135)
+frase_perturbar = ""
+es_prueba = false
+puede_agarrar = false
+color = Color(0.7, 0.7, 0.7, 1)
+distancia_uso = -16.0
 
-[node name="Velador" parent="Props" instance=ExtResource("6")]
+[node name="Velador" parent="Props" unique_id=1803848025 instance=ExtResource("6")]
 position = Vector2(135, 130)
+nombre_desconocido = "mesa de luz"
+nombre = "Mesa de luz"
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+color = Color(0.7, 0.7, 0.7, 1)
+distancia_uso = -16.0
 
-[node name="Lumi" parent="Props" instance=ExtResource("7")]
+[node name="Lumi" parent="Props" unique_id=254826395 instance=ExtResource("7")]
 position = Vector2(140, 100)
+frase_mirar = "¡Hola!"
+frase_perturbar = ""
+puede_perturbar = true
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+distancia_uso = -16.0
 
-[node name="Comoda" parent="Props" instance=ExtResource("8")]
+[node name="Comoda" parent="Props" unique_id=1593410324 instance=ExtResource("8")]
 position = Vector2(295, 145)
+frase_perturbar = ""
+es_prueba = false
+puede_agarrar = false
+color = Color(0.7, 0.7, 0.7, 1)
+distancia_uso = -16.0
 
-[node name="Dentadura" parent="Props" instance=ExtResource("9")]
+[node name="Dentadura" parent="Props" unique_id=107335040 instance=ExtResource("9")]
 position = Vector2(135, 110)
+frase_perturbar = ""
+color = Color(0.7, 0.7, 0.7, 1)
+distancia_uso = -16.0
 
-[node name="Vaso" parent="Props" instance=ExtResource("10")]
+[node name="Vaso" parent="Props" unique_id=954909369 instance=ExtResource("10")]
 position = Vector2(130, 101)
+frase_perturbar = ""
+es_prueba = false
+puede_agarrar = false
+color = Color(0.7, 0.7, 0.7, 1)
+distancia_uso = -16.0
 
-[node name="Cortina" parent="Props" instance=ExtResource("11")]
+[node name="Cortina" parent="Props" unique_id=1826249158 instance=ExtResource("11")]
 position = Vector2(219, 98)
+puede_perturbar = true
+puede_agarrar = false
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+distancia_uso = -16.0
 
-[node name="Ramon" parent="Props" instance=ExtResource("12")]
+[node name="Ramon" parent="Props" unique_id=132687917 instance=ExtResource("12")]
 position = Vector2(300, 122)
+frase_perturbar = ""
+puede_perturbar = true
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
+tamano = Vector2(12, 16)
+color = Color(0.7, 0.7, 0.7, 1)
+distancia_uso = -16.0
 
-[node name="Ovillo" parent="Props" instance=ExtResource("13")]
+[node name="Ovillo" parent="Props" unique_id=704343579 instance=ExtResource("13")]
 position = Vector2(200, 147)
+es_prueba = false
+puede_perturbar = true
+color = Color(0.7, 0.7, 0.7, 1)
+distancia_uso = -16.0
 
-[node name="Hotspots" type="Node2D" parent="."]
+[node name="Hotspots" type="Node2D" parent="." unique_id=426245050]
 
-[node name="Regions" type="Node2D" parent="."]
+[node name="Regions" type="Node2D" parent="." unique_id=2023348274]
 
-[node name="Markers" type="Node2D" parent="."]
+[node name="Markers" type="Node2D" parent="." unique_id=1196417991]
 
-[node name="EntradaNuna" type="Marker2D" parent="Markers"]
+[node name="EntradaNuna" type="Marker2D" parent="Markers" unique_id=1270364594]
 position = Vector2(16, 81)
 
-[node name="InicioNuna" type="Marker2D" parent="Markers"]
+[node name="InicioNuna" type="Marker2D" parent="Markers" unique_id=2013274080]
 position = Vector2(36, 140)
 
-[node name="Characters" type="Node2D" parent="."]
-
+[node name="Characters" type="Node2D" parent="." unique_id=537159811]

@@ -1,165 +1,191 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene format=3 uid="uid://dnsecxt28o05l"]
 
-[ext_resource type="Script" path="res://game/rooms/recepcion/room_recepcion.gd" id="1"]
-[ext_resource type="Texture2D" path="res://arte/backgrounds/recepcion_hotel_bg.png" id="2"]
-[ext_resource type="PackedScene" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="3"]
-[ext_resource type="Script" path="res://game/objects/zona_intro.gd" id="4"]
-[ext_resource type="Script" path="res://game/objects/lampara_recepcion.gd" id="5"]
-[ext_resource type="Script" path="res://game/objects/viejo_recepcion.gd" id="6"]
-[ext_resource type="Texture2D" path="res://arte/objetos/llavero_sin_llave.png" id="7"]
-[ext_resource type="Texture2D" path="res://arte/objetos/llave_101.png" id="8"]
+[ext_resource type="Script" uid="uid://bknh5381nhpk1" path="res://game/rooms/recepcion/room_recepcion.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bgyebkyxost7i" path="res://arte/backgrounds/recepcion_hotel_bg.png" id="2"]
+[ext_resource type="PackedScene" uid="uid://do1k681xt48cm" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="3"]
+[ext_resource type="Script" uid="uid://dlrvxap865e2b" path="res://game/objects/zona_intro.gd" id="4"]
+[ext_resource type="Script" uid="uid://8oas0s2li4i6" path="res://game/objects/lampara_recepcion.gd" id="5"]
+[ext_resource type="Script" uid="uid://o4nafr8k7pd5" path="res://game/objects/viejo_recepcion.gd" id="6"]
+[ext_resource type="Texture2D" uid="uid://dhm8dgmiaaoah" path="res://arte/objetos/llavero_sin_llave.png" id="7"]
+[ext_resource type="Texture2D" uid="uid://d0boe7nnokiyw" path="res://arte/objetos/llave_101.png" id="8"]
 
-[node name="RoomRecepcion" type="Node2D"]
+[node name="RoomRecepcion" type="Node2D" unique_id=1322526596]
 script = ExtResource("1")
 script_name = "Recepcion"
 width = 885
 height = 180
 
-[node name="Background" type="Sprite2D" parent="."]
+[node name="Background" type="Sprite2D" parent="." unique_id=530450752]
 texture = ExtResource("2")
 centered = false
 
-[node name="LlaveroSinLlave" type="Sprite2D" parent="."]
+[node name="LlaveroSinLlave" type="Sprite2D" parent="." unique_id=1107388324]
 visible = false
 position = Vector2(215, 39)
 texture = ExtResource("7")
 centered = false
 
-[node name="Llave101" type="Sprite2D" parent="."]
+[node name="Llave101" type="Sprite2D" parent="." unique_id=1266278805]
 visible = false
 position = Vector2(215, 39)
 texture = ExtResource("8")
 centered = false
 
-[node name="Viejo" type="Node2D" parent="."]
+[node name="Viejo" type="Node2D" parent="." unique_id=79839458]
 position = Vector2(823, 146)
 script = ExtResource("6")
 
-[node name="SonidoTimbre" type="AudioStreamPlayer" parent="."]
+[node name="SonidoTimbre" type="AudioStreamPlayer" parent="." unique_id=1794045273]
 
-[node name="WalkableAreas" type="Node2D" parent="."]
+[node name="WalkableAreas" type="Node2D" parent="." unique_id=783894232]
 
-[node name="Props" type="Node2D" parent="."]
+[node name="Props" type="Node2D" parent="." unique_id=1022849161]
 
-[node name="Timbre" parent="Props" instance=ExtResource("3")]
+[node name="Timbre" parent="Props" unique_id=48503610 instance=ExtResource("3")]
 position = Vector2(194, 91)
 script = ExtResource("4")
-script_name = "Timbre"
-description = "timbre"
+accion_directa = true
 id = &"timbre"
+textura = null
 nombre_desconocido = "timbre"
 nombre = "Timbre"
+frase_mirar = "¡Hola!"
+frase_perturbar = ""
+es_prueba = false
 puede_perturbar = false
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
 tamano = Vector2(20, 13)
+color = Color(0.7, 0.7, 0.7, 1)
 distancia_uso = -16.0
+script_name = "Timbre"
+description = "timbre"
 
-[node name="Sprite2D" parent="Props/Timbre" index="0"]
-visible = false
-
-[node name="Lampara" parent="Props" instance=ExtResource("3")]
+[node name="Lampara" parent="Props" unique_id=2094924600 instance=ExtResource("3")]
 position = Vector2(340, 92)
 script = ExtResource("5")
-script_name = "Lampara"
-description = "lámpara"
+accion_directa = true
 id = &"lampara"
+textura = null
 nombre_desconocido = "lámpara"
 nombre = "Doña Luz"
 frase_mirar = "¡Hola, Doña Luz!"
+frase_perturbar = ""
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
 tamano = Vector2(26, 38)
+color = Color(0.7, 0.7, 0.7, 1)
 distancia_uso = -18.0
+script_name = "Lampara"
+description = "lámpara"
 
-[node name="Sprite2D" parent="Props/Lampara" index="0"]
-visible = false
-
-[node name="Mostrador" parent="Props" instance=ExtResource("3")]
+[node name="Mostrador" parent="Props" unique_id=1029449881 instance=ExtResource("3")]
 position = Vector2(240, 92)
 script = ExtResource("4")
-script_name = "Mostrador"
-description = "mostrador"
+accion_directa = true
 id = &"mostrador"
+textura = null
 nombre_desconocido = "mostrador"
 nombre = "Mostrador"
 frase_mirar = "El mostrador."
+frase_perturbar = ""
+es_prueba = false
 puede_perturbar = false
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
 tamano = Vector2(24, 12)
+color = Color(0.7, 0.7, 0.7, 1)
 distancia_uso = -16.0
+script_name = "Mostrador"
+description = "mostrador"
 
-[node name="Sprite2D" parent="Props/Mostrador" index="0"]
-visible = false
-
-[node name="Tubo" parent="Props" instance=ExtResource("3")]
+[node name="Tubo" parent="Props" unique_id=245870790 instance=ExtResource("3")]
 position = Vector2(372, 96)
 script = ExtResource("4")
-script_name = "Tubo"
-description = "tubo"
+accion_directa = true
 id = &"tubo"
+textura = null
 nombre_desconocido = "tubo"
 nombre = "Tubo"
 frase_mirar = "Un tubo que va para arriba."
+frase_perturbar = ""
+es_prueba = false
 puede_perturbar = false
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
 tamano = Vector2(14, 96)
+color = Color(0.7, 0.7, 0.7, 1)
 distancia_uso = -16.0
+script_name = "Tubo"
+description = "tubo"
 
-[node name="Sprite2D" parent="Props/Tubo" index="0"]
-visible = false
-
-[node name="Llavero" parent="Props" instance=ExtResource("3")]
+[node name="Llavero" parent="Props" unique_id=1509315052 instance=ExtResource("3")]
 position = Vector2(219, 55)
 script = ExtResource("4")
-script_name = "Llavero"
-description = "llavero"
+accion_directa = true
 id = &"llavero"
+textura = null
 nombre_desconocido = "llavero"
 nombre = "Llavero"
 frase_mirar = "El llavero."
+frase_perturbar = ""
+es_prueba = false
 puede_perturbar = false
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
 tamano = Vector2(8, 16)
+color = Color(0.7, 0.7, 0.7, 1)
 distancia_uso = -12.0
+script_name = "Llavero"
+description = "llavero"
 
-[node name="Sprite2D" parent="Props/Llavero" index="0"]
-visible = false
-
-[node name="Cartel202" parent="Props" instance=ExtResource("3")]
+[node name="Cartel202" parent="Props" unique_id=208524979 instance=ExtResource("3")]
 position = Vector2(871, 96)
 script = ExtResource("4")
-script_name = "Cartel202"
-description = "cartel"
+accion_directa = true
 id = &"cartel_202"
+textura = null
 nombre_desconocido = "cartel"
 nombre = "Cartel 202"
 frase_mirar = "La 202 es para arriba."
+frase_perturbar = ""
+es_prueba = false
 puede_perturbar = false
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
 tamano = Vector2(26, 14)
+color = Color(0.7, 0.7, 0.7, 1)
 distancia_uso = -16.0
+script_name = "Cartel202"
+description = "cartel"
 
-[node name="Sprite2D" parent="Props/Cartel202" index="0"]
-visible = false
+[node name="Hotspots" type="Node2D" parent="." unique_id=1921942134]
 
-[node name="Hotspots" type="Node2D" parent="."]
+[node name="Regions" type="Node2D" parent="." unique_id=2052978856]
 
-[node name="Regions" type="Node2D" parent="."]
+[node name="Markers" type="Node2D" parent="." unique_id=1525042947]
 
-[node name="Markers" type="Node2D" parent="."]
-
-[node name="Entrada" type="Marker2D" parent="Markers"]
+[node name="Entrada" type="Marker2D" parent="Markers" unique_id=983262647]
 position = Vector2(64, 146)
 
-[node name="Mostrador" type="Marker2D" parent="Markers"]
+[node name="Mostrador" type="Marker2D" parent="Markers" unique_id=1865890449]
 position = Vector2(112, 146)
 
-[node name="PuertaViejo" type="Marker2D" parent="Markers"]
+[node name="PuertaViejo" type="Marker2D" parent="Markers" unique_id=574682766]
 position = Vector2(823, 146)
 
-[node name="ViejoMostrador" type="Marker2D" parent="Markers"]
+[node name="ViejoMostrador" type="Marker2D" parent="Markers" unique_id=751920240]
 position = Vector2(300, 146)
 
-[node name="Libro" type="Marker2D" parent="Markers"]
+[node name="Libro" type="Marker2D" parent="Markers" unique_id=1094768409]
 position = Vector2(258, 146)
 
-[node name="Puerta101" type="Marker2D" parent="Markers"]
+[node name="Puerta101" type="Marker2D" parent="Markers" unique_id=240750397]
 position = Vector2(477, 146)
 
-[node name="Escalera" type="Marker2D" parent="Markers"]
+[node name="Escalera" type="Marker2D" parent="Markers" unique_id=802849558]
 position = Vector2(866, 146)
 
-[node name="Characters" type="Node2D" parent="."]
+[node name="Characters" type="Node2D" parent="." unique_id=261092668]

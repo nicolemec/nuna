@@ -1,0 +1,36 @@
+{ "frames": {
+   "mesa_noche_303 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 42, "h": 47 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 42, "h": 47 },
+    "sourceSize": { "w": 42, "h": 47 },
+    "duration": 100
+   },
+   "mesa_noche_303 1.aseprite": {
+    "frame": { "x": 42, "y": 0, "w": 42, "h": 47 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 42, "h": 47 },
+    "sourceSize": { "w": 42, "h": 47 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.7-x64",
+  "image": "mesa_noche_303.png",
+  "format": "RGBA8888",
+  "size": { "w": 84, "h": 47 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "abierto", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
+   { "name": "cerrado", "from": 1, "to": 1, "direction": "forward", "color": "#000000ff" }
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

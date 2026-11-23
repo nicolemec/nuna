@@ -13,6 +13,7 @@ var agua := 0
 var azucar := 0
 var _valores := {}
 var _jarra: Label
+var _resultado: Label
 
 
 func _armar() -> void:
@@ -20,6 +21,7 @@ func _armar() -> void:
 	caja.add_child(_label("3 de café por cada 1 de agua.", COLOR_NARANJA))
 	caja.add_child(_label("La jarra lleva 12 medidas justas.", COLOR_NARANJA))
 	caja.add_child(_label("Azúcar: 1 por cada noche sin dormir.", COLOR_NARANJA))
+	caja.add_child(_label("Lo que la receta no dice, está en la habitación.", COLOR_PISTA))
 	caja.add_child(_espacio(2))
 	for nombre in ["café", "agua", "azúcar"]:
 		var fila := HBoxContainer.new()
@@ -44,6 +46,9 @@ func _armar() -> void:
 	fila_boton.add_child(_jarra)
 	fila_boton.add_child(_boton("Preparar", func(): preparado.emit(cafe, agua, azucar), 70))
 	caja.add_child(fila_boton)
+	_resultado = _label("", COLOR_ROJO)
+	_resultado.visible = false
+	caja.add_child(_resultado)
 	caja.add_child(_label("clic afuera para cerrar", COLOR_PISTA))
 	_refrescar()
 
@@ -53,7 +58,22 @@ func _cambiar(nombre: String, delta: int) -> void:
 		"café": cafe = clampi(cafe + delta, 0, 15)
 		"agua": agua = clampi(agua + delta, 0, 15)
 		"azúcar": azucar = clampi(azucar + delta, 0, 15)
+	if _resultado.visible:
+		_resultado.visible = false  # al tocar algo, se borra el error anterior
+		reacomodar()
 	_refrescar()
+
+
+## Muestra en el panel qué salió mal (en rojo) y lo sacude cuadro a cuadro.
+func mostrar_error(texto: String) -> void:
+	_resultado.text = "NO: " + texto
+	_resultado.visible = true
+	reacomodar()
+	var base := _panel.position
+	var tw := create_tween()
+	for dx in [3, -3, 2, -2, 0]:
+		tw.tween_callback(func(): _panel.position = base + Vector2(dx, 0))
+		tw.tween_interval(0.05)
 
 
 func _refrescar() -> void:
@@ -61,3 +81,4 @@ func _refrescar() -> void:
 	_valores["agua"].text = str(agua)
 	_valores["azúcar"].text = str(azucar)
 	_jarra.text = "Jarra: %d / %d medidas" % [cafe + agua, MAXIMO]
+	_jarra.add_theme_color_override("font_color", COLOR_ROJO if cafe + agua > MAXIMO else COLOR_PISTA)

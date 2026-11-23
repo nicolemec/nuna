@@ -1,0 +1,102 @@
+{ "frames": {
+   "arodeluz 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 40, "h": 100 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 40, "h": 100 },
+    "sourceSize": { "w": 40, "h": 100 },
+    "duration": 1
+   },
+   "arodeluz 1.aseprite": {
+    "frame": { "x": 40, "y": 0, "w": 40, "h": 100 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 40, "h": 100 },
+    "sourceSize": { "w": 40, "h": 100 },
+    "duration": 250
+   },
+   "arodeluz 2.aseprite": {
+    "frame": { "x": 80, "y": 0, "w": 40, "h": 100 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 40, "h": 100 },
+    "sourceSize": { "w": 40, "h": 100 },
+    "duration": 350
+   },
+   "arodeluz 3.aseprite": {
+    "frame": { "x": 120, "y": 0, "w": 40, "h": 100 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 40, "h": 100 },
+    "sourceSize": { "w": 40, "h": 100 },
+    "duration": 250
+   },
+   "arodeluz 4.aseprite": {
+    "frame": { "x": 160, "y": 0, "w": 40, "h": 100 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 40, "h": 100 },
+    "sourceSize": { "w": 40, "h": 100 },
+    "duration": 250
+   },
+   "arodeluz 5.aseprite": {
+    "frame": { "x": 200, "y": 0, "w": 40, "h": 100 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 40, "h": 100 },
+    "sourceSize": { "w": 40, "h": 100 },
+    "duration": 350
+   },
+   "arodeluz 6.aseprite": {
+    "frame": { "x": 240, "y": 0, "w": 40, "h": 100 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 40, "h": 100 },
+    "sourceSize": { "w": 40, "h": 100 },
+    "duration": 250
+   },
+   "arodeluz 7.aseprite": {
+    "frame": { "x": 280, "y": 0, "w": 40, "h": 100 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 40, "h": 100 },
+    "sourceSize": { "w": 40, "h": 100 },
+    "duration": 250
+   },
+   "arodeluz 8.aseprite": {
+    "frame": { "x": 320, "y": 0, "w": 40, "h": 100 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 40, "h": 100 },
+    "sourceSize": { "w": 40, "h": 100 },
+    "duration": 250
+   },
+   "arodeluz 9.aseprite": {
+    "frame": { "x": 360, "y": 0, "w": 40, "h": 100 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 40, "h": 100 },
+    "sourceSize": { "w": 40, "h": 100 },
+    "duration": 350
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.7-x64",
+  "image": "arodeluz.png",
+  "format": "RGBA8888",
+  "size": { "w": 400, "h": 100 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "apagado", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
+   { "name": "fria", "from": 1, "to": 3, "direction": "forward", "color": "#000000ff" },
+   { "name": "calida", "from": 4, "to": 6, "direction": "forward", "color": "#000000ff" },
+   { "name": "poseida", "from": 7, "to": 9, "direction": "forward", "color": "#000000ff" }
+  ],
+  "layers": [
+   { "name": "Layer 2", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

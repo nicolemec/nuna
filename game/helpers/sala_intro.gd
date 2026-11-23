@@ -387,4 +387,6 @@ func _saltar(toda: bool) -> void:
 	# Cierra la línea que se esté mostrando; lo que seguía de la charla queda esperando en _nunca.
 	if is_instance_valid(G.gui) and G.gui.has_method("completar_dialogo"):
 		G.gui.completar_dialogo(true)
+		E.playing_queue = false
+		G.unblock()
 	_ir_a(destino)

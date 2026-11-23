@@ -3,11 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://t8gcfh2lvx2a"
-valid=false
+path="res://.godot/imported/telefono_202.aseprite-dafddf26ea3946b222bc3d3a6d517c03.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://arte/objetos/telefono_202.aseprite"
+dest_files=["res://.godot/imported/telefono_202.aseprite-dafddf26ea3946b222bc3d3a6d517c03.ctex"]
 
 [params]
 

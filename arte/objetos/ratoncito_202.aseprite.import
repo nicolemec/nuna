@@ -3,11 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ddw4hym3wmiib"
-valid=false
+path="res://.godot/imported/ratoncito_202.aseprite-586950f91a9a2649121f4deade6a5b70.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://arte/objetos/ratoncito_202.aseprite"
+dest_files=["res://.godot/imported/ratoncito_202.aseprite-586950f91a9a2649121f4deade6a5b70.ctex"]
 
 [params]
 

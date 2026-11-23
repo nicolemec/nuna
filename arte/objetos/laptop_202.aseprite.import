@@ -3,11 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://8aju03j7bfrs"
-valid=false
+path="res://.godot/imported/laptop_202.aseprite-b2e2da76a1b866c2e7c29a48fa84bd3c.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://arte/objetos/laptop_202.aseprite"
+dest_files=["res://.godot/imported/laptop_202.aseprite-b2e2da76a1b866c2e7c29a48fa84bd3c.ctex"]
 
 [params]
 

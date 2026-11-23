@@ -23,6 +23,8 @@ const DURACIONES_MS: Dictionary = {
 }
 const ANIMACIONES_SIN_LOOP: Array[String] = ["tiembla", "salto"]
 
+## Después del salto Ofelia queda sentada en la cama, despierta (último cuadro de "salto").
+var despierta := false
 var _anim_sprite: AnimatedSprite2D
 var _temporizador_ronca: Timer
 ## El grito cuando la señora salta de la cama (audio/sfx/scream.mp3).
@@ -95,12 +97,17 @@ func _draw() -> void:
 
 
 func respirar() -> void:
+	if despierta:
+		_mostrar_despierta()
+		return
 	if _temporizador_ronca != null:
 		_temporizador_ronca.stop()
 	_reproducir_animacion(ANIM_RESPIRA)
 
 
 func temblar() -> void:
+	if despierta:
+		return
 	if _esta_reproduciendo(ANIM_SALTO) or _esta_reproduciendo(ANIM_TIEMBLA):
 		return
 	if _temporizador_ronca != null:
@@ -109,7 +116,7 @@ func temblar() -> void:
 
 
 func roncar(segundos: float = 2.0) -> void:
-	if _esta_reproduciendo(ANIM_SALTO):
+	if despierta or _esta_reproduciendo(ANIM_SALTO):
 		return
 	if not is_finite(segundos) or segundos < 0.0:
 		push_warning("La duración de roncar debe ser un número finito no negativo.")
@@ -122,7 +129,7 @@ func roncar(segundos: float = 2.0) -> void:
 
 
 func asustarse() -> void:
-	if _esta_reproduciendo(ANIM_SALTO):
+	if despierta or _esta_reproduciendo(ANIM_SALTO):
 		return
 	if _temporizador_ronca != null:
 		_temporizador_ronca.stop()
@@ -157,8 +164,32 @@ func _esta_reproduciendo(animacion: StringName) -> bool:
 
 
 func _al_terminar_animacion() -> void:
-	if _anim_sprite.animation == ANIM_TIEMBLA or _anim_sprite.animation == ANIM_SALTO:
+	if _anim_sprite.animation == ANIM_SALTO:
+		# No se vuelve a dormir: queda en el último cuadro, sentada y con los ojos abiertos.
+		quedar_despierta()
+	elif _anim_sprite.animation == ANIM_TIEMBLA:
 		respirar()
+
+
+## Deja a Ofelia despierta (también al volver a la habitación o al cargar la partida).
+func quedar_despierta() -> void:
+	despierta = true
+	if _temporizador_ronca != null:
+		_temporizador_ronca.stop()
+	if _esta_reproduciendo(ANIM_SALTO):
+		return  # al terminar el salto vuelve a entrar acá y se queda quieta
+	_mostrar_despierta()
+
+
+func _mostrar_despierta() -> void:
+	if _anim_sprite == null or _anim_sprite.sprite_frames == null:
+		return
+	if not _anim_sprite.sprite_frames.has_animation(ANIM_SALTO):
+		return
+	_cambiar_visibilidad_anim_sprite(true)
+	_anim_sprite.stop()
+	_anim_sprite.animation = ANIM_SALTO
+	_anim_sprite.frame = _anim_sprite.sprite_frames.get_frame_count(ANIM_SALTO) - 1
 
 
 func _al_terminar_ronquido() -> void:

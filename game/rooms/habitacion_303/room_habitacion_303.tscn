@@ -1,0 +1,416 @@
+[gd_scene format=3 uid="uid://epn5s1koslmh"]
+
+[ext_resource type="Script" uid="uid://y3jstnxpvkg0" path="res://game/rooms/habitacion_303/room_habitacion_303.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://do1k681xt48cm" path="res://addons/popochiu/engine/objects/prop/popochiu_prop.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/puerta/prop_puerta.tscn" id="2_ocfx2"]
+[ext_resource type="Script" uid="uid://bamvig2w2j6yq" path="res://game/objects/objeto_interactivo.gd" id="3"]
+[ext_resource type="Script" uid="uid://ccvwked72lk0n" path="res://game/rooms/habitacion_303/objeto_303.gd" id="4"]
+
+[node name="RoomHabitacion303" type="Node2D" unique_id=1731236494]
+script = ExtResource("1")
+script_name = "Habitacion303"
+width = 320
+height = 180
+
+[node name="Background" type="Sprite2D" parent="." unique_id=100814119]
+centered = false
+
+[node name="Cuadros" type="Sprite2D" parent="." unique_id=1417535246]
+position = Vector2(168, 18)
+centered = false
+
+[node name="WalkableAreas" type="Node2D" parent="." unique_id=1419658198]
+
+[node name="Props" type="Node2D" parent="." unique_id=653174771]
+
+[node name="Puerta" parent="Props" unique_id=2146758339 instance=ExtResource("2_ocfx2")]
+position = Vector2(16, 152)
+textura = null
+frase_perturbar = ""
+es_prueba = false
+puede_agarrar = false
+color = Color(0.7, 0.7, 0.7, 1)
+distancia_uso = -16.0
+
+[node name="Placard" parent="Props" unique_id=1618198393 instance=ExtResource("2")]
+position = Vector2(64, 162)
+script = ExtResource("4")
+zona_clic = Rect2(24, 9, 58, 106)
+ruta_tira = "res://arte/objetos/placard_303.png"
+frame_ancho = 117
+frame_alto = 144
+etiquetas = {
+"abierto": [13, 13],
+"abre": [5, 9],
+"avalancha": [10, 12],
+"cerrado": [0, 0],
+"tembla": [1, 4]
+}
+duraciones_ms = {
+"abierto": [100],
+"abre": [90, 70, 70, 70, 120],
+"avalancha": [100, 100, 220],
+"cerrado": [100],
+"tembla": [70, 70, 70, 70]
+}
+anim_reposo = &"cerrado"
+anim_perturbar = &"tembla"
+vueltas_perturbar = 1
+id = &"placard_303"
+textura = null
+nombre_desconocido = "algo"
+nombre = "Objeto"
+frase_mirar = "¡Hola!"
+frase_perturbar = ""
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
+tamano = Vector2(117, 144)
+color = Color(1, 1, 1, 0)
+distancia_uso = 31.0
+script_name = "Placard"
+description = "placard"
+walk_to_point = Vector2(31, 10)
+
+[node name="Aro" parent="Props" unique_id=194249381 instance=ExtResource("2")]
+position = Vector2(142, 144)
+script = ExtResource("4")
+zona_clic = Rect2(9, 3, 23, 97)
+ruta_tira = "res://arte/objetos/arodeluz.png"
+frame_ancho = 40
+frame_alto = 100
+etiquetas = {
+"apagado": [0, 0],
+"calida": [4, 6],
+"fria": [1, 3],
+"poseida": [7, 9]
+}
+duraciones_ms = {
+"apagado": [1],
+"calida": [250, 350, 250],
+"fria": [250, 350, 250],
+"poseida": [250, 250, 350]
+}
+anim_reposo = &"fria"
+anim_perturbar = &""
+vueltas_perturbar = 2
+id = &"aro_303"
+textura = null
+nombre_desconocido = "algo"
+nombre = "Objeto"
+frase_mirar = "¡Hola!"
+frase_perturbar = ""
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
+tamano = Vector2(40, 100)
+color = Color(1, 1, 1, 0)
+distancia_uso = -17.0
+script_name = "Aro"
+description = "aro"
+walk_to_point = Vector2(-17, 10)
+
+[node name="Tripode" parent="Props" unique_id=486825637 instance=ExtResource("2")]
+position = Vector2(142, 66)
+script = ExtResource("3")
+id = &"tripode_303"
+textura = null
+nombre_desconocido = "algo"
+nombre = "Objeto"
+frase_mirar = "¡Hola!"
+frase_perturbar = ""
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
+tamano = Vector2(8, 13)
+color = Color(1, 1, 1, 0)
+distancia_uso = -17.0
+script_name = "Tripode"
+description = "tripode"
+walk_to_point = Vector2(-17, 10)
+
+[node name="Cama" parent="Props" unique_id=887255972 instance=ExtResource("2")]
+position = Vector2(214, 148)
+script = ExtResource("4")
+zona_clic = Rect2(2, 4, 77, 75)
+ruta_tira = "res://arte/objetos/cama_303.png"
+frame_ancho = 80
+frame_alto = 80
+etiquetas = {
+"arrugada": [4, 4],
+"sacude": [1, 3],
+"tendida": [0, 0]
+}
+duraciones_ms = {
+"arrugada": [100],
+"sacude": [80, 80, 80],
+"tendida": [100]
+}
+anim_reposo = &"tendida"
+anim_perturbar = &"sacude"
+vueltas_perturbar = 2
+id = &"cama_303"
+textura = null
+nombre_desconocido = "algo"
+nombre = "Objeto"
+frase_mirar = "¡Hola!"
+frase_perturbar = ""
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
+tamano = Vector2(80, 80)
+color = Color(1, 1, 1, 0)
+distancia_uso = -49.0
+script_name = "Cama"
+description = "cama"
+walk_to_point = Vector2(-49, 10)
+
+[node name="Tocador" parent="Props" unique_id=1029583296 instance=ExtResource("2")]
+position = Vector2(283, 133)
+script = ExtResource("4")
+zona_clic = Rect2(3, 6, 36, 38)
+ruta_tira = "res://arte/objetos/mesa_noche_303.png"
+frame_ancho = 42
+frame_alto = 47
+etiquetas = {
+"abierto": [0, 0],
+"cerrado": [1, 1]
+}
+duraciones_ms = {
+"abierto": [100],
+"cerrado": [100]
+}
+anim_reposo = &"cerrado"
+anim_perturbar = &""
+vueltas_perturbar = 2
+id = &"tocador_303"
+textura = null
+nombre_desconocido = "algo"
+nombre = "Objeto"
+frase_mirar = "¡Hola!"
+frase_perturbar = ""
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
+tamano = Vector2(42, 47)
+color = Color(1, 1, 1, 0)
+distancia_uso = -21.0
+script_name = "Tocador"
+description = "tocador"
+walk_to_point = Vector2(-21, 10)
+
+[node name="Maquillaje" parent="Props" unique_id=909087268 instance=ExtResource("2")]
+position = Vector2(274, 96)
+script = ExtResource("4")
+zona_clic = Rect2(1, 2, 13, 9)
+ruta_tira = "res://arte/objetos/maquillaje_303.png"
+frame_ancho = 18
+frame_alto = 11
+etiquetas = {
+"cae_pincel": [3, 4],
+"quieto": [0, 0],
+"tiembla": [1, 2]
+}
+duraciones_ms = {
+"cae_pincel": [90, 140],
+"quieto": [100],
+"tiembla": [70, 70]
+}
+anim_reposo = &"quieto"
+anim_perturbar = &"cae_pincel"
+vueltas_perturbar = 1
+id = &"maquillaje_303"
+textura = null
+nombre_desconocido = "algo"
+nombre = "Objeto"
+frase_mirar = "¡Hola!"
+frase_perturbar = ""
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
+tamano = Vector2(18, 11)
+color = Color(1, 1, 1, 0)
+distancia_uso = -12.0
+script_name = "Maquillaje"
+description = "maquillaje"
+walk_to_point = Vector2(-12, 10)
+
+[node name="Delineador" parent="Props" unique_id=666720713 instance=ExtResource("2")]
+position = Vector2(285, 97)
+script = ExtResource("4")
+zona_clic = Rect2(0, 0, 10, 3)
+ruta_tira = "res://arte/objetos/delineador_303.png"
+frame_ancho = 13
+frame_alto = 3
+etiquetas = {
+"quieto": [0, 0],
+"rueda": [1, 3]
+}
+duraciones_ms = {
+"quieto": [100],
+"rueda": [90, 110, 140]
+}
+anim_reposo = &"quieto"
+anim_perturbar = &"rueda"
+vueltas_perturbar = 1
+id = &"delineador_303"
+textura = null
+nombre_desconocido = "algo"
+nombre = "Objeto"
+frase_mirar = "¡Hola!"
+frase_perturbar = ""
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = true
+frase_agarrar = "¡Te llevo!"
+tamano = Vector2(13, 3)
+color = Color(1, 1, 1, 0)
+distancia_uso = -23.0
+script_name = "Delineador"
+description = "delineador"
+walk_to_point = Vector2(-23, 10)
+
+[node name="Flacozem" parent="Props" unique_id=20645131 instance=ExtResource("2")]
+position = Vector2(295, 96)
+script = ExtResource("4")
+zona_clic = Rect2(1, 0, 7, 10)
+ruta_tira = "res://arte/objetos/flacozem_303.png"
+frame_ancho = 9
+frame_alto = 10
+etiquetas = {
+"quieto": [0, 0],
+"tiembla": [1, 2]
+}
+duraciones_ms = {
+"quieto": [100],
+"tiembla": [60, 60]
+}
+anim_reposo = &"quieto"
+anim_perturbar = &"tiembla"
+vueltas_perturbar = 2
+id = &"flacozem_303"
+textura = null
+nombre_desconocido = "algo"
+nombre = "Objeto"
+frase_mirar = "¡Hola!"
+frase_perturbar = ""
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = true
+frase_agarrar = "¡Te llevo!"
+tamano = Vector2(9, 10)
+color = Color(1, 1, 1, 0)
+distancia_uso = -33.0
+script_name = "Flacozem"
+description = "flacozem"
+walk_to_point = Vector2(-33, 10)
+
+[node name="Espejo" parent="Props" unique_id=720827607 instance=ExtResource("2")]
+position = Vector2(308, 143)
+script = ExtResource("4")
+zona_clic = Rect2(5, 4, 18, 91)
+ruta_tira = "res://arte/objetos/espejo_303.png"
+frame_ancho = 24
+frame_alto = 98
+etiquetas = {
+"apagado": [0, 0],
+"calibrando": [3, 4],
+"encendido": [1, 2],
+"error": [5, 7],
+"nuna_aparece": [8, 11]
+}
+duraciones_ms = {
+"apagado": [100],
+"calibrando": [200, 200],
+"encendido": [500, 500],
+"error": [60, 60, 60],
+"nuna_aparece": [120, 120, 120, 120]
+}
+anim_reposo = &"apagado"
+anim_perturbar = &""
+vueltas_perturbar = 2
+id = &"espejo_303"
+textura = null
+nombre_desconocido = "algo"
+nombre = "Objeto"
+frase_mirar = "¡Hola!"
+frase_perturbar = ""
+es_prueba = false
+puede_perturbar = true
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
+tamano = Vector2(24, 98)
+color = Color(1, 1, 1, 0)
+distancia_uso = -18.0
+script_name = "Espejo"
+description = "espejo"
+walk_to_point = Vector2(-18, 10)
+
+[node name="Vale" parent="Props" unique_id=1180727920 instance=ExtResource("2")]
+position = Vector2(214, 117)
+script = ExtResource("4")
+zona_clic = Rect2(10, 14, 30, 48)
+ruta_tira = "res://arte/objetos/vale_303.png"
+frame_ancho = 50
+frame_alto = 62
+etiquetas = {
+"despierta": [12, 12],
+"despierta_lee": [13, 13],
+"dormida": [10, 11],
+"espejo": [4, 5],
+"espejo_senala": [7, 7],
+"espejo_susto": [6, 6],
+"llora_rie": [8, 9],
+"vivo": [0, 2],
+"vivo_cansada": [3, 3]
+}
+duraciones_ms = {
+"despierta": [500],
+"despierta_lee": [500],
+"dormida": [900, 900],
+"espejo": [600, 600],
+"espejo_senala": [400],
+"espejo_susto": [400],
+"llora_rie": [350, 350],
+"vivo": [300, 300, 300],
+"vivo_cansada": [600]
+}
+anim_reposo = &"vivo"
+anim_perturbar = &""
+vueltas_perturbar = 2
+id = &"vale"
+textura = null
+nombre_desconocido = "algo"
+nombre = "Objeto"
+frase_mirar = "¡Hola!"
+frase_perturbar = ""
+es_prueba = false
+puede_perturbar = false
+puede_agarrar = false
+frase_agarrar = "¡Te llevo!"
+tamano = Vector2(50, 62)
+color = Color(1, 1, 1, 0)
+distancia_uso = 20.0
+script_name = "Vale"
+description = "vale"
+walk_to_point = Vector2(20, 10)
+
+[node name="Hotspots" type="Node2D" parent="." unique_id=1605486942]
+
+[node name="Regions" type="Node2D" parent="." unique_id=1107633975]
+
+[node name="Markers" type="Node2D" parent="." unique_id=1911307090]
+
+[node name="EntradaNuna" type="Marker2D" parent="Markers" unique_id=1764524263]
+position = Vector2(18, 112)
+
+[node name="InicioNuna" type="Marker2D" parent="Markers" unique_id=1467745722]
+position = Vector2(44, 140)
+
+[node name="Characters" type="Node2D" parent="." unique_id=226051632]

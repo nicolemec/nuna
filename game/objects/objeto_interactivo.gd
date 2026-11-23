@@ -27,6 +27,22 @@ const FRASE_PERTURBAR_GENERICA: String = "¡Buu!"
 var nombrado: bool = false
 var recogido := false
 var _tiempo: float = 0.0
+## Destello "hacé clic acá": cada objeto sin mirar brilla de vez en cuando, a destiempo
+## de los demás, cuadro a cuadro (sin interpolar, para no romper el pixel art).
+const BRILLO_CUADROS: Array[float] = [1.15, 1.35, 1.15]
+const DESTELLO_CUADROS: Array[int] = [1, 2, 1]   # 1 = punto, 2 = cruz de 3x3
+const SEGUNDOS_POR_CUADRO := 0.1
+const ESPERA_DESTELLO_MIN := 3.0
+const ESPERA_DESTELLO_MAX := 9.0
+var _espera_destello := 0.0
+var _cuadro_destello := -1
+var _punto_destello := Vector2.ZERO
+var _destello: Node2D
+## Los destellos (y el latido de la intro) solo aparecen al entrar a una sala, hasta el primer
+## clic sobre un objeto, y después solo si el jugador pasa un rato largo sin tocar ningún objeto.
+const SEGUNDOS_SIN_CLIC_PARA_AYUDA := 20.0
+static var _sala_del_ultimo_clic := 0
+static var _ultimo_clic_ms := 0
 # El anclaje es visual, no progreso: Vector2 queda fuera del snapshot de Props.
 var _posicion_base := Vector2.ZERO
 var _sacudida: Tween
@@ -37,6 +53,7 @@ func _ready() -> void:
 	$Sprite2D.hide()
 	add_to_group("interactivos")
 	_posicion_base = position
+	_espera_destello = randf_range(0.5, ESPERA_DESTELLO_MAX)  # cada uno arranca a destiempo
 	if textura != null:
 		tamano = textura.get_size()
 	var rect := _rect_local()
@@ -45,20 +62,99 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_tiempo += delta
-	_aplicar_latido()
+	_avanzar_destello(delta)
+	if _ayuda_permitida():
+		_aplicar_latido()
+	else:
+		_quitar_latido()
 	queue_redraw()
 
 
-## Latido: el objeto se ilumina suave mientras Nuna no lo miró (sin borde).
+## ¿Toca mostrar la ayuda visual? Sí al entrar a la sala (antes del primer clic en un objeto)
+## y cuando pasó mucho tiempo desde el último clic en un objeto.
+func _ayuda_permitida() -> bool:
+	if not is_instance_valid(R.current):
+		return false
+	if R.current.get_instance_id() != _sala_del_ultimo_clic:
+		return true
+	return Time.get_ticks_msec() - _ultimo_clic_ms > SEGUNDOS_SIN_CLIC_PARA_AYUDA * 1000.0
+
+
+func _quitar_latido() -> void:
+	self_modulate = Color.WHITE
+	for hijo in get_children():
+		if hijo is AnimatedSprite2D:
+			hijo.self_modulate = Color.WHITE
+
+
+## Anota cada clic que cae sobre un objeto (no lo consume: la sala lo sigue resolviendo igual).
+func _input(event: InputEvent) -> void:
+	if not event is InputEventMouseButton or not event.pressed or event.button_index != MOUSE_BUTTON_LEFT:
+		return
+	if not visible or not clickable or not is_instance_valid(R.current):
+		return
+	var punto: Vector2 = R.current.get_global_transform_with_canvas().affine_inverse() * event.position
+	if contiene(punto):
+		_sala_del_ultimo_clic = R.current.get_instance_id()
+		_ultimo_clic_ms = Time.get_ticks_msec()
+
+
+## Latido: mientras Nuna no miró el objeto, cada tanto (al azar) brilla un instante
+## y le aparece una chispita en una esquina. Va por cuadros, no suave.
 func _aplicar_latido() -> void:
 	var luz: float = 1.0
-	if not nombrado:
-		luz = 1.0 + 0.25 * (0.5 + 0.5 * sin(_tiempo * 3.0))
+	if _cuadro_destello >= 0:
+		luz = BRILLO_CUADROS[_cuadro_destello]
 	var tinte := Color(luz, luz, luz, 1.0)
 	self_modulate = tinte
 	for hijo in get_children():
 		if hijo is AnimatedSprite2D:
 			hijo.self_modulate = tinte
+
+
+func _avanzar_destello(delta: float) -> void:
+	if nombrado or not visible or not clickable or not _ayuda_permitida():
+		if _cuadro_destello >= 0:
+			_cuadro_destello = -1
+			_redibujar_destello()
+		return
+	_espera_destello -= delta
+	if _espera_destello > 0.0:
+		return
+	var anterior := _cuadro_destello
+	if _cuadro_destello < 0:
+		# Empieza un destello en un lugar al azar del borde de arriba.
+		var rect := _rect_local()
+		_punto_destello = Vector2(roundf(randf_range(rect.position.x + 1, rect.end.x - 2)), rect.position.y + 1)
+	_cuadro_destello += 1
+	if _cuadro_destello >= BRILLO_CUADROS.size():
+		_cuadro_destello = -1
+		_espera_destello = randf_range(ESPERA_DESTELLO_MIN, ESPERA_DESTELLO_MAX)
+	else:
+		_espera_destello = SEGUNDOS_POR_CUADRO
+	if anterior != _cuadro_destello:
+		_redibujar_destello()
+
+
+func _redibujar_destello() -> void:
+	if _destello == null:
+		_destello = Node2D.new()
+		_destello.name = "Destello"
+		_destello.z_index = 1  # por encima del dibujo del objeto
+		_destello.draw.connect(_dibujar_destello)
+		add_child(_destello)
+	_destello.queue_redraw()
+
+
+func _dibujar_destello() -> void:
+	if _cuadro_destello < 0:
+		return
+	var p := _punto_destello
+	var blanco := Color(1, 1, 1, 0.9)
+	_destello.draw_rect(Rect2(p, Vector2.ONE), blanco)
+	if DESTELLO_CUADROS[_cuadro_destello] == 2:
+		for d in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
+			_destello.draw_rect(Rect2(p + d, Vector2.ONE), Color(1, 1, 1, 0.55))
 
 
 ## El rectángulo del objeto, alineado a pixeles enteros.
@@ -150,11 +246,14 @@ func restaurar_posicion() -> void:
 ## Placeholder de "perturbar": el objeto tiembla.
 func _sacudir() -> void:
 	restaurar_posicion()
+	# Cuadro a cuadro: salta de pixel en pixel, sin deslizarse.
 	_sacudida = create_tween()
 	for i in 3:
-		_sacudida.tween_property(self, "position:x", _posicion_base.x + 2.0, 0.04)
-		_sacudida.tween_property(self, "position:x", _posicion_base.x - 2.0, 0.04)
-	_sacudida.tween_property(self, "position:x", _posicion_base.x, 0.04)
+		_sacudida.tween_callback(func(): position.x = _posicion_base.x + 2.0)
+		_sacudida.tween_interval(0.05)
+		_sacudida.tween_callback(func(): position.x = _posicion_base.x - 2.0)
+		_sacudida.tween_interval(0.05)
+	_sacudida.tween_callback(func(): position = _posicion_base)
 
 func _on_input_event(viewport: Node, event: InputEvent, shape_idx: int) -> void:
 	if G.is_blocked or E.hovered != self:
@@ -167,6 +266,15 @@ func _on_input_event(viewport: Node, event: InputEvent, shape_idx: int) -> void:
 			E.remove_hovered(objetivo)
 			E.add_hovered(objetivo)
 			await objetivo._on_input_event(viewport, event, shape_idx)
+			return
+		# Con un objeto del inventario en la mano, el clic lo usa acá (sin depender de la fila
+		# de Popochiu, que a veces quedaba trabada y el objeto no se usaba).
+		if event.button_index == MOUSE_BUTTON_LEFT and I.active != null:
+			var item: PopochiuInventoryItem = I.active
+			get_viewport().set_input_as_handled()
+			I.set_active_item(null)
+			if R.current.has_method("usar_objeto"):
+				await R.current.usar_objeto(item, self)
 			return
 	await super(viewport, event, shape_idx)
 

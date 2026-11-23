@@ -25,6 +25,7 @@ var _hablante: Label
 var _texto: Label
 var _chica: Label
 var _indicador: Label
+var _panel: PanelContainer
 var _listo_desde := 0
 
 
@@ -49,7 +50,12 @@ func _ready() -> void:
 	panel.custom_minimum_size = Vector2(272, 0)
 	panel.gui_input.connect(_al_clic)
 	add_child(panel)
-	panel.resized.connect(func(): panel.position.y = floorf((152.0 - panel.size.y) / 2.0))
+	# Siempre centrado (a lo ancho y a lo alto), aunque una línea sea más larga que otra.
+	panel.resized.connect(func():
+		panel.position.x = floorf((320.0 - panel.size.x) / 2.0)
+		panel.position.y = floorf((152.0 - panel.size.y) / 2.0)
+	)
+	_panel = panel
 
 	var caja := VBoxContainer.new()
 	caja.add_theme_constant_override("separation", -2)
@@ -63,6 +69,11 @@ func _ready() -> void:
 	_texto.add_theme_constant_override("line_spacing", -4)
 	caja.add_child(_texto)
 	_chica = _label(COLOR_AZUL)
+	# La letra chica también corta en renglones: si no, una línea larga estiraba la caja
+	# y la caja quedaba corrida a la derecha para el resto del diálogo.
+	_chica.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_chica.custom_minimum_size = Vector2(260, 0)
+	_chica.add_theme_constant_override("line_spacing", -4)
 	caja.add_child(_chica)
 	_indicador = _label(COLOR_GRIS)
 	_indicador.text = "clic para seguir >"
@@ -110,6 +121,9 @@ func _siguiente() -> void:
 	_texto.text = String(linea[1])
 	_chica.text = String(linea[2]) if linea.size() > 2 else ""
 	_chica.visible = not _chica.text.is_empty()
+	# La caja vuelve a su tamaño justo para esta línea (no se queda con el de la anterior).
+	if is_instance_valid(_panel):
+		_panel.reset_size()
 	_listo_desde = Time.get_ticks_msec() + int(ESPERA_MINIMA * 1000.0)
 
 

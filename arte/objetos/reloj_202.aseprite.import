@@ -3,11 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dgn7bjrl4rqq0"
-valid=false
+path="res://.godot/imported/reloj_202.aseprite-2313c4ee2fbed244d254840a4d566898.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://arte/objetos/reloj_202.aseprite"
+dest_files=["res://.godot/imported/reloj_202.aseprite-2313c4ee2fbed244d254840a4d566898.ctex"]
 
 [params]
 

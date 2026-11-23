@@ -1,0 +1,137 @@
+{ "frames": {
+   "placard_303 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 100
+   },
+   "placard_303 1.aseprite": {
+    "frame": { "x": 117, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 70
+   },
+   "placard_303 2.aseprite": {
+    "frame": { "x": 234, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 70
+   },
+   "placard_303 3.aseprite": {
+    "frame": { "x": 351, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 70
+   },
+   "placard_303 4.aseprite": {
+    "frame": { "x": 468, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 70
+   },
+   "placard_303 5.aseprite": {
+    "frame": { "x": 585, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 90
+   },
+   "placard_303 6.aseprite": {
+    "frame": { "x": 702, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 70
+   },
+   "placard_303 7.aseprite": {
+    "frame": { "x": 819, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 70
+   },
+   "placard_303 8.aseprite": {
+    "frame": { "x": 936, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 70
+   },
+   "placard_303 9.aseprite": {
+    "frame": { "x": 1053, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 120
+   },
+   "placard_303 10.aseprite": {
+    "frame": { "x": 1170, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 100
+   },
+   "placard_303 11.aseprite": {
+    "frame": { "x": 1287, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 100
+   },
+   "placard_303 12.aseprite": {
+    "frame": { "x": 1404, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 220
+   },
+   "placard_303 13.aseprite": {
+    "frame": { "x": 1521, "y": 0, "w": 117, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 117, "h": 144 },
+    "sourceSize": { "w": 117, "h": 144 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.7-x64",
+  "image": "placard_303.png",
+  "format": "RGBA8888",
+  "size": { "w": 1638, "h": 144 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "cerrado", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
+   { "name": "tembla", "from": 1, "to": 4, "direction": "forward", "repeat": "2", "color": "#000000ff" },
+   { "name": "abre", "from": 5, "to": 9, "direction": "forward", "repeat": "1", "color": "#000000ff" },
+   { "name": "avalancha", "from": 10, "to": 12, "direction": "forward", "repeat": "1", "color": "#000000ff" },
+   { "name": "abierto", "from": 13, "to": 13, "direction": "forward", "color": "#000000ff" }
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" },
+   { "name": "Layer 2", "opacity": 255, "blendMode": "normal" },
+   { "name": "Avalancha", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

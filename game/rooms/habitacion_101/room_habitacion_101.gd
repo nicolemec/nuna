@@ -14,6 +14,29 @@ const OVI_ALTURA := 14.0
 ## La puerta de la 101 está en el borde izquierdo: Nuna entra y sale del cuadro por ahí.
 const POS_PUERTA := Vector2(16, 140)
 const POS_AFUERA := Vector2(-14, 140)
+## Borde izquierdo del hueco oscuro de la puerta abierta (door.png, cuadro "abierta").
+## Mientras Nuna cruza, lo que queda a la izquierda de esta línea no se dibuja:
+## así parece que sale (o entra) por el hueco de la puerta, y no por delante de la pared.
+const CORTE_PUERTA_X := 9.0
+const SHADER_CORTE := """
+shader_type canvas_item;
+uniform float corte_x = 9.0;
+varying float mundo_x;
+void vertex() {
+	mundo_x = (MODEL_MATRIX * vec4(VERTEX, 0.0, 1.0)).x;
+}
+void fragment() {
+	if (mundo_x < corte_x) {
+		discard;
+	}
+}
+"""
+## La cómoda: lo que dice depende de lo que Nuna ya sabe.
+const COMODA_SIN_PISTAS := "Se llama «cómoda». ¿Quién estará realmente cómodo acá?"
+const COMODA_CON_RECIBO := "¿Cómoda? ¿Quién va a estar cómodo con lo que cobra un jubilado?"
+## Ofelia despierta (después del tercer sello).
+const OFELIA_DESPIERTA := "Está despierta. Mira para todos lados… ¿y eso es una sonrisa?"
+const SENORA_DESPIERTA := "La señora está despierta. Mira para todos lados… ¿y eso es una sonrisa?"
 ## Ramón: la etiqueta trae el código al revés (ORTAUC = CUATRO).
 ## Las estaciones son un día de trabajo (Mérito, Ocupada, Feriado, Hora Extra) y Ofelia las
 ## escuchó 45 años: ya no la despiertan. Solo la Radio Revés llega: pasa su vida para atrás,
@@ -71,6 +94,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_room_entered() -> void:
 	Musica.tocar(&"habitacion")
+	# Si la escena anterior quedó cortada a mitad de una acción (por ejemplo, al saltar la intro),
+	# la fila de acciones de Popochiu puede haber quedado "ocupada" y nada respondía acá.
+	# Al entrar a la 101 no hay ninguna acción en curso: se libera.
+	E.playing_queue = false
+	C.player.modulate.a = 1.0
 	if not state.entrada_completada:
 		# Que no se vea a Nuna adentro antes de que entre por la puerta.
 		C.player.hide()
@@ -109,6 +137,8 @@ func _restaurar_visual() -> void:
 	_mostrar_cajon(state.cajon_abierto)
 	if state.recibo_leido:
 		_presentar_ofelia()
+	if state.mision_completada:
+		_dejar_despierta()
 	G.gui.mostrar_habitacion(true)
 	_actualizar_guia()
 
@@ -136,12 +166,18 @@ func seleccionar_ramon() -> void:
 	seleccionar_objeto($Props/Ramon)
 
 
+var _ovi_desde_inventario := false
+
+
 func usar_objeto(item: PopochiuInventoryItem, objetivo: ObjetoInteractivo) -> void:
 	if ocupado or G.is_blocked:
 		return
 	seleccionar_objeto(objetivo)
 	if item.script_name == "Ovillo" and objetivo == $Props/Cortina and objetivo.nombrado:
+		# Desde el inventario ya eligió a Ovi: no le volvemos a preguntar.
+		_ovi_desde_inventario = true
 		await ejecutar_accion("perturbar")
+		_ovi_desde_inventario = false
 	else:
 		ocupado = true
 		await E.queue([func (): await _decir("Primero conocé la cortina." if not objetivo.nombrado else "No me ayuda con eso.")])
@@ -203,7 +239,11 @@ func _resolver_accion(obj: ObjetoInteractivo, verbo: StringName) -> void:
 			if not Globals.tiene(obj.id):
 				return
 		var primera_mirada: bool = verbo == Globals.MIRAR and not obj.nombrado
-		await _decir(obj.ejecutar(verbo))
+		if obj.id == &"comoda" and verbo == Globals.MIRAR:
+			obj.ejecutar(verbo)
+			await _decir(_frase_comoda(obj))
+		else:
+			await _decir(obj.ejecutar(verbo))
 		if primera_mirada and obj is Ramon:
 			# La etiqueta de Ramón trae la pista del dial en la letra chica.
 			await G.gui.ui.mostrar_certificacion(ETIQUETA_RAMON, LETRA_CHICA_RAMON)
@@ -419,7 +459,9 @@ func _perturbar_ventana(ventana: VentanaAnimada) -> void:
 
 ## Pregunta si usar a Ovi; si dice que sí, Ovi queda en el piso, Nuna se sube y perturba la cortina.
 func _usar_ovi_en_ventana(ventana: VentanaAnimada) -> void:
-	var usar: bool = await PreguntaSiNo.preguntar(self, "¿Usar a Ovi?")
+	var usar: bool = true
+	if not _ovi_desde_inventario:
+		usar = await PreguntaSiNo.preguntar(self, "¿Usar a Ovi?")
 	if not usar:
 		await _decir("Mejor la guardo para después.")
 		return
@@ -468,12 +510,12 @@ func _texto_guia() -> String:
 		return "Llevate la sonrisa del cajón: la vas a necesitar."
 	if Globals.sellos >= Globals.SELLOS_TOTALES:
 		if not Globals.tiene(&"dentadura"):
-			return "¡3 de 3 sellos! Antes de irte, llevate la sonrisa del velador."
+			return "¡3 de 3 sellos! Antes de irte, llevate la sonrisa de la mesa de luz."
 		return "¡Turno cumplido! Mirá la puerta para volver a la recepción."
 	if _dial_abierto:
 		return "Leé el código de Ramón al revés."
 	if Globals.tiene(&"ovillo"):
-		return "Llevá a Ovi a la ventana."
+		return "Llevá a Ovi a la ventana: tocá la cortina (o usá a Ovi desde el inventario)."
 	var lumi: Lumi = $Props/Lumi
 	if lumi.estado in [Lumi.Estado.NIVEL_1, Lumi.Estado.NIVEL_2] and not Globals.sellos_obtenidos.has("lumi"):
 		return "Lumi tiene algo grabado. Perturbala otra vez para leerlo."
@@ -528,7 +570,9 @@ func _on_room_transition_finished() -> void:
 		C.player.show()
 	if not testing and not state.entrada_completada:
 		ocupado = true
-		await E.queue([_reproducir_entrada])
+		G.block()
+		await _reproducir_entrada()
+		G.unblock()
 		ocupado = false
 		_actualizar_guia()
 
@@ -537,17 +581,19 @@ func _reproducir_entrada() -> void:
 	Globals.pausado = true
 	C.player.hide()
 	await $Props/Puerta.abrir()
-	# Entra desde afuera del cuadro, cruzando la puerta.
+	# Entra desde afuera del cuadro, cruzando la puerta (sale del hueco oscuro).
 	C.player.position = POS_AFUERA
+	_mascara_puerta(true)
 	C.player.show()
 	await _cruzar_puerta(POS_PUERTA)
+	_mascara_puerta(false)
 	await C.player.walk($Markers/InicioNuna.global_position)
 	C.player.volver_a_reposo_frontal()
 	await $Props/Puerta.cerrar()
 	# La charla de entrada va en una ventana aparte; después todo sigue en la consola.
 	await DialogoPopup.mostrar(self, [
 		["NUNA", "Los profesionales entran por la puerta, ¿no?"],
-		["ORDEN DE TRABAJO", "Asustá a la huésped y ganá 3 sellos.", "(Horas extra no remuneradas.)"],
+		["DIN", "Orden de trabajo: asustá a la huésped y ganá 3 sellos.", "(Horas extra no remuneradas.)"],
 		["DIN", "¡A asustar, equipo! ♥"],
 		["NUNA", "¡Tres sellos y soy profesional!"],
 	])
@@ -607,7 +653,10 @@ func _presentar_ofelia() -> void:
 	var huesped: ObjetoInteractivo = $Props/Huesped
 	huesped.nombre = "Ofelia"
 	huesped.nombrado = true
-	huesped.frase_mirar = "Ofelia duerme. Cuarenta y cinco años… se merece la siesta."
+	if state.mision_completada:
+		huesped.frase_mirar = OFELIA_DESPIERTA
+	else:
+		huesped.frase_mirar = "Ofelia duerme. Cuarenta y cinco años… se merece la siesta."
 	huesped.description = huesped.nombre_visible()
 
 
@@ -618,7 +667,7 @@ func _salir_de_la_101() -> void:
 			await _decir("¡Ay, me olvido la sonrisa! Sin sonrisa no se sale a trabajar.")
 			_brillar($Props/Dentadura)
 		else:
-			await _decir("Todavía no… Me parece que el velador guarda algo.")
+			await _decir("Todavía no… Me parece que la mesa de luz guarda algo.")
 			_brillar($Props/Velador)
 		return
 	var salir: bool = await PreguntaSiNo.preguntar(self, "¿Volver a la recepción?")
@@ -629,8 +678,10 @@ func _salir_de_la_101() -> void:
 	await $Props/Puerta.abrir()
 	await C.player.walk(POS_PUERTA)
 	# Sigue de largo y sale del cuadro por la puerta (la recepción la vuelve a mostrar).
+	_mascara_puerta(true)
 	await _cruzar_puerta(POS_AFUERA)
 	C.player.hide()
+	_mascara_puerta(false)
 	await $Props/Puerta.cerrar()
 	_saliendo = true
 	_cancelar_seleccion()
@@ -650,12 +701,45 @@ func _cruzar_puerta(destino: Vector2) -> void:
 	C.player.volver_a_reposo_frontal()
 
 
-## El tercer sello: el único susto grande. Ofelia salta de la cama y grita.
+## El tercer sello: el único susto grande. Ofelia salta de la cama, grita y queda despierta.
 func _ofelia_salta() -> void:
 	await get_tree().create_timer(0.3).timeout
 	$Props/Huesped.asustarse()
 	await get_tree().create_timer(1.9).timeout
 	await _decir("¡%s saltó de la cama!" % _mayuscula(_ella()))
+	_dejar_despierta()
+
+
+## Después del susto grande Ofelia no se vuelve a dormir: queda sentada en la cama.
+func _dejar_despierta() -> void:
+	var huesped: Huesped101 = $Props/Huesped
+	huesped.quedar_despierta()
+	huesped.frase_mirar = OFELIA_DESPIERTA if state.recibo_leido else SENORA_DESPIERTA
+
+
+## Hace que Nuna solo se vea a la derecha del hueco de la puerta (true) o entera (false).
+func _mascara_puerta(activa: bool) -> void:
+	var sprite: CanvasItem = C.player.get_node_or_null("AnimatedSprite2D")
+	if sprite == null:
+		return
+	if not activa:
+		sprite.material = null
+		return
+	var shader := Shader.new()
+	shader.code = SHADER_CORTE
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	material.set_shader_parameter("corte_x", CORTE_PUERTA_X)
+	sprite.material = material
+
+
+## La cómoda no sabe de Ramón hasta que Nuna lo conoce.
+func _frase_comoda(comoda: ObjetoInteractivo) -> String:
+	if $Props/Ramon.nombrado:
+		return comoda.frase_mirar  # "Qué cómoda… para Ramón."
+	if state.recibo_leido:
+		return COMODA_CON_RECIBO
+	return COMODA_SIN_PISTAS
 
 
 ## Cómo llama Nuna a la huésped: "la señora" hasta leer el recibo, después "Ofelia".
