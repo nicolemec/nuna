@@ -411,6 +411,6 @@ walk_to_point = Vector2(20, 10)
 position = Vector2(18, 112)
 
 [node name="InicioNuna" type="Marker2D" parent="Markers" unique_id=1467745722]
-position = Vector2(44, 140)
+position = Vector2(44, 146)
 
 [node name="Characters" type="Node2D" parent="." unique_id=226051632]

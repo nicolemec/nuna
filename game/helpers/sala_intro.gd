@@ -293,17 +293,19 @@ func _completar_toda_la_intro() -> void:
 
 ## Letra más chica para "SALTAR »": Silkscreen a 8 (nítida en pixel art, como el HUD),
 ## con margen a los costados para que no se corte la S.
-func _achicar_boton_saltar() -> void:
+func _achicar_boton_saltar(boton: Button = null) -> void:
+	if boton == null:
+		boton = _boton_saltar
 	const FUENTE_CHICA := "res://arte/fuentes/Silkscreen-Regular.ttf"
 	if ResourceLoader.exists(FUENTE_CHICA):
 		var fuente: FontFile = load(FUENTE_CHICA)
 		fuente.antialiasing = TextServer.FONT_ANTIALIASING_NONE
 		fuente.hinting = TextServer.HINTING_NONE
 		fuente.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
-		_boton_saltar.add_theme_font_override("font", fuente)
-		_boton_saltar.add_theme_font_size_override("font_size", 8)
+		boton.add_theme_font_override("font", fuente)
+		boton.add_theme_font_size_override("font_size", 8)
 	for estado in ["normal", "hover", "pressed", "disabled"]:
-		var caja: StyleBox = _boton_saltar.get_theme_stylebox(estado)
+		var caja: StyleBox = boton.get_theme_stylebox(estado)
 		if caja == null:
 			continue
 		caja = caja.duplicate()
@@ -311,7 +313,7 @@ func _achicar_boton_saltar() -> void:
 		caja.content_margin_right = 4
 		caja.content_margin_top = 3
 		caja.content_margin_bottom = 3
-		_boton_saltar.add_theme_stylebox_override(estado, caja)
+		boton.add_theme_stylebox_override(estado, caja)
 
 
 func _crear_boton_saltar() -> void:

@@ -1,0 +1,48 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/rooms/gerencia/room_gerencia.gd" id="1"]
+[ext_resource type="Texture2D" path="res://arte/backgrounds/gerencia.png" id="2"]
+[ext_resource type="PackedScene" path="res://game/rooms/habitacion_101/props/puerta/prop_puerta.tscn" id="3"]
+
+[node name="RoomGerencia" type="Node2D"]
+script = ExtResource("1")
+script_name = "Gerencia"
+width = 320
+height = 180
+
+[node name="Background" type="Sprite2D" parent="."]
+centered = false
+texture = ExtResource("2")
+
+[node name="WalkableAreas" type="Node2D" parent="."]
+
+[node name="Props" type="Node2D" parent="."]
+
+[node name="Puerta" parent="Props" instance=ExtResource("3")]
+position = Vector2(16, 152)
+
+[node name="Hotspots" type="Node2D" parent="."]
+
+[node name="Regions" type="Node2D" parent="."]
+
+[node name="Markers" type="Node2D" parent="."]
+
+[node name="Afuera" type="Marker2D" parent="Markers"]
+position = Vector2(-14, 140)
+
+[node name="EnLaPuerta" type="Marker2D" parent="Markers"]
+position = Vector2(16, 140)
+
+[node name="Inicio" type="Marker2D" parent="Markers"]
+position = Vector2(48, 140)
+
+[node name="Archivos" type="Marker2D" parent="Markers"]
+position = Vector2(74, 140)
+
+[node name="Escritorio" type="Marker2D" parent="Markers"]
+position = Vector2(160, 142)
+
+[node name="PuertaMaquina" type="Marker2D" parent="Markers"]
+position = Vector2(270, 140)
+
+[node name="Characters" type="Node2D" parent="."]

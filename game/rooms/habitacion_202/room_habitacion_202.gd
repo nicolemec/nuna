@@ -85,6 +85,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_room_entered() -> void:
+	# Si se abre la 202 directo (para probar), la recepción no sabe que la historia avanzó:
+	# la dejamos como si Nuna ya hubiera hecho la intro y la 101.
+	var recepcion: Resource = load("res://game/rooms/recepcion/room_recepcion.tres")
+	if recepcion.paso != 3:
+		recepcion.paso = 3
+		recepcion.cinematica_2 = true
 	Musica.tocar(&"habitacion")
 	C.player.position = $Markers/InicioNuna.position
 	$Props/Laptop.se_quemo.connect(func (): state.laptop_quemada = true)
@@ -130,6 +136,7 @@ func _restaurar_visual() -> void:
 
 
 func _on_room_transition_finished() -> void:
+	C.player.poner_birrete(false)  # en las habitaciones Nuna ya no lleva birrete
 	if not state.entrada_completada:
 		state.entrada_completada = true
 		ocupado = true

@@ -35,6 +35,8 @@ const ESCENA_202 := "res://game/rooms/habitacion_202/room_habitacion_202.tscn"
 const SALA_303 := "Habitacion303"
 const ESCENA_303 := "res://game/rooms/habitacion_303/room_habitacion_303.tscn"
 const ESTADO_303 := "res://game/rooms/habitacion_303/room_habitacion_303.tres"
+## El final: después de la cinemática 4 Nuna sube a la Gerencia.
+const SALA_GERENCIA := "Gerencia"
 ## Cinemática 3: si existen estas tomas se muestran; si no, el texto va en la tarjeta de la consola.
 ## En la 202 Nuna aprende a POSEER (beta): el certificado de la cinemática 3 es el de Posesión.
 const TOMA_CERTIFICADO_POSESION := "res://arte/tomas/toma_certificado_posesion.png"
@@ -68,6 +70,7 @@ var _cartel_303: Sprite2D
 var _capa_saltar_escena: CanvasLayer
 var _saltando_escena := false
 var _descuento_hecho := false
+var _en_c4 := false
 
 var state: Data = load("res://game/rooms/recepcion/room_recepcion.tres")
 
@@ -82,7 +85,8 @@ func _on_room_entered() -> void:
 		C.player.position = $Markers/Escalera.position  # baja por la escalera
 	else:
 		C.player.position = $Markers/Entrada.position
-	if _vuelve_de_la_202() or state.cinematica_3:
+	# Después de la 303 la silla del fantasma de la calle queda vacía.
+	if (_vuelve_de_la_202() or state.cinematica_3) and not _vuelve_de_la_303() and not state.cinematica_4:
 		_poner_fantasma(0.15 if state.cinematica_3 else 0.45)
 	C.player.show()  # la 101 la escondió al cruzar la puerta
 	if _vuelve_de_la_101():
@@ -118,6 +122,8 @@ func _on_room_entered() -> void:
 
 
 func _on_room_transition_finished() -> void:
+	# Por las dudas: después de la 101 Nuna nunca vuelve con el birrete de la graduación.
+	C.player.poner_birrete(nuna_con_birrete)
 	if _vuelve_de_la_101():
 		_crear_boton_saltar_escena()
 		await _cinematica_2()
@@ -127,7 +133,8 @@ func _on_room_transition_finished() -> void:
 		await _cinematica_3()
 		return
 	if _vuelve_de_la_303():
-		await _caida_de_la_gerencia()
+		_crear_boton_saltar_escena()
+		await _cinematica_4()
 		return
 	if state.cinematica_2:
 		_actualizar_guia()
@@ -157,7 +164,7 @@ func _texto_guia() -> String:
 			return "Subí a la 202: hacé clic en el cartel."
 	if state.cinematica_3:
 		if _303_terminada():
-			return "Turno 3 cumplido. Cinemática 4 y Gerencia: en obra."
+			return "Presentate en Gerencia: hacé clic en el cartel de la escalera."
 		if ResourceLoader.exists(ESCENA_303):
 			return "Subí a la 303: hacé clic en el cartel de la escalera."
 		return "Fin del turno 2. La 303 todavía está en obra."
@@ -189,7 +196,9 @@ func _resolver_accion(obj: ObjetoInteractivo, verbo: StringName) -> void:
 		&"llavero":
 			await _c2_colgar_llave()
 		&"cartel_202":
-			if state.cinematica_3:
+			if state.cinematica_4:
+				await _subir_a_la_gerencia()
+			elif state.cinematica_3:
 				await _subir_a_la_303()
 			else:
 				await _c2_escalera()
@@ -1112,20 +1121,70 @@ func _subir_a_la_303() -> void:
 	_ir_a(SALA_303)
 
 
+# ---------- Cinemática 4: la silla vacía y el ascenso ----------
 ## Nuna vio la máquina unos segundos y un engranaje la escupió hasta la recepción.
-## Placeholder hasta que exista la cinemática 4 (la arma Lore).
-func _caida_de_la_gerencia() -> void:
+
+func _cinematica_4() -> void:
+	_en_c4 = true
 	var e := _estado_303()
 	if e != null:
 		e.set("cayo_en_recepcion", true)
 	ocupado = true
+	_actualizar_guia()
 	C.player.show()
 	await C.player.mini_salto()
 	await _decir("¡Auch! …Me escupió un engranaje.")
-	await _decir("…¿Qué era esa cosa?")
-	await _decir("(Acá empieza la cinemática 4.)")
-	ocupado = false
-	_actualizar_guia()
+	await _decir("¿Qué era esa cosa? Tenía frascos. Y velas. Y fantasmas empujando.")
+	await _decir("Parecía una fábrica. Una fábrica de… ¿de qué?")
+	# La silla vacía: Nuna le pone nombre al que ya no está, para que no se pierda.
+	await C.player.walk(Vector2(POS_FANTASMA.x - 10, 146))
+	C.player.mirar_a(POS_FANTASMA + Vector2(15, 15))
+	await _decir("Acá trabajaba el fantasma del banco.")
+	await E.wait(0.8)
+	await _decir("…Ya no está. Ni transparente.")
+	await _decir("Nunca me dijo su nombre. Le pongo uno yo, para que no se pierda.")
+	await _decir("Don Banco. Porque lo conocí en un banco.")
+	Globals.anotar("Don Banco. Trabajaba en la recepción. Ya no está. Lo anoto para que no se pierda.")
+	await G.gui.ui.mostrar_certificacion("Don Banco.", "(Anotado en el cuaderno. Para que alguien se acuerde.)")
+	# El viejo llega solo: hoy no hace falta el timbre.
+	await C.player.walk($Markers/Mostrador.position)
+	C.player.volver_a_reposo_frontal()
+	await _llega_el_viejo()
+	await _decir("El viejo está mirando un retrato. Fantasmas jóvenes, con birrete.")
+	await _decir("Uno se le parece un poquito.")
+	await _decir("¡Ya tengo todas las certificaciones!")
+	await _viejo("Felicitaciones. Ahora sos profesional del espanto.")
+	await _decir("¿Y ahora puedo descansar?")
+	await _viejo("Ahora podés empezar a pensar en ascender.")
+	await _decir("¿Ascender? ¿Más arriba que la 303?")
+	await _viejo("Supervisar habitaciones. Evaluar a los nuevos.")
+	await _decir("¿Y asustar?")
+	await _viejo("Eso lo hacen los demás.")
+	await _decir("Pero… ¡si yo quería asustar!")
+	await E.wait(1.2)  # el viejo no contesta
+	await _din("Nuna, tu perfil fue seleccionado para la Evaluación de Desempeño Ectoplasmático. ♥")
+	await _din("Presentate en Gerencia. Esta vez por la escalera, como todos. ♥")
+	await _decir("¡Ya fui! Me escupieron.")
+	await _din("¡Gracias por tu respuesta! ♥")
+	await _viejo("¿Cuántas velas llevás, pibe?")
+	await _decir("Mmm… no sé. Dejé de contarlas.")
+	await _viejo("Yo también.")
+	await _viejo("Hace siglos.")
+	await _viejo("Andá. Y no te quedes mirando la máquina.")
+	await _decir("¿Por qué?")
+	await _viejo("Porque después no se puede dejar de mirar.")
+	await $Viejo.desaparecer()
+	state.cinematica_4 = true
+	_quitar_boton_saltar_escena()
+	await _subir_a_la_gerencia()
+
+
+func _subir_a_la_gerencia() -> void:
+	ocupado = true
+	await C.player.walk($Markers/Escalera.position)
+	C.player.mirar_a(C.player.global_position + Vector2(0, -20))  # de espaldas, hacia arriba
+	await _decir("Arriba de todo. A la Gerencia.")
+	_ir_a(SALA_GERENCIA)
 
 
 # ---------- La 303 se asoma ----------
@@ -1183,6 +1242,7 @@ func _crear_boton_saltar_escena() -> void:
 	boton.theme = tema
 	boton.focus_mode = Control.FOCUS_NONE
 	boton.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_achicar_boton_saltar(boton)  # la misma letra chica que el SALTAR de la intro
 	boton.pressed.connect(_saltar_escena)
 	boton.modulate.a = 0.0
 	_capa_saltar_escena.add_child(boton)
@@ -1208,6 +1268,12 @@ func _saltar_escena() -> void:
 	if is_instance_valid(G.gui) and G.gui.has_method("completar_dialogo"):
 		G.gui.completar_dialogo(true)
 	_poner_alfa_nuna(1.0)
+	if _en_c4:
+		# Cinemática 4: Don Banco queda anotado y Nuna sube a la Gerencia.
+		Globals.anotar("Don Banco. Trabajaba en la recepción. Ya no está. Lo anoto para que no se pierda.")
+		state.cinematica_4 = true
+		_ir_a(SALA_GERENCIA)
+		return
 	if not state.cinematica_2:
 		# Vuelta de la 101: la vela se entregó, se cobró el adelanto, se cambió de llave.
 		Globals.aumentar_vela(Ajustes.LUMI_HABITACION_ID, -100.0)
