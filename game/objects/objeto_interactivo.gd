@@ -27,9 +27,9 @@ const FRASE_PERTURBAR_GENERICA: String = "¡Buu!"
 var nombrado: bool = false
 var recogido := false
 var _tiempo: float = 0.0
-## Destello "hacé clic acá": cada objeto sin mirar brilla de vez en cuando, a destiempo
-## de los demás, cuadro a cuadro (sin interpolar, para no romper el pixel art).
-const BRILLO_CUADROS: Array[float] = [1.15, 1.35, 1.15]
+## Aviso "hacé clic acá": cada objeto sin mirar vibra un poquito de vez en cuando, a destiempo
+## de los demás, cuadro a cuadro. Se corre de a 1 píxel: los colores del pixel art no cambian.
+const VIBRACION_CUADROS: Array[float] = [1.0, -1.0, 1.0]
 const DESTELLO_CUADROS: Array[int] = [1, 2, 1]   # 1 = punto, 2 = cruz de 3x3
 const SEGUNDOS_POR_CUADRO := 0.1
 const ESPERA_DESTELLO_MIN := 3.0
@@ -81,10 +81,7 @@ func _ayuda_permitida() -> bool:
 
 
 func _quitar_latido() -> void:
-	self_modulate = Color.WHITE
-	for hijo in get_children():
-		if hijo is AnimatedSprite2D:
-			hijo.self_modulate = Color.WHITE
+	_poner_vibracion(0.0)
 
 
 ## Anota cada clic que cae sobre un objeto (no lo consume: la sala lo sigue resolviendo igual).
@@ -99,17 +96,26 @@ func _input(event: InputEvent) -> void:
 		_ultimo_clic_ms = Time.get_ticks_msec()
 
 
-## Latido: mientras Nuna no miró el objeto, cada tanto (al azar) brilla un instante
-## y le aparece una chispita en una esquina. Va por cuadros, no suave.
+## Latido: mientras Nuna no miró el objeto, cada tanto (al azar) vibra un instante.
+## Va por cuadros, de a 1 píxel, sin cambiar los colores.
 func _aplicar_latido() -> void:
-	var luz: float = 1.0
+	var x := 0.0
 	if _cuadro_destello >= 0:
-		luz = BRILLO_CUADROS[_cuadro_destello]
-	var tinte := Color(luz, luz, luz, 1.0)
-	self_modulate = tinte
+		x = VIBRACION_CUADROS[_cuadro_destello]
+	_poner_vibracion(x)
+
+
+## Corre el dibujo del objeto (no el objeto: así el clic y el anclaje no cambian).
+var _vibracion_x := 0.0
+
+func _poner_vibracion(x: float) -> void:
+	if x == _vibracion_x:
+		return
+	_vibracion_x = x
 	for hijo in get_children():
-		if hijo is AnimatedSprite2D:
-			hijo.self_modulate = tinte
+		if hijo is AnimatedSprite2D or (hijo is Sprite2D and hijo.name != "Sprite2D"):
+			hijo.offset.x = x
+	queue_redraw()
 
 
 func _avanzar_destello(delta: float) -> void:
@@ -127,7 +133,7 @@ func _avanzar_destello(delta: float) -> void:
 		var rect := _rect_local()
 		_punto_destello = Vector2(roundf(randf_range(rect.position.x + 1, rect.end.x - 2)), rect.position.y + 1)
 	_cuadro_destello += 1
-	if _cuadro_destello >= BRILLO_CUADROS.size():
+	if _cuadro_destello >= VIBRACION_CUADROS.size():
 		_cuadro_destello = -1
 		_espera_destello = randf_range(ESPERA_DESTELLO_MIN, ESPERA_DESTELLO_MAX)
 	else:
@@ -147,6 +153,7 @@ func _redibujar_destello() -> void:
 
 
 func _dibujar_destello() -> void:
+	return  # sin chispita: el aviso ahora es solo la vibración
 	if _cuadro_destello < 0:
 		return
 	var p := _punto_destello
@@ -165,7 +172,7 @@ func _rect_local() -> Rect2:
 func _draw() -> void:
 	var rect: Rect2 = _rect_local()
 	if textura != null:
-		draw_texture(textura, rect.position)
+		draw_texture(textura, rect.position + Vector2(_vibracion_x, 0))
 	else:
 		draw_rect(rect, color)
 
@@ -241,6 +248,15 @@ func restaurar_posicion() -> void:
 	if _sacudida != null and _sacudida.is_valid():
 		_sacudida.kill()
 	position = _posicion_base
+
+
+## Pista "mirá acá" (antes era un brillo): vibra dos veces, de a 1 píxel, sin cambiar colores.
+func vibrar_pista() -> void:
+	for vuelta in 2:
+		for x in [1.0, -1.0, 1.0, -1.0, 0.0]:
+			_poner_vibracion(x)
+			await get_tree().create_timer(0.06).timeout
+		await get_tree().create_timer(0.25).timeout
 
 
 ## Placeholder de "perturbar": el objeto tiembla.

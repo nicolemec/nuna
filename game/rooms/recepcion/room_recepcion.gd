@@ -112,6 +112,8 @@ func _on_room_entered() -> void:
 	_cartel_303 = _crear_cartel_303()
 	if _cartel_303 != null:
 		_cartel_303.visible = state.cinematica_3
+	if state.cinematica_3:
+		_zona_escalera_a_303()
 	# La llave 101 está afuera del llavero entre la intro y la vuelta de la 101.
 	$LlaveroSinLlave.visible = state.paso == Paso.TERMINADO and not state.cinematica_2
 	$Llave101.hide()
@@ -280,7 +282,8 @@ func _firmar_contrato() -> void:
 	await _viejo("Nuna. Aprendiz. Anotado.")
 	await _viejo("Y esta es la cuota de hoy.")
 	await _decir("¿Velas?")
-	await _viejo("Una por habitación: tres habitaciones, tres velas. Se encienden con el miedo de los huéspedes.")
+	await _viejo("Una por habitación: tres habitaciones, tres velas.")
+	await _viejo("Se encienden con el miedo de los huéspedes.")
 	await _decir("¡Qué lindas! ¿Y qué se quema?")
 	await _viejo("Tu tiempo. Cada susto te cuesta un rato de eternidad.")
 	await _decir("¡Pero si tengo toda la eternidad!")
@@ -318,7 +321,8 @@ func _charla_trabajo() -> void:
 	await _viejo("Los mirás, los agarrás, los perturbás... Lo de siempre.")
 	await _decir("¿Y las herramientas? ¿Me dan cadenas? ¿Una sábana?")
 	await _viejo("La empresa no da insumos.")
-	await _viejo("Lo que encuentres en una habitación, guardalo. Capaz te sirve para asustar en otra.")
+	await _viejo("Lo que encuentres en una habitación, guardalo.")
+	await _viejo("Capaz te sirve para asustar en otra.")
 	await _decir("¡Reciclaje fantasma!")
 	await _viejo("Se llama arreglarse con lo que hay.")
 	await _decir("¿Y volar? ¿Atravesar paredes?")
@@ -389,7 +393,8 @@ func _entregar_cuaderno_y_llave() -> void:
 	await _decir("¡Mi primer cuaderno!")
 	await _viejo("Cada susto bien hecho, un sello.")
 	await _viejo("Con sellos subís de nivel.")
-	await _viejo("Primero perturbás. Después te metés adentro de las cosas. Y al final, si llegás, te ven.")
+	await _viejo("Primero perturbás. Después te metés adentro de las cosas.")
+	await _viejo("Y al final, si llegás, te ven.")
 	await _decir("¿Me ven? ¿Los vivos?")
 	await _viejo("Si te dejan.")
 	await toma.esperar_clic(ZONA_TERROR, "Hacé clic en el nivel más alto.")
@@ -570,13 +575,11 @@ func _sacar_vela() -> void:
 	llama.autostart = true
 	llama.timeout.connect(func (): _vela_corta.frame = 1 - _vela_corta.frame)
 	_vela_corta.add_child(llama)
-	# Un destellito al aparecer (cuadro a cuadro).
+	# Un temblorcito al aparecer (cuadro a cuadro, de a 1 píxel: sin cambiar colores).
 	var tw := create_tween()
-	for i in 2:
-		tw.tween_callback(func(): _vela_corta.modulate = Color(2.0, 2.0, 2.0))
-		tw.tween_interval(0.08)
-		tw.tween_callback(func(): _vela_corta.modulate = Color.WHITE)
-		tw.tween_interval(0.08)
+	for x in [1.0, -1.0, 1.0, -1.0, 0.0]:
+		tw.tween_callback(func(): _vela_corta.offset.x = x)
+		tw.tween_interval(0.06)
 
 
 ## La vela corta va de la mano de Nuna al mostrador.
@@ -979,10 +982,12 @@ func _cinematica_3() -> void:
 	_atenuar_fantasma(0.15)
 	await _decir("No contesta. Casi no se lo ve.")
 	await E.wait(0.6)
-	await G.gui.ui.mostrar_certificacion("Llevo dos velas trabajando. Aprendí a poseer y que Bruno trabaja para el jefe de su jefe.", "(A la compu la pueden cambiar. No aprendí: para qué junto bruma.)")
+	await G.gui.ui.mostrar_certificacion("Llevo dos velas trabajando. Aprendí a poseer.", "(Y que Bruno trabaja para el jefe de su jefe.)")
+	await G.gui.ui.mostrar_certificacion("A la compu la pueden cambiar.", "(No aprendí: para qué junto bruma.)")
 	state.cinematica_3 = true
 	_quitar_boton_saltar_escena()
 	ocupado = false
+	_zona_escalera_a_303()
 	if _puede_subir_a_la_303():
 		_habilitar($Props/Cartel202)
 	_actualizar_guia()
@@ -1162,7 +1167,8 @@ func _cinematica_4() -> void:
 	await _viejo("Eso lo hacen los demás.")
 	await _decir("Pero… ¡si yo quería asustar!")
 	await E.wait(1.2)  # el viejo no contesta
-	await _din("Nuna, tu perfil fue seleccionado para la Evaluación de Desempeño Ectoplasmático. ♥")
+	await _din("Nuna, tu perfil fue seleccionado. ♥")
+	await _din("Te toca la Evaluación de Desempeño Ectoplasmático. ♥")
 	await _din("Presentate en Gerencia. Esta vez por la escalera, como todos. ♥")
 	await _decir("¡Ya fui! Me escupieron.")
 	await _din("¡Gracias por tu respuesta! ♥")
@@ -1210,6 +1216,23 @@ func _anunciar_303() -> void:
 	await _viejo("Y no te mires en el espejo.")
 	await _decir("¡Si los fantasmas no nos reflejamos!")
 	await _viejo("Por eso.")
+
+
+## Después de la cinemática 3 la escalera lleva a la 303: la zona clickeable deja el cartel
+## de la 202 y pasa al de la 303 (el que está más arriba), con su nombre y su frase.
+func _zona_escalera_a_303() -> void:
+	var zona: ZonaIntro = $Props/Cartel202
+	if zona.get_meta("en_303", false) or _cartel_303 == null:
+		return
+	zona.set_meta("en_303", true)
+	zona.fijar_anclaje(zona.position + OFFSET_CARTEL_303)
+	zona.recorte = _cartel_303.texture
+	zona.nombre = "Cartel 303"
+	zona.nombre_desconocido = "cartel"
+	zona.frase_mirar = "La 303 es más arriba."
+	zona.description = zona.nombre_visible()
+	var rect := zona._rect_local()
+	zona.interaction_polygon = PackedVector2Array([rect.position, Vector2(rect.end.x, rect.position.y), rect.end, Vector2(rect.position.x, rect.end.y)])
 
 
 func _crear_cartel_303() -> Sprite2D:

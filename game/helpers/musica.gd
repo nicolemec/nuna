@@ -28,6 +28,10 @@ const BUS_RETRO := "Retro"
 const RETRO_INTENSIDAD := 0.25
 const RETRO_AGUDOS_HZ := 7000.0
 
+## La única música del juego. Se guarda acá apenas se crea, aunque todavía no esté en el
+## árbol: así dos pedidos seguidos (en el mismo cuadro) no crean dos reproductores.
+static var _instancia: Musica
+
 var pista_actual: StringName = &""
 var _pendiente: StringName = &""
 var _tween: Tween
@@ -38,10 +42,16 @@ static func tocar(pista: StringName) -> void:
 	if arbol == null or Engine.is_editor_hint():
 		return
 	var musica := arbol.root.get_node_or_null("Musica") as Musica
+	if musica == null and is_instance_valid(_instancia):
+		musica = _instancia
+		if not musica.is_inside_tree():
+			musica._pendiente = pista  # todavía se está agregando: solo cambia la pista
+			return
 	if musica == null:
 		musica = Musica.new()
 		musica.name = "Musica"
 		musica._pendiente = pista
+		_instancia = musica
 		# Diferido: puede llamarse desde el _ready de una escena.
 		arbol.root.add_child.call_deferred(musica)
 		return

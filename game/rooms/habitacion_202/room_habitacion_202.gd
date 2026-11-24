@@ -367,7 +367,8 @@ func _minijuego_cafetera() -> void:
 	await _decir("Tiene una receta pegada. ¡Le preparo el café del deadline!")
 	if not _cafetera_hablo:
 		_cafetera_hablo = true
-		await _decir("DOÑA CAFETERA: Glu-glu… La receta no lo dice todo, corazón. Lo que falta, buscalo en la habitación.")
+		await _decir("DOÑA CAFETERA: Glu-glu… La receta no lo dice todo, corazón.")
+		await _decir("DOÑA CAFETERA: Lo que falta, buscalo en la habitación.")
 	Globals.pausado = true
 	var panel := CafeteraPanel.new()
 	add_child(panel)
@@ -514,13 +515,11 @@ func _salir_de_la_202() -> void:
 
 
 func _brillar(nodo: CanvasItem) -> void:
-	# Cuadro a cuadro (prendido/apagado), sin fundidos.
-	var tw := create_tween()
-	for i in 4:
-		tw.tween_callback(func(): nodo.modulate = Color(1.8, 1.8, 1.8))
-		tw.tween_interval(0.15)
-		tw.tween_callback(func(): nodo.modulate = Color.WHITE)
-		tw.tween_interval(0.15)
+	# Pista "mirá acá": el objeto vibra (antes brillaba; así no cambian los colores del pixel art).
+	if nodo.has_method("vibrar_pista"):
+		nodo.vibrar_pista()
+	elif nodo.has_method("_sacudir"):
+		nodo._sacudir()
 
 
 # ---------- Guía y consola ----------
@@ -553,7 +552,7 @@ func _cajon_escritorio() -> void:
 func _mostrar_contrato() -> Toma:
 	if ResourceLoader.exists(RUTA_CONTRATO) or FileAccess.file_exists(RUTA_CONTRATO):
 		return await Toma.mostrar(self, RUTA_CONTRATO)
-	await G.gui.ui.mostrar_certificacion("CONTRATO DE PASANTÍA · 3 meses · Renovable · Sin aportes · «¡Gran oportunidad de crecimiento!»", "(Renovado 12 veces. Firmado hace 3 años.)")
+	await G.gui.ui.mostrar_certificacion("CONTRATO DE PASANTÍA · 3 meses · Renovable · Sin aportes.", "(«¡Gran oportunidad de crecimiento!» Renovado 12 veces, hace 3 años.)")
 	return null
 
 
@@ -675,9 +674,11 @@ func _desbloquear_poseer() -> void:
 	await _decir("DIN: Optimizamos recursos. ♥")
 	await _decir("¿Y qué dicen los términos y condiciones?")
 	await _decir("DIN: Que sí. ♥")
-	await _decir("DIN: Metete adentro de un objeto. Si se mueve solo, el humano se despierta. Si no se despierta, es un problema de actitud.")
+	await _decir("DIN: Metete adentro de un objeto. Si se mueve solo, el humano se despierta.")
+	await _decir("DIN: Si no se despierta, es un problema de actitud. ♥")
 	state.poseer_desbloqueado = true
-	await _decir("¡Puedo poseer! La compu, la cafetera y el reloj ya lo pusieron nervioso. Ahora, ¡desde adentro!")
+	await _decir("¡Puedo poseer! La compu, la cafetera y el reloj ya lo pusieron nervioso.")
+	await _decir("Ahora, ¡desde adentro!")
 
 
 func _se_puede_poseer(obj: ObjetoInteractivo) -> bool:
@@ -726,7 +727,8 @@ func _poseer(obj: ObjetoInteractivo) -> void:
 		2:
 			$Props/Bruno.temblar()
 			await _decir("BRUNO (dormido): …cinco minutitos más… de trabajar…")
-			await _decir("Ni con un fantasma adentro de sus cosas se despierta. Está más cansado que yo, y yo no duermo desde que me morí.")
+			await _decir("Ni con un fantasma adentro de sus cosas se despierta.")
+			await _decir("Está más cansado que yo, y yo no duermo desde que me morí.")
 	# La tercera la cuenta _mision_cumplida: ahí se despierta.
 	Globals.otorgar_sello(datos.sello)
 
