@@ -111,7 +111,8 @@ func _expediente() -> void:
 	await _decir("¡Archivos! Uno dice «NUNA». ¡Tengo un archivo! ¡Soy importante!")
 	await G.gui.ui.mostrar_certificacion("EXPEDIENTE · NUNA (aprendiz)", "(Habitaciones completadas: 3. Sustos registrados: 9.)")
 	await _decir("¿Nueve sustos? A ver…")
-	await _decir("Ofelia sonrió. Bruno se asustó por haberse dormido, no por mí. Vale lloró y se rió a la vez.")
+	await _decir("Ofelia sonrió. Bruno se asustó por haberse dormido, no por mí.")
+	await _decir("Y Vale lloró y se rió a la vez.")
 	await _decir("El Registro dice que eran sustos. ¿Me equivoqué yo o el Registro?")
 	await G.gui.ui.mostrar_certificacion("Eficiencia: 87%. Tiempo improductivo: 0%.", "(¡Felicitaciones! Nunca descansaste.)")
 	await _decir("¿Cero? ¡Pero si me senté en el banco de la calle!")
@@ -131,7 +132,8 @@ func _la_maquina() -> void:
 	await _din("¡Gracias por tu respuesta! ♥")
 	await C.player.walk($Markers/PuertaMaquina.position)
 	C.player.mirar_a(C.player.global_position + Vector2(20, -20))
-	await _decir("La voz sale de esta puerta. Hay luz violeta… y bruma. Como en el tubo de la recepción.")
+	await _decir("La voz sale de esta puerta. Hay luz violeta… y bruma.")
+	await _decir("Como en el tubo de la recepción.")
 	await _decir("Permiso…")
 	await _abrir_plano_maquina()
 	await E.wait(1.5)
@@ -139,7 +141,6 @@ func _la_maquina() -> void:
 	await _decir("Es la máquina que me escupió. Y los caños… son los tubos de abajo.")
 	await _decir("Entran frascos de bruma. Ese de ahí… ¡es el susto de Ofelia! Tiene canción de cuna.")
 	await _decir("Y salen velas. Velas cortitas. Como la que dejé en el mostrador.")
-	await _mostrar_maquina_de_cerca()
 	await _decir("Hay fantasmas empujando las palancas. ¡Hola! ¿Ustedes también son aprendices?")
 	await E.wait(1.0)
 	await _decir("No me escuchan. Están muy ocupados empujando.")
@@ -220,7 +221,8 @@ func _final_sentarse() -> void:
 	await _din("¿Seguís ahí? ♥")
 	await _decir("Sí. Pero no estoy haciendo nada.")
 	_frenar_maquina(0.2)
-	await _decir("Si no hago nada, no asusto. Si no asusto, no hay bruma. Y sin bruma la máquina no come.")
+	await _decir("Si no hago nada, no asusto. Si no asusto, no hay bruma.")
+	await _decir("Y sin bruma la máquina no come.")
 	await _din("¿Seguís a… ♥")
 	await E.wait(1.2)
 	await _decir("…Se calló.")
@@ -289,9 +291,12 @@ func _la_palanca() -> void:
 	palanca.bajar()
 	_clonc()
 	await E.wait(0.4)
-	# Arriba, la máquina se apaga.
-	await _cambiar_plano(_plano_fondo(RUTA_MAQUINA, 0))
-	_plano.get_child(0).modulate = Color(0.45, 0.4, 0.55)
+	# Arriba, la máquina se apaga: la misma animación, quieta y oscura.
+	await _mostrar_maquina_de_cerca()
+	if is_instance_valid(_maquina):
+		_maquina.stop()
+		_maquina.frame = 0
+		_maquina.modulate = Color(0.45, 0.4, 0.55)
 	await E.wait(1.0)
 	await _decir("…Se apagó.")
 	await _decir("Din no dice nada. Es la primera vez que no dice nada.")
@@ -426,8 +431,9 @@ func _fundir(nodo: CanvasItem, hasta: float) -> void:
 
 # ---------- Planos ----------
 
+## La máquina siempre se ve animada (la animación de 3 cuadros), nunca el fondo quieto.
 func _abrir_plano_maquina() -> void:
-	await _cambiar_plano(_plano_fondo(RUTA_MAQUINA, 0))
+	await _mostrar_maquina_de_cerca()
 
 
 ## Primer plano de la máquina: la animación de 3 cuadros sobre negro.

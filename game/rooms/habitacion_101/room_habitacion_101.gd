@@ -758,10 +758,11 @@ func _mayuscula(texto: String) -> String:
 
 
 func _brillar(nodo: CanvasItem) -> void:
-	var tw := create_tween()
-	for i in 4:
-		tw.tween_property(nodo, "modulate", Color(1.8, 1.8, 1.8), 0.15)
-		tw.tween_property(nodo, "modulate", Color.WHITE, 0.15)
+	# Pista "mirá acá": el objeto vibra (antes brillaba; así no cambian los colores del pixel art).
+	if nodo.has_method("vibrar_pista"):
+		nodo.vibrar_pista()
+	elif nodo.has_method("_sacudir"):
+		nodo._sacudir()
 
 
 func _decir(texto: String) -> void:

@@ -506,7 +506,7 @@ func _crear_consola_inferior() -> void:
 		Ajustes.UI_CONSOLA_EXPANDIDA_TAMANO.x,
 		Ajustes.UI_CONSOLA_BORDE_SUPERIOR_ALTO
 	)
-	borde_superior.color = Color(0.28, 0.28, 0.32)
+	borde_superior.color = COLOR_CONSOLA  # negro, igual que la consola (antes era una línea gris)
 	borde_superior.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_consola.add_child(borde_superior)
 

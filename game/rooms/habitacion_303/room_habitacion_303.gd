@@ -16,9 +16,8 @@ extends PopochiuRoom
 
 const Data := preload("room_habitacion_303_state.gd")
 const RUTA_FONDO := "res://arte/backgrounds/habitacion_303.png"
-## El vistazo usa la toma si existe; si no, el fondo de la máquina (el mismo de la Gerencia).
-const RUTA_TOMA_MAQUINA := "res://arte/tomas/toma_maquina.png"
-const RUTA_FONDO_MAQUINA := "res://arte/backgrounds/maquina.png"
+## El vistazo a la máquina usa su animación (la misma de la Gerencia).
+const RUTA_MAQUINA_ANIM := "res://arte/objetos/maquina_anim.png"
 const RUTA_CUADROS := "res://arte/objetos/cuadros_303.png"
 const FRASES_PROGRESO := ["", "¡Sello uno! Faltan dos.", "¡Dos de tres! ¡Ya casi!", "¡Tres sellos!"]
 const MIEDO_PRIMER_SUSTO := 4.0
@@ -52,10 +51,9 @@ const TEXTOS := {
 }
 
 var state: Data = load("res://game/rooms/habitacion_303/room_habitacion_303.tres")
-## Nuna camina por adelante (la franja de piso más cercana a la cámara), así no queda
-## escondida detrás de la cama ni del placard. Lo usa punto_de_uso() de cada objeto.
-var piso_y := 146.0
-const PISO_DELANTE_MIN := 140.0
+## Para la cama, Nuna se para adelante (la franja de piso más cercana a la cámara), así no
+## queda tapando la cama. Con el resto de los objetos se acerca normal, como en la 101 y la 202.
+const PISO_DELANTE := 146.0
 var ocupado := false
 var objeto_seleccionado: ObjetoInteractivo
 var _saliendo := false
@@ -167,7 +165,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	I.set_active_item(null)
 	if C.player.is_moving:
 		C.player.stop_walking()
-	destino.y = clampf(destino.y, PISO_DELANTE_MIN, Ajustes.PISO_Y_MAX)  # siempre por adelante
 	C.player.walk(destino)
 
 
@@ -366,8 +363,11 @@ func ejecutar_accion(verbo: String) -> void:
 	else:
 		if C.player.is_moving:
 			C.player.stop_walking()
+		var hasta := obj.punto_de_uso()
+		if obj == $Props/Cama:
+			hasta.y = PISO_DELANTE
 		await E.queue([
-			C.player.queue_walk(obj.punto_de_uso()),
+			C.player.queue_walk(hasta),
 			func (): await C.player.interactuar(obj.global_position),
 			func (): await _resolver_accion(obj, StringName(verbo)),
 		])
@@ -805,22 +805,29 @@ func _salir_de_la_303() -> void:
 	R.goto_room("Recepcion")
 
 
-## Unos segundos: la puerta entreabierta de Gerencia y la Gran Máquina. Sin explicaciones.
+## Unos segundos: la Gran Máquina, animada (la misma de la Gerencia). Sin explicaciones.
 func _vistazo_maquina() -> void:
 	G.block()
-	var ruta_maquina := RUTA_TOMA_MAQUINA if ResourceLoader.exists(RUTA_TOMA_MAQUINA) else RUTA_FONDO_MAQUINA
-	if ResourceLoader.exists(ruta_maquina):
-		var toma := await Toma.mostrar(self, ruta_maquina)
-		await get_tree().create_timer(3.5).timeout
-		await toma.cerrar()
-	else:
-		var capa := CanvasLayer.new()
-		capa.layer = 60
-		add_child(capa)
-		var maquina := MaquinaGrayBox.new()
+	var capa := CanvasLayer.new()
+	capa.layer = 60
+	add_child(capa)
+	var fondo := ColorRect.new()
+	fondo.color = Color.BLACK
+	fondo.size = Vector2(320, 180)
+	capa.add_child(fondo)
+	var frames := AsepriteCargador.crear_desde_tira(RUTA_MAQUINA_ANIM, 161, 128, {"anda": [0, 2]}, 6.0)
+	if frames != null:
+		var maquina := AnimatedSprite2D.new()
+		maquina.sprite_frames = frames
+		maquina.centered = false
+		maquina.position = Vector2(80, 12)
+		maquina.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		capa.add_child(maquina)
-		await get_tree().create_timer(4.0).timeout
-		capa.queue_free()
+		maquina.play(&"anda")
+	else:
+		capa.add_child(MaquinaGrayBox.new())
+	await get_tree().create_timer(3.5).timeout
+	capa.queue_free()
 	G.unblock()
 
 
@@ -957,12 +964,11 @@ func _flash() -> void:
 
 
 func _brillar(nodo: CanvasItem) -> void:
-	var tw := create_tween()
-	for i in 4:
-		tw.tween_callback(func(): nodo.modulate = Color(1.8, 1.8, 1.8))
-		tw.tween_interval(0.15)
-		tw.tween_callback(func(): nodo.modulate = Color.WHITE)
-		tw.tween_interval(0.15)
+	# Pista "mirá acá": el objeto vibra (antes brillaba; así no cambian los colores del pixel art).
+	if nodo.has_method("vibrar_pista"):
+		nodo.vibrar_pista()
+	elif nodo.has_method("_sacudir"):
+		nodo._sacudir()
 
 
 func _texto_guia() -> String:
