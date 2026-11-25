@@ -366,6 +366,8 @@ func ejecutar_accion(verbo: String) -> void:
 		var hasta := obj.punto_de_uso()
 		if obj == $Props/Cama:
 			hasta.y = PISO_DELANTE
+		elif obj == $Props/Puerta:
+			hasta.y = 140.0  # junto a la puerta, sobre el piso (no en la línea del fondo)
 		await E.queue([
 			C.player.queue_walk(hasta),
 			func (): await C.player.interactuar(obj.global_position),

@@ -197,8 +197,10 @@ func ejecutar_accion(verbo: String) -> void:
 	ocupado = true
 	if C.player.is_moving:
 		C.player.stop_walking()
+	# La puerta está en el piso de adelante: si Nuna va a la línea de fondo, queda flotando al lado.
+	var hasta: Vector2 = POS_PUERTA if obj == $Props/Puerta else obj.punto_de_uso()
 	await E.queue([
-		C.player.queue_walk(obj.punto_de_uso()),
+		C.player.queue_walk(hasta),
 		func (): await C.player.interactuar(obj.global_position),
 		func (): await _resolver_accion(obj, StringName(verbo)),
 	])

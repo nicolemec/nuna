@@ -336,6 +336,8 @@ func _crear_boton_saltar() -> void:
 	_cartel_saltar.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var lista := VBoxContainer.new()
 	lista.add_theme_constant_override("separation", 2)
+	# Más ancho que el texto más largo: si no, "Seguir mirando" tocaba los bordes del botón.
+	lista.custom_minimum_size = Vector2(100, 0)
 	_cartel_saltar.add_child(lista)
 	var titulo := Label.new()
 	titulo.text = "¿Saltar?"
