@@ -6,8 +6,9 @@ extends PopochiuRoom
 ## Sellos: la compu (minijuego de mails), la cafetera (minijuego de la receta) y el
 ## reloj a las 3 (después de leer el DEADLINE del calendario).
 ## Acto 1: cada puzzle resuelto llena MEDIO sello (Bruno se mueve pero no se despierta).
-## Acto 2: con los tres medios sellos, Din manda POSEER (beta) por el teléfono de Bruno.
-## Poseer cada uno de esos tres objetos completa su sello; la tercera posesión despierta a Bruno.
+## Acto 2: con el primer medio sello, Din manda POSEER (beta) por el teléfono de Bruno.
+## Cada objeto ya asustado se puede poseer, en cualquier orden; eso completa su sello.
+## La tercera posesión despierta a Bruno.
 
 const Data := preload("room_habitacion_202_state.gd")
 const FRASES_PROGRESO := ["", "¡Sello uno! Faltan dos.", "¡Dos de tres! ¡Ya casi!", "¡Tres sellos!"]
@@ -153,7 +154,7 @@ func _on_room_transition_finished() -> void:
 			["DIN", "Orden de trabajo: despertá al huésped y ganá 3 sellos.", "(Horas extra no remuneradas. Otra vez.)"],
 			["DIN", "Paso 1: presentate. MIRÁ cada cosa: un objeto que no te conoce no se asusta. ♥"],
 			["DIN", "Paso 2: PERTURBÁ lo que más le importa al muchacho. Cada susto que no lo despierta vale MEDIO sello.", "(Pistas: la compu, el café y la hora.)"],
-			["DIN", "Paso 3: con tres medios sellos te mando una actualización. Con eso lo despertás. ♥"],
+			["DIN", "Paso 3: lo que asustes, después lo podés POSEER. Con eso lo despertás. ♥"],
 			["DIN", "¿Trajiste algo de la 101? INVENTARIO, elegí el objeto, USAR, y clic donde lo querés usar.", "(Clic derecho lo guarda. La empresa no da insumos.)"],
 			["DIN", "Si el huésped no se despierta, es un problema de actitud. Tuya. ♥"],
 			["NUNA", "¡Tres sellos y a otra cosa!"],
@@ -274,15 +275,6 @@ func _resolver_accion(obj: ObjetoInteractivo, verbo: StringName) -> void:
 
 
 func _perturbar(obj: ObjetoInteractivo) -> void:
-	if _se_puede_poseer(obj) and obj == $Props/Cafetera and _falta_sonrisa():
-		# Doña Cafetera quiere servirle a una taza que sonría (la sonrisa de la 101).
-		_taza_pidio_sonrisa = true
-		$Props/Cafetera._sacudir()
-		await _decir("DOÑA CAFETERA: ¿Y a quién le sirvo? Esa taza tiene cara de lunes.")
-		await _decir("«Sonreír es parte del trabajo», dice la taza… y no sonríe nada.")
-		await _decir("¡Yo tengo una sonrisa! La de la 101. Voy a tocar la taza…")
-		_brillar($Props/Taza)
-		return
 	if _se_puede_poseer(obj):
 		await _poseer(obj)
 		return
@@ -292,7 +284,13 @@ func _perturbar(obj: ObjetoInteractivo) -> void:
 	if obj == $Props/Cafetera and not state.cafe_listo:
 		await _minijuego_cafetera()
 		return
-	if obj == $Props/Reloj and not state.alarma_sonada and $Props/Calendario.nombrado:
+	if obj == $Props/Reloj and not state.alarma_sonada:
+		if not $Props/Calendario.nombrado:
+			# La hora sale del calendario («DEADLINE 3:00»): sin verlo, Nuna no sabe a qué hora ponerlo.
+			$Props/Reloj._sacudir()
+			await _decir("¿A qué hora lo pongo? Algo en la pared debe marcar la hora clave…")
+			_brillar($Props/Calendario)
+			return
 		await _alarma_deadline()
 		return
 	if obj is ObjetoAnimado:
@@ -598,11 +596,7 @@ func _texto_guia() -> String:
 	if state.mision_completada:
 		return "¡Turno cumplido! Mirá la puerta para volver a la recepción."
 	if state.poseer_desbloqueado:
-		if state.poseidos.is_empty() and not _taza_pidio_sonrisa:
-			return "Paso 3: ¡POSEER! Elegí la compu, la cafetera o el reloj y tocá Poseer."
-		if _taza_pidio_sonrisa and _falta_sonrisa():
-			return "A la taza le falta una sonrisa. Tocá la taza (o usá la sonrisa desde el inventario)."
-		return "Poseé la compu, la cafetera y el reloj (%d de 3)." % state.poseidos.size()
+		return "Asustá y poseé la compu, la cafetera y el reloj, en el orden que quieras (%d de 3)." % state.poseidos.size()
 	if state.mails_resueltos > 0 and not state.laptop_quemada:
 		return "La compu todavía aguanta. Seguí contestando sus mails."
 	if $Props/Calendario.nombrado and not state.alarma_sonada:
@@ -657,10 +651,10 @@ func _medio_sello() -> void:
 	var n := _puzzles_resueltos()
 	G.gui.ui.mostrar_medios_sellos(n)
 	await _decir(FRASES_MEDIO[clampi(n, 0, 3)])
-	if n == 1:
-		await _decir("DIN: Medio sello. Lo asustaste, pero no se enteró. ♥")
-	if n >= 3 and not state.poseer_desbloqueado:
+	if not state.poseer_desbloqueado:
 		await _desbloquear_poseer()
+	else:
+		await _decir("¡Y ahora lo puedo poseer!")
 	_actualizar_guia()
 
 
@@ -670,27 +664,33 @@ func _desbloquear_poseer() -> void:
 	await _decir("Le vibra el teléfono al muchacho…")
 	await G.gui.ui.mostrar_certificacion("DIN: Actualización disponible: POSEER (beta).", "(Al continuar aceptás los términos y condiciones.)")
 	$Props/Telefono.mostrar_reposo()
-	await _decir("¿Din me escribe al teléfono de un humano?")
-	await _decir("DIN: Optimizamos recursos. ♥")
-	await _decir("¿Y qué dicen los términos y condiciones?")
-	await _decir("DIN: Que sí. ♥")
-	await _decir("DIN: Metete adentro de un objeto. Si se mueve solo, el humano se despierta.")
-	await _decir("DIN: Si no se despierta, es un problema de actitud. ♥")
+	await _decir("DIN: Metete adentro de un objeto. Si se mueve solo, el humano se despierta. ♥")
 	state.poseer_desbloqueado = true
-	await _decir("¡Puedo poseer! La compu, la cafetera y el reloj ya lo pusieron nervioso.")
-	await _decir("Ahora, ¡desde adentro!")
+	await _decir("¡Puedo poseer lo que ya asusté! ¡Desde adentro!")
 
 
 func _se_puede_poseer(obj: ObjetoInteractivo) -> bool:
 	return state.poseer_desbloqueado and not state.mision_completada \
-			and POSESIONES.has(String(obj.name)) and not state.poseidos.has(String(obj.name))
+			and POSESIONES.has(String(obj.name)) and not state.poseidos.has(String(obj.name)) \
+			and _puzzle_resuelto(String(obj.name))
+
+
+## Cada objeto se puede poseer apenas se resolvió su puzzle (no importa el orden).
+func _puzzle_resuelto(nombre: String) -> bool:
+	match nombre:
+		"Laptop":
+			return state.laptop_quemada
+		"Cafetera":
+			return state.cafe_listo
+		"Reloj":
+			return state.alarma_sonada
+	return false
 
 
 ## Nuna se mete en el objeto: el objeto se pone violeta y se transforma (estilo Terrortown).
 func _poseer(obj: ObjetoInteractivo) -> void:
 	var nombre := String(obj.name)
 	var datos: Dictionary = POSESIONES[nombre]
-	await _decir(FRASES_ENTRAR[clampi(state.poseidos.size(), 0, 2)])
 	await _parpadear_nuna(false)
 	obj.modulate = COLOR_POSESION
 	var efecto: Tween
@@ -703,7 +703,7 @@ func _poseer(obj: ObjetoInteractivo) -> void:
 				$Props/Taza.reproducir(&"castanetea")
 		"Reloj":
 			efecto = _efecto_reloj(obj)
-	await get_tree().create_timer(0.6).timeout
+	await get_tree().create_timer(0.3).timeout
 	await _decir(datos.dice)
 	if efecto != null and efecto.is_valid():
 		efecto.kill()
@@ -723,12 +723,9 @@ func _poseer(obj: ObjetoInteractivo) -> void:
 		1:
 			$Props/Bruno.temblar()
 			await _decir("BRUNO (dormido): …sí, jefe… ya lo mando…")
-			await _decir("¡Contesta dormido! ¿Le pagarán las horas soñadas?")
 		2:
 			$Props/Bruno.temblar()
 			await _decir("BRUNO (dormido): …cinco minutitos más… de trabajar…")
-			await _decir("Ni con un fantasma adentro de sus cosas se despierta.")
-			await _decir("Está más cansado que yo, y yo no duermo desde que me morí.")
 	# La tercera la cuenta _mision_cumplida: ahí se despierta.
 	Globals.otorgar_sello(datos.sello)
 
