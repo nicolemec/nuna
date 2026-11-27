@@ -12,6 +12,7 @@ extends PopochiuRoom
 ##     juego de memoria de 3 rondas que revela «LA CÁMARA SOLO MIRA DONDE LA APUNTÁS».
 ##   Sello 3 (PERTURBAR): Vale vuelve al vivo. Perturbar el trípode gira la cámara hacia la
 ##     mitad real; perturbar el placard: avalancha en vivo.
+##   Los tres sellos se pueden hacer en cualquier orden (Vale vuelve al vivo después de cada uno).
 ##   Cierre: Vale se duerme en vivo; Nuna posee el teléfono y sube una foto honesta.
 
 const Data := preload("room_habitacion_303_state.gd")
@@ -255,6 +256,7 @@ func _on_room_transition_finished() -> void:
 		["DIN", "Orden de trabajo: asustá a la huésped y ganá 3 sellos.", "(Turno en vivo. Sonreí.)"],
 		["DIN", "La huésped está transmitiendo. Lo que no sale en cámara, no pasó. ♥", "(El cuadro con REC es lo que ve la cámara.)"],
 		["DIN", "Primero MIRÁ: presentate con cada cosa. Después usá todo lo que aprendiste: PERTURBAR y POSEER.", "(Y si te portás bien, una actualización nueva.)"],
+		["DIN", "Tres sustos, en el orden que quieras: el aro de luz, el espejo y el placard. ♥"],
 		["DIN", "Si no se asusta, es un problema de engagement. Tuyo. ♥"],
 		["NUNA", "¡Un vivo! Yo también estuve en vivo una vez. Hace mucho."],
 	])
@@ -310,7 +312,7 @@ func usar_extra(id: String, objetivo: ObjetoInteractivo) -> void:
 	if id == "delineador" and nombre == "Espejo":
 		if state.sello_espejo:
 			await _decir("Le escribo abajo de la nota: «Fantasma 10/10». Por fin alguien me califica bien.")
-		elif state.aparicion_desbloqueada and state.vale_estado == "espejo":
+		elif state.aparicion_desbloqueada:
 			await _decir("Podría escribirle algo… pero mejor que me vea a MÍ. ¡APARECER!")
 			_brillar(objetivo)
 		else:
@@ -425,6 +427,8 @@ func _mirar(obj: ObjetoInteractivo) -> void:
 		"Espejo":
 			if state.sello_espejo:
 				await _decir("Ahora dice: «2 rostros detectados». Uno soy yo.")
+			elif not state.aparicion_desbloqueada:
+				await _desbloquear_aparicion()
 
 
 func _agarrar(obj: ObjetoInteractivo) -> void:
@@ -497,7 +501,7 @@ func _nombre_tercer_verbo(obj: ObjetoInteractivo) -> String:
 			if obj.nombrado and not state.sello_aro:
 				return "Poseer"
 		"Espejo":
-			if state.aparicion_desbloqueada and state.vale_estado == "espejo" and not state.sello_espejo:
+			if state.aparicion_desbloqueada and not state.sello_espejo:
 				return "Aparecer"
 		"Tripode":
 			if state.vale_estado == "dormida" and not state.foto_subida:
@@ -557,9 +561,8 @@ func _transformar_aro() -> void:
 			Globals.aumentar_vela(MIEDO_SELLO)
 			Globals.otorgar_sello(&"aro_303")
 			await _decir("¡Cortó el vivo!")
-			_poner_vale("espejo")
-			await _decir("VALE: ¿Salí fea en el susto? Tengo que ver…")
-			await _desbloquear_aparicion()
+			await _decir("VALE: …Respiro. Me acomodo el pelo. ¡Volví, chicos!")
+			_volver_al_vivo()
 
 
 func _desbloquear_aparicion() -> void:
@@ -571,10 +574,22 @@ func _desbloquear_aparicion() -> void:
 	_brillar($Props/Espejo)
 
 
+## Después de cada susto Vale retoma el vivo: así lo que falta se puede hacer en cualquier orden.
+func _volver_al_vivo() -> void:
+	_poner_vale("vivo")
+	_rec_visible = true
+	_actualizar_rec()
+
+
 # ---------- Sello 2: el espejo (Aparecer + memoria) ----------
 
 func _aparecer_en_espejo() -> void:
 	var espejo: ObjetoInteractivo = $Props/Espejo
+	if state.vale_estado != "espejo":
+		await _decir("VALE: Un segundito, chicos… me miro al espejo.")
+		_poner_vale("espejo")
+		_rec_visible = false
+		_actualizar_rec()
 	await _decir("Vale está despierta y mirando el espejo. ¡Ahora!")
 	await _parpadear_nuna(false)
 	if espejo is ObjetoAnimado:
@@ -610,6 +625,7 @@ func _aparecer_en_espejo() -> void:
 		_reposo(espejo, &"encendido")
 		await _parpadear_nuna(true)
 		await _decir("Mejor salgo. Ya vuelvo a calibrarlo.")
+		_volver_al_vivo()
 		return
 	var espejo_anim := espejo as ObjetoAnimado
 	if espejo_anim != null and espejo_anim.reproducir(&"nuna_aparece"):
@@ -626,12 +642,11 @@ func _aparecer_en_espejo() -> void:
 	Globals.otorgar_sello(&"espejo_303")
 	await _decir("«La cámara solo mira donde la apuntás». Me lo anoto.")
 	Globals.anotar("La cámara solo mira donde la apuntás.")
-	_poner_vale("vivo")
+	_volver_al_vivo()
 	_reposo(espejo, &"encendido")
-	_rec_visible = true
-	_actualizar_rec()
 	await _decir("VALE: ¡Perdón, chicos, volví! Problemas técnicos.")
-	_brillar($Props/Tripode)
+	if not state.camara_girada:
+		_brillar($Props/Tripode)
 
 
 # ---------- Sello 3: la avalancha (Perturbar) ----------
@@ -639,11 +654,6 @@ func _aparecer_en_espejo() -> void:
 func _perturbar_tripode() -> void:
 	var tripode: ObjetoInteractivo = $Props/Tripode
 	tripode._sacudir()
-	if not state.sello_espejo:
-		_sumar_miedo_primera_vez(tripode)
-		await _decir("VALE: ¡Ay! Se movió la cámara… ¡Ya está, chicos!")
-		await _decir("Lo acomodó enseguida. Todavía no sé para dónde apuntarlo.")
-		return
 	if state.camara_girada:
 		await _decir("Ya mira para el lado del desorden. Que se quede ahí.")
 		return
@@ -690,6 +700,9 @@ func _perturbar_placard() -> void:
 	state.sello_placard = true
 	Globals.aumentar_vela(MIEDO_SELLO)
 	Globals.otorgar_sello(&"placard_303")
+	if Globals.sellos < Globals.SELLOS_TOTALES:
+		await _decir("VALE: …Bueno. Sigo, chicos. El show sigue.")
+		_volver_al_vivo()
 
 
 ## Ropa con etiqueta, cajas y vasos caen dentro del cuadro (gray box: rectangulitos).
@@ -982,17 +995,16 @@ func _texto_guia() -> String:
 		return "Vale se durmió en vivo. Poseé el teléfono del trípode."
 	if _poseyendo:
 		return "Estás adentro del aro. Tocá TRANSFORMAR (%d de 3)." % state.aro_forma
+	if Globals.sellos == 0 and not $Props/Aro.nombrado and not $Props/Espejo.nombrado:
+		return "Vale está EN VIVO: solo cuenta lo que entra en el cuadro REC. Mirá todo."
+	var faltan: Array[String] = []
 	if not state.sello_aro:
-		if not $Props/Aro.nombrado:
-			return "Vale está EN VIVO: solo cuenta lo que entra en el cuadro REC. Mirá lo que hay adentro."
-		return "Sello 1: ¡POSEÉ el aro de luz! Ilumina todo el vivo."
+		faltan.append("aro: POSEER")
 	if not state.sello_espejo:
-		if not $Props/Espejo.nombrado:
-			return "Vale está frente al espejo. Mirá el espejo."
-		return "Sello 2: APARECÉ en el espejo mientras Vale se mira."
-	if not state.camara_girada:
-		return "Sello 3: la cámara solo mira donde la apuntás. ¿Y el trípode?"
-	return "La cámara mira el desorden. ¡Perturbá el placard! Que salga todo en cámara."
+		faltan.append("espejo: APARECER")
+	if not state.sello_placard:
+		faltan.append("placard: PERTURBAR" if state.camara_girada else "girá el trípode")
+	return "En el orden que quieras: " + " · ".join(faltan)
 
 
 func _actualizar_guia() -> void:
@@ -1004,13 +1016,10 @@ func _actualizar_guia() -> void:
 ## sello en curso está empezado. Aro: ya lo poseíste. Espejo: pasaste una ronda. Placard: la
 ## cámara ya mira el desorden.
 func _actualizar_medio_sello() -> void:
-	var medio := false
-	if not state.sello_aro:
-		medio = _poseyendo or state.aro_forma > 0
-	elif not state.sello_espejo:
-		medio = state.espejo_ronda > 0
-	elif not state.sello_placard:
-		medio = state.camara_girada
+	# Cualquier sello empezado (en cualquier orden) llena medio casillero.
+	var medio: bool = (not state.sello_aro and (_poseyendo or state.aro_forma > 0)) \
+			or (not state.sello_espejo and state.espejo_ronda > 0) \
+			or (not state.sello_placard and state.camara_girada)
 	G.gui.ui.mostrar_medios_sellos(Globals.sellos + 1 if medio else 0)
 
 
